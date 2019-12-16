@@ -1,5 +1,5 @@
 <?php
-require_once _PS_MODULE_DIR_ . 'centry_ps/classes/ConfigurationCentry.php';
+require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/ConfigurationCentry.php';
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -9,10 +9,10 @@ class Centry_PS_esclavo extends Module
 {
     public function __construct()
     {
-        $this->name = 'Centry_PS_esclavo';
-        $this->tab = 'front_office_features';
+        $this->name = 'centry_ps_esclavo';
+        $this->tab = 'market_place';
         $this->version = '1.0.0';
-        $this->author = 'Vanessa Guzman, Yerko Cuzmar';
+        $this->author = 'Centry';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = [
             'min' => '1.6',
@@ -35,6 +35,7 @@ class Centry_PS_esclavo extends Module
     public function install()
     {
         ConfigurationCentry::createSyncAttribute("name");
+        ConfigurationCentry::createAuthAttribute("app_id");
         if (Shop::isFeatureActive()) {
             Shop::setContext(Shop::CONTEXT_ALL);
         }
