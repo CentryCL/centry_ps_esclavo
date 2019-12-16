@@ -1,4 +1,6 @@
 <?php
+require_once _PS_MODULE_DIR_ . 'centry_ps/classes/ConfigurationCentry.php';
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -32,6 +34,7 @@ class Centry_PS_esclavo extends Module
 
     public function install()
     {
+        ConfigurationCentry::createSyncAttribute("name");
         if (Shop::isFeatureActive()) {
             Shop::setContext(Shop::CONTEXT_ALL);
         }
