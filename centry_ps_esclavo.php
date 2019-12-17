@@ -34,7 +34,7 @@ class Centry_PS_esclavo extends Module
 
     public function install(){
         $sync_names=["name","price","price_offer","description","product_sku","stock","variant_sku","size","name","barcode","images","status","warranty","variant_images","characteristics"];
-        $auth_names=["APP_ID","SECRET_ID","REFRESH_TOKEN","REDIRECT_URI","SCOPES"];
+        $auth_names=["APP_ID","SECRET_ID","REDIRECT_URI","SCOPES"];
         foreach($auth_names as $auth){
           ConfigurationCentry::createAuthAttribute($auth);
         }
