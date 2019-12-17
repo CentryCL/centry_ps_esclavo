@@ -71,7 +71,7 @@ class ConfigurationCentry extends ObjectModel {
   }
 
   /**
-   * Función para actualizar un atributo de Centry
+   * Función para actualizar un atributo de Centry, si es un atributo de sincronizacion anteponer "ONUPDATE_" O "ONCREATE_"
    * @var $name: Nombre del atributo.
    */
   public static function setAttributeValue($name,$value) {
