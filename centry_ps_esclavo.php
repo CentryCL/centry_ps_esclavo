@@ -32,10 +32,16 @@ class Centry_PS_esclavo extends Module
         }
     }
 
-    public function install()
-    {
-        ConfigurationCentry::createSyncAttribute("name");
-        ConfigurationCentry::createAuthAttribute("app_id");
+    public function install(){
+        $sync_names=["name","price","price_offer","description","product_sku","stock","variant_sku","size","name","barcode","images","status","warranty","variant_images","characteristics"];
+        $auth_names=["APP_ID","SECRET_ID","REFRESH_TOKEN","REDIRECT_URI","SCOPES"];
+        foreach($auth_names as $auth){
+          ConfigurationCentry::createAuthAttribute($auth);
+        }
+        foreach($sync_names as $sync){
+          ConfigurationCentry::createSyncAttributeUpdate($sync);
+          ConfigurationCentry::createSyncAttributeCreate($sync);
+        }
         if (Shop::isFeatureActive()) {
             Shop::setContext(Shop::CONTEXT_ALL);
         }

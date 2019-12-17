@@ -27,17 +27,38 @@ class ConfigurationCentry extends ObjectModel {
     return $attr[0]["value"];
   }
 
-  public static function createSyncAttribute($name) {
-    if (gettype(self::getAttributeValue($name))=="string"){
+  /**
+   * Función para crear un atributo de sincronizacion con Centry dentro de la tabla de Configuracion de Prestashop
+   * @var $name: Nombre del atributo.
+   */
+
+  public static function createSyncAttributeUpdate($name) {
+    if (gettype(self::getAttributeValue("ONUPDATE_".$name))=="string"){
       return false;
     }
     $db = Db::getInstance();
     $sql = "INSERT INTO `" . _DB_PREFIX_ . static::$TABLE
             . "` (`name`, `value`)"
-            . " VALUES ('CENTRY_SYNC_" . $name . "', 'on')";
+            . " VALUES ('CENTRY_SYNC_ONCREATE_" . $name . "', 'on')";
     return $db->execute($sql) != false;
   }
 
+  public static function createSyncAttributeCreate($name) {
+    if (gettype(self::getAttributeValue("ONCREATE_".$name))=="string"){
+      return false;
+    }
+    $db = Db::getInstance();
+    $sql = "INSERT INTO `" . _DB_PREFIX_ . static::$TABLE
+            . "` (`name`, `value`)"
+            . " VALUES ('CENTRY_SYNC_ONUPDATE_" . $name . "', 'on')";
+    return $db->execute($sql) != false;
+  }
+
+
+  /**
+   * Función para crear un atributo de autorizacion con Centry dentro de la tabla de Configuracion de Prestashop
+   * @var $name: Nombre del atributo.
+   */
   public static function createAuthAttribute($name) {
     if (gettype(self::getAttributeValue($name))=="string"){
       return false;
@@ -47,6 +68,14 @@ class ConfigurationCentry extends ObjectModel {
             . "` (`name`, `value`)"
             . " VALUES ('CENTRY_SYNC_" . $name . "', '')";
     return $db->execute($sql) != false;
+  }
+
+  /**
+   * Función para actualizar un atributo de Centry
+   * @var $name: Nombre del atributo.
+   */
+  public static function setAttributeValue($name,$value) {
+    Configuration::updateValue("CENTRY_SYNC_".$name, $value);
   }
 
 }
