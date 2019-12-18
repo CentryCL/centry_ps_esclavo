@@ -11,6 +11,21 @@ class ConfigurationCentry extends ObjectModel {
 
     }
 
+    /**
+     * @return string
+     */
+    public function getClientId() {
+        return Configuration::get("CENTRY_CLIENT_ID");
+    }
+
+    /**
+     * @param $clientId
+     * @return bool
+     */
+    public function setClientId($clientId) {
+        return Configuration::updateValue("CENTRY_CLIENT_ID", $clientId);
+    }
+
 
     /**
      * Función para obtener el valor de un atributo dentro de la configuración de Prestashop
@@ -79,3 +94,6 @@ class ConfigurationCentry extends ObjectModel {
   }
 
 }
+
+$cfg = new ConfigurationCentry();
+print_r($cfg->getAttributeValue("CENTRY_SYNC_APP_ID"));
