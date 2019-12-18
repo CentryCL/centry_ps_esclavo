@@ -1,5 +1,6 @@
 <?php
 require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/ConfigurationCentry.php';
+require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/AuthorizationCentry.php';
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -39,6 +40,7 @@ class Centry_PS_esclavo extends Module
 
     public function install(){
       $this->createCentryConfigurationAuth();
+      AuthorizationCentry::prueba();
 
       if (Shop::isFeatureActive()) {
           Shop::setContext(Shop::CONTEXT_ALL);

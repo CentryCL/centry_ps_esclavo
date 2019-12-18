@@ -2,7 +2,7 @@
 
 namespace Centry;
 
-class Sdk {
+class CentrySDK {
 
   const PublicEndpoints = array(
     "oauth/token"
