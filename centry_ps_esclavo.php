@@ -32,55 +32,8 @@ class Centry_PS_esclavo extends Module
         }
     }
 
-    protected function createCentryConfigAuth(){
-      ConfigurationCentry::setSyncAuthAppId("");
-      ConfigurationCentry::setSyncAuthSecretId("");
-    }
-
-    protected function createCentryConfigSyncOnCreate(){
-      ConfigurationCentry::setSyncOnCreateName(true);
-      ConfigurationCentry::setSyncOnCreatePrice(true);
-      ConfigurationCentry::setSyncOnCreatePriceOffer(true);
-      ConfigurationCentry::setSyncOnCreateDescription(true);
-      ConfigurationCentry::setSyncOnCreateSkuProduct(true);
-      ConfigurationCentry::setSyncOnCreateCharacteristics(true);
-      ConfigurationCentry::setSyncOnCreateStock(true);
-      ConfigurationCentry::setSyncOnCreateVariantSku(true);
-      ConfigurationCentry::setSyncOnCreateSize(true);
-      ConfigurationCentry::setSyncOnCreateColor(true);
-      ConfigurationCentry::setSyncOnCreateBarcode(true);
-      ConfigurationCentry::setSyncOnCreateProductImages(true);
-      ConfigurationCentry::setSyncOnCreateCondition(true);
-      ConfigurationCentry::setSyncOnCreateWarranty(true);
-      ConfigurationCentry::setSyncOnCreateVariantImages(true);
-      ConfigurationCentry::setSyncOnCreateStatus(true);
-    }
-
-    protected function createCentryConfigSyncOnUpdate(){
-      ConfigurationCentry::setSyncOnUpdateName(false);
-      ConfigurationCentry::setSyncOnUpdatePrice(false);
-      ConfigurationCentry::setSyncOnUpdatePriceOffer(false);
-      ConfigurationCentry::setSyncOnUpdateDescription(false);
-      ConfigurationCentry::setSyncOnUpdateSkuProduct(false);
-      ConfigurationCentry::setSyncOnUpdateCharacteristics(false);
-      ConfigurationCentry::setSyncOnUpdateStock(false);
-      ConfigurationCentry::setSyncOnUpdateVariantSku(false);
-      ConfigurationCentry::setSyncOnUpdateSize(false);
-      ConfigurationCentry::setSyncOnUpdateColor(false);
-      ConfigurationCentry::setSyncOnUpdateBarcode(false);
-      ConfigurationCentry::setSyncOnUpdateProductImages(false);
-      ConfigurationCentry::setSyncOnUpdateCondition(false);
-      ConfigurationCentry::setSyncOnUpdateWarranty(false);
-      ConfigurationCentry::setSyncOnUpdateVariantImages(false);
-      ConfigurationCentry::setSyncOnUpdateStatus(false);
-    }
-
-
 
     public function install(){
-      $this->createCentryConfigAuth();
-      $this->createCentryConfigSyncOnCreate();
-      $this->createCentryConfigSyncOnUpdate();
 
       if (Shop::isFeatureActive()) {
           Shop::setContext(Shop::CONTEXT_ALL);
