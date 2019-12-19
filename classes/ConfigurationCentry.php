@@ -3,79 +3,44 @@
 /**
  * @author Vanessa Guzman
  */
-class ConfigurationCentry extends ObjectModel {
-  private static $TABLE = "configuration";
+class ConfigurationCentry  {
 
-  public function __construct() {
-        parent::__construct();
+// TODO: utilizar todas las cositas con Configuration y para cada atirbuto sin extender de object model
 
-    }
-
-
-    /**
-     * Función para obtener el valor de un atributo dentro de la configuración de Prestashop
-     * @var $name: Nombre del atributo.
-     */
-  public static function getAttributeValue($name) {
-    $db = Db::getInstance();
-    $query = new DbQuery();
-    $query->select('*');
-    $query->from(static::$TABLE);
-    $query->where("name = 'CENTRY_SYNC_".$name."'");
-    $query->limit("1");
-    $attr = $db->executeS($query);
-    return $attr[0]["value"];
+  public static function setSyncOnCreateName($value) {
+    Configuration::updateValue("CENTRY_SYNC_ONCREATE_name",$value);
   }
 
-  /**
-   * Función para crear un atributo de sincronizacion con Centry dentro de la tabla de Configuracion de Prestashop
-   * @var $name: Nombre del atributo.
-   */
-
-  public static function createSyncAttributeUpdate($name) {
-    if (gettype(self::getAttributeValue("ONUPDATE_".$name))=="string"){
-      return false;
-    }
-    $db = Db::getInstance();
-    $sql = "INSERT INTO `" . _DB_PREFIX_ . static::$TABLE
-            . "` (`name`, `value`)"
-            . " VALUES ('CENTRY_SYNC_ONCREATE_" . $name . "', 'on')";
-    return $db->execute($sql) != false;
+  public static function setSyncOnUpdateName($value) {
+    Configuration::updateValue("CENTRY_SYNC_ONUPDATE_name",$value);
   }
 
-  public static function createSyncAttributeCreate($name) {
-    if (gettype(self::getAttributeValue("ONCREATE_".$name))=="string"){
-      return false;
-    }
-    $db = Db::getInstance();
-    $sql = "INSERT INTO `" . _DB_PREFIX_ . static::$TABLE
-            . "` (`name`, `value`)"
-            . " VALUES ('CENTRY_SYNC_ONUPDATE_" . $name . "', 'on')";
-    return $db->execute($sql) != false;
+  public static function getSyncOnCreateName(){
+    return Configuration::get("CENTRY_SYNC_ONCREATE_name");
+  }
+
+  public static function getSyncOnUpdateName(){
+    return Configuration::get("CENTRY_SYNC_ONUPDATE_name");
   }
 
 
-  /**
-   * Función para crear un atributo de autorizacion con Centry dentro de la tabla de Configuracion de Prestashop
-   * @var $name: Nombre del atributo.
-   */
-  public static function createAuthAttribute($name) {
-    if (gettype(self::getAttributeValue($name))=="string"){
-      return false;
-    }
-    $db = Db::getInstance();
-    $sql = "INSERT INTO `" . _DB_PREFIX_ . static::$TABLE
-            . "` (`name`, `value`)"
-            . " VALUES ('CENTRY_SYNC_" . $name . "', '')";
-    return $db->execute($sql) != false;
+// Auth
+
+  public static function setSyncAuthAppId($value) {
+    Configuration::updateValue("CENTRY_SYNC_APP_ID",$value);
   }
 
-  /**
-   * Función para actualizar un atributo de Centry, si es un atributo de sincronizacion anteponer "ONUPDATE_" O "ONCREATE_"
-   * @var $name: Nombre del atributo.
-   */
-  public static function setAttributeValue($name,$value) {
-    Configuration::updateValue("CENTRY_SYNC_".$name, $value);
+  public static function getSyncAuthAppId(){
+    return Configuration::get("CENTRY_SYNC_APP_ID");
   }
+
+  public static function setSyncAuthSecretId($value) {
+    Configuration::updateValue("CENTRY_SYNC_SECRET_ID",$value);
+  }
+
+  public static function getSyncAuthSecretId(){
+    return Configuration::get("CENTRY_SYNC_SECRET_ID");
+  }
+
 
 }

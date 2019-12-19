@@ -2,7 +2,7 @@
 
 namespace Centry;
 
-class Sdk {
+class CentrySDK {
 
   const PublicEndpoints = array(
     "oauth/token"
@@ -91,7 +91,7 @@ class Sdk {
       curl_setopt($curl, CURLOPT_POSTFIELDS, $stringPayload);
       $header[] = 'Content-Length: ' . strlen($stringPayload);
     }
-    if (!in_array($endpoint, Sdk::PublicEndpoints)) {
+    if (!in_array($endpoint, CentrySDK::PublicEndpoints)) {
       $header[] = "Authorization: Bearer $this->accessToken";
     }
     curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
