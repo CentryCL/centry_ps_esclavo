@@ -16,15 +16,7 @@ class WebhookCentry extends AbstractCentry
     public $on_order_delete;
     public static $TABLE = "webhook_centry";
 
-    public function __construct($callback_url=null, $on_product_save=true, $on_product_delete=true, $on_order_save=true, $on_order_delete=true){
-        $this->callback_url = $callback_url;
-        $this->on_product_save = $on_product_save;
-        $this->on_product_delete = $on_product_delete;
-        $this->on_order_save = $on_order_save;
-        $this->on_order_delete = $on_order_delete;
-    }
-
-    public function __cconstruct($id = null, $id_centry = null) {
+    public function __construct($id = null, $id_centry = null, $callback_url=null, $on_product_save=true, $on_product_delete=true, $on_order_save=true, $on_order_delete=true){
         if (!is_null($id)){
             $this->id = $id;
             $this->id_centry = $this->getIdCentry($id);
@@ -33,6 +25,11 @@ class WebhookCentry extends AbstractCentry
             $this->id_centry = $id_centry;
             $this->id = $this->getId($id_centry);
         }
+        $this->callback_url = $callback_url;
+        $this->on_product_save = $on_product_save;
+        $this->on_product_delete = $on_product_delete;
+        $this->on_order_save = $on_order_save;
+        $this->on_order_delete = $on_order_delete;
     }
 
     public static function createTable() {
@@ -53,6 +50,7 @@ class WebhookCentry extends AbstractCentry
             return false;
         }
         else{
+
             $centry = new AuthorizationCentry();
 
             $endpoint = "conexion/v1/webhooks.json ";
@@ -66,18 +64,20 @@ class WebhookCentry extends AbstractCentry
             );
 
             $resp = $centry->sdk()->request($endpoint, $method, null, $payload);
-            //TODO: guardar id Centry
+
+            self::createTable();
+            $this->id_centry = $resp->_id;
+            $this->save();
             return true;
         }
     }
 
     public function getCentryWebhook()
     {
-        //TODO: Obtener id de Centry
-        $centry_id = "5dfcfdd0ce4247131f3a8837";
+        $this->id_centry = $this->getIdCentry($this->id);
         $centry = new AuthorizationCentry();
 
-        $endpoint = "conexion/v1/webhooks/" . $centry_id . ".json ";
+        $endpoint = "conexion/v1/webhooks/" . $this->id_centry . ".json ";
         $method = "GET";
         $resp = $centry->sdk()->request($endpoint, $method);
         error_log(print_r($resp, true));
@@ -98,8 +98,8 @@ class WebhookCentry extends AbstractCentry
             return false;
         }
         else{
-            //TODO: obtener id Centry
-            $centry_id = "5dfcfe33887072131c014f9c";
+            $centry_id = $this->getIdCentry($this->id);
+
             $centry = new AuthorizationCentry();
 
             $endpoint = "conexion/v1/webhooks/" . $centry_id . ".json ";
@@ -112,23 +112,25 @@ class WebhookCentry extends AbstractCentry
                 "on_order_delete" => $this->on_order_delete,
             );
             $centry->sdk()->request($endpoint, $method, null, $payload);
+            // TODO: Verificar request exitoso
             return true;
         }
     }
 
-    public static function deleteCentryWebhook(){
+    public function deleteCentryWebhook(){
         if(ConfigurationCentry::getSyncAuthSecretId() == false || ConfigurationCentry::getSyncAuthSecretId() == false){
             return false;
         }
         else{
-            //TODO: obtener id Centry
-            $centry_id = "5dfcfe33887072131c014f9c";
+            $centry_id = $this->getIdCentry($this->id);
+
             $centry = new AuthorizationCentry();
 
             $endpoint = "conexion/v1/webhooks/" . $centry_id . ".json ";
             $method = "DELETE";
             $resp = $centry->sdk()->request($endpoint, $method);
-            //TODO: eliminar registro de la BD
+            // TODO: Verificar request exitoso
+            $this->delete();
             return true;
         }
     }
