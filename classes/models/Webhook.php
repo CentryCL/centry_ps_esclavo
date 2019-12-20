@@ -5,6 +5,10 @@ require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/AuthorizationCentry.ph
 require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Abstract.php';
 
 
+/**
+ * Class WebhookCentry
+ * Maneja la creacion de
+ */
 class WebhookCentry extends AbstractCentry
 {
     public $id;
@@ -16,7 +20,19 @@ class WebhookCentry extends AbstractCentry
     public $on_order_delete;
     public static $TABLE = "webhook_centry";
 
-    public function __construct($id = null, $id_centry = null, $callback_url=null, $on_product_save=true, $on_product_delete=true, $on_order_save=true, $on_order_delete=true){
+    /**
+     * WebhookCentry constructor.
+     * Si se entrega el parametro $id buscará en la BD el id del Webhook relacionado de Centry.
+     * Si se entrega el parametro $id_centry buscará en la BD el id almacenado en la BD.
+     * @param int|null $id
+     * @param string|null $id_centry id en Centry del Webhook.
+     * @param string|null $callback_url callback url que se utilizará en el webhook.
+     * @param bool $on_product_save define si se suscribirá al topico product_save.
+     * @param bool $on_product_delete define si se suscribirá al topico product_delete.
+     * @param bool $on_order_save define si se suscribirá al topico order_save.
+     * @param bool $on_order_delete define si se suscribirá al topico order_delete.
+     */
+    public function __construct( int $id = null, string $id_centry = null, string $callback_url=null, $on_product_save=true, $on_product_delete=true, $on_order_save=true, $on_order_delete=true){
         if (!is_null($id)){
             $this->id = $id;
             $this->id_centry = $this->getIdCentry($id);
@@ -32,6 +48,10 @@ class WebhookCentry extends AbstractCentry
         $this->on_order_delete = $on_order_delete;
     }
 
+    /**
+     * Crea la tabla ps_webhook_centry si es que no existe.
+     * @return bool
+     */
     public static function createTable() {
         $sql = "CREATE TABLE IF NOT EXISTS `" . _DB_PREFIX_ . static::$TABLE . "`(
       `id` INT(10) NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -42,6 +62,12 @@ class WebhookCentry extends AbstractCentry
         return Db::getInstance()->execute($sql);
     }
 
+    /**
+     * Crea un webhook en Centry con los valores almacenados en sus propiedades.
+     * No creara el webhook en Centry si es que no existen las credenciales de Centry, o si es que no se suscribira a
+     * ninguno de los topicos.
+     * @return bool
+     */
     public function createCentryWebhook()
     {
         if((ConfigurationCentry::getSyncAuthSecretId() == false || ConfigurationCentry::getSyncAuthSecretId() == false) ||
@@ -64,7 +90,7 @@ class WebhookCentry extends AbstractCentry
             );
 
             $resp = $centry->sdk()->request($endpoint, $method, null, $payload);
-
+            // TODO: Verificar request exitoso
             self::createTable();
             $this->id_centry = $resp->_id;
             $this->save();
@@ -72,6 +98,10 @@ class WebhookCentry extends AbstractCentry
         }
     }
 
+    /**
+     * Obtiene la informacion del webhook de Centry asociado al id.
+     * @return bool
+     */
     public function getCentryWebhook()
     {
         $this->id_centry = $this->getIdCentry($this->id);
@@ -90,6 +120,12 @@ class WebhookCentry extends AbstractCentry
         return true;
     }
 
+    /**
+     * Actualiza un webhook en Centry con los valores almacenados en sus propiedades.
+     * No actualizara el webhook en Centry si es que no existen las credenciales de Centry, o si es que no se suscribira a
+     * ninguno de los topicos.
+     * @return bool
+     */
     public function updateCentryWebhook()
     {
         if((ConfigurationCentry::getSyncAuthSecretId() == false || ConfigurationCentry::getSyncAuthSecretId() == false) ||
@@ -117,6 +153,10 @@ class WebhookCentry extends AbstractCentry
         }
     }
 
+    /**
+     * Elimina el webhook asociado en Centry segun el id.
+     * @return bool
+     */
     public function deleteCentryWebhook(){
         if(ConfigurationCentry::getSyncAuthSecretId() == false || ConfigurationCentry::getSyncAuthSecretId() == false){
             return false;
