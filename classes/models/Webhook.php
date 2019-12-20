@@ -2,16 +2,19 @@
 
 require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/ConfigurationCentry.php';
 require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/AuthorizationCentry.php';
+require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Abstract.php';
 
 
-class WebhookCentry
+class WebhookCentry extends AbstractCentry
 {
     public $id;
+    public $id_centry;
     public $callback_url;
     public $on_product_save;
     public $on_product_delete;
     public $on_order_save;
     public $on_order_delete;
+    public static $TABLE = "webhook_centry";
 
     public function __construct($callback_url=null, $on_product_save=true, $on_product_delete=true, $on_order_save=true, $on_order_delete=true){
         $this->callback_url = $callback_url;
@@ -19,6 +22,27 @@ class WebhookCentry
         $this->on_product_delete = $on_product_delete;
         $this->on_order_save = $on_order_save;
         $this->on_order_delete = $on_order_delete;
+    }
+
+    public function __cconstruct($id = null, $id_centry = null) {
+        if (!is_null($id)){
+            $this->id = $id;
+            $this->id_centry = $this->getIdCentry($id);
+        }
+        if(!is_null($id_centry)){
+            $this->id_centry = $id_centry;
+            $this->id = $this->getId($id_centry);
+        }
+    }
+
+    public static function createTable() {
+        $sql = "CREATE TABLE IF NOT EXISTS `" . _DB_PREFIX_ . static::$TABLE . "`(
+      `id` INT(10) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+      `id_centry` VARCHAR(200) NOT NULL
+      );
+      ALTER TABLE  " . _DB_PREFIX_ . "webhook_centry"." ADD UNIQUE INDEX (`id_centry`) ;
+      ";
+        return Db::getInstance()->execute($sql);
     }
 
     public function createCentryWebhook()
