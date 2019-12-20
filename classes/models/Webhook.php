@@ -117,6 +117,9 @@ class WebhookCentry extends AbstractCentry
         $this->on_product_delete = $resp->on_product_delete;
         $this->on_order_save = $resp->on_order_save;
         $this->on_order_delete = $resp->on_order_delete;
+        if($this->on_product_save == false && $this->on_product_delete == false && $this->on_order_save == false && $this->on_order_delete == false){
+            $this->deleteCentryWebhook();
+        }
         return true;
     }
 
