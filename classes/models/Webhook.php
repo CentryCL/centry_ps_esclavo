@@ -89,7 +89,8 @@ class WebhookCentry extends AbstractCentry
                 "on_order_delete" => $this->on_order_delete,
             );
 
-            $resp = $centry->sdk()->request($endpoint, $method, null, $payload);
+            $resp = $centry->sdk()->post($endpoint, null, $payload);
+//            $resp = $centry->sdk()->request($endpoint, $method, null, $payload);
             // TODO: Verificar request exitoso
             self::createTable();
             $this->id_centry = $resp->_id;
@@ -110,7 +111,6 @@ class WebhookCentry extends AbstractCentry
         $endpoint = "conexion/v1/webhooks/" . $this->id_centry . ".json ";
         $method = "GET";
         $resp = $centry->sdk()->request($endpoint, $method);
-        error_log(print_r($resp, true));
         // TODO: Verificar request exitoso
         $this->callback_url = $resp->callback_url;
         $this->on_product_save = $resp->on_product_save;

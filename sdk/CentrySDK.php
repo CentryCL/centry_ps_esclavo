@@ -103,6 +103,45 @@ class CentrySDK {
     return $err ? $err : json_decode($response);
   }
 
+    /**
+     * @param $endpoint Endpoint de Centry que se hara un POST.
+     * @param array $params (opcional) Parámetros para el request.
+     * @param array $payload (opcional) Body del request puede ser un objeto PHP o un arreglo (diccionario), internamente es transformado a JSON.
+     * @return mixed|string
+     */
+    function post($endpoint, $params=array(), $payload){
+        return $this->request($endpoint, "POST", $params, $payload);
+    }
+
+    /**
+     * @param $endpoint Endpoint de Centry que se hara un GET.
+     * @param array $params (opcional) Parámetros para el request.
+     * @return mixed|string
+     */
+  function get($endpoint, $params=array()){
+      return $this->request($endpoint, "GET", $params, null);
+  }
+
+    /**
+     * @param $endpoint Endpoint de Centry que se hara un UPDATE.
+     * @param array $params (opcional) Parámetros para el request.
+     * @param array $payload (opcional) Body del request puede ser un objeto PHP o un arreglo (diccionario), internamente es transformado a JSON.
+     * @return mixed|string
+     */
+    function update($endpoint, $params=array(), $payload=array()){
+        return $this->request($endpoint, "UPDATE", $params, $payload);
+    }
+
+
+    /**
+     * @param $endpoint Endpoint de Centry que se hara un DELETE.
+     * @param array $params (opcional) Parámetros para el request.
+     * @return mixed|string
+     */
+    function delete($endpoint, $params=array()){
+        return $this->request($endpoint, "DELETE", $params, null);
+    }
+
   /**
   * Una vez que un usuario ha autorizado nuestra aplicación para que accceda a su información, Centry genera un código
   * de autorización con el cual podremos solicitar el primer access_token y refresh_token. Éste método se encarga de
