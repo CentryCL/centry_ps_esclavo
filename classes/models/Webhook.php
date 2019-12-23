@@ -125,16 +125,19 @@ class WebhookCentry extends AbstractCentry
 
     /**
      * Actualiza un webhook en Centry con los valores almacenados en sus propiedades.
-     * No actualizara el webhook en Centry si es que no existen las credenciales de Centry, o si es que no se suscribira a
-     * ninguno de los topicos.
+     * No actualizara el webhook en Centry si es que no existen las credenciales de Centry,
+     * Se elimina el webhook si es que no se suscribira a ninguno de los topicos.
      * @return bool
      */
     public function updateCentryWebhook()
     {
         if((ConfigurationCentry::getSyncAuthSecretId() == false || ConfigurationCentry::getSyncAuthSecretId() == false) ||
-            (empty($this->callback_url)) ||
-            ($this->on_product_save == false && $this->on_product_delete == false && $this->on_order_save == false && $this->on_order_delete == false)){
+            (empty($this->callback_url))){
             return false;
+        }
+        elseif ($this->on_product_save == false && $this->on_product_delete == false && $this->on_order_save == false && $this->on_order_delete == false){
+            $this->deleteCentryWebhook();
+            return true;
         }
         else{
             $centry_id = $this->getIdCentry($this->id);
