@@ -129,7 +129,7 @@ class CentrySDK {
      * @return mixed|string
      */
     function update($endpoint, $params=array(), $payload=array()){
-        return $this->request($endpoint, "UPDATE", $params, $payload);
+        return $this->request($endpoint, "PUT", $params, $payload);
     }
 
 
@@ -195,4 +195,8 @@ class CentrySDK {
       if (property_exists($response, 'expires_in'))     $this->expiresIn = $response->expires_in;
       return $this;
   }
+
+
+
 }
+

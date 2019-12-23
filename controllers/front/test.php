@@ -15,13 +15,13 @@ class Centry_PS_esclavoTestModuleFrontController extends FrontController {
     public function initContent() {
         //parent::initContent();
         // Full test webhooks
-        $wh = new WebhookCentry(null, null, "https://prestahop.webhook.com/postEndpointTest", true, false, true, false);
+        $wh = new WebhookCentry(null, null, "https://prestahop.webhook.com/Test", true, false, true, false);
 //        $resp = $wh->createCentryWebhook();
         error_log(print_r($wh, true));
-        $wh->id = 4;
+        $wh->id = 12;
         $wh->getCentryWebhook();
-//        error_log(print_r($wh, true));
-//        $wh->callback_url = "https://prestahop.webhook.com/postEndpointTestUpdated";
+        error_log(print_r($wh, true));
+//        $wh->callback_url = "https://prestahop.webhook.com/GlobalTestUpdated";
 //        $wh->on_product_save = true;
 //        $wh->on_product_delete = true;
 //        $wh->on_order_save = true;
@@ -31,7 +31,6 @@ class Centry_PS_esclavoTestModuleFrontController extends FrontController {
         $wh->deleteCentryWebhook();
 
 //        error_log(print_r(ConfigurationCentry::getSyncAuthSecretId(), true));
-
         die();
     }
 }

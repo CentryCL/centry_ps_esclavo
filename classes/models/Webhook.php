@@ -76,9 +76,6 @@ class WebhookCentry extends AbstractCentry
             return false;
         }
         else{
-
-            $centry = new AuthorizationCentry();
-
             $endpoint = "conexion/v1/webhooks.json ";
             $method = "POST";
             $payload = array(
@@ -89,8 +86,7 @@ class WebhookCentry extends AbstractCentry
                 "on_order_delete" => $this->on_order_delete,
             );
 
-            $resp = $centry->sdk()->post($endpoint, null, $payload);
-//            $resp = $centry->sdk()->request($endpoint, $method, null, $payload);
+            $resp = AuthorizationCentry::sdk()->post($endpoint, null, $payload);
             // TODO: Verificar request exitoso
             self::createTable();
             $this->id_centry = $resp->_id;
@@ -106,11 +102,8 @@ class WebhookCentry extends AbstractCentry
     public function getCentryWebhook()
     {
         $this->id_centry = $this->getIdCentry($this->id);
-        $centry = new AuthorizationCentry();
-
         $endpoint = "conexion/v1/webhooks/" . $this->id_centry . ".json ";
-        $method = "GET";
-        $resp = $centry->sdk()->request($endpoint, $method);
+        $resp = AuthorizationCentry::sdk()->get($endpoint);
         // TODO: Verificar request exitoso
         $this->callback_url = $resp->callback_url;
         $this->on_product_save = $resp->on_product_save;
@@ -142,10 +135,7 @@ class WebhookCentry extends AbstractCentry
         else{
             $centry_id = $this->getIdCentry($this->id);
 
-            $centry = new AuthorizationCentry();
-
             $endpoint = "conexion/v1/webhooks/" . $centry_id . ".json ";
-            $method = "PUT";
             $payload = array(
                 "callback_url"=> $this->callback_url,
                 "on_product_save" => $this->on_product_save,
@@ -153,9 +143,8 @@ class WebhookCentry extends AbstractCentry
                 "on_order_save" => $this->on_order_save,
                 "on_order_delete" => $this->on_order_delete,
             );
-            $centry->sdk()->request($endpoint, $method, null, $payload);
+            return AuthorizationCentry::sdk()->update($endpoint, null, $payload);
             // TODO: Verificar request exitoso
-            return true;
         }
     }
 
@@ -169,12 +158,8 @@ class WebhookCentry extends AbstractCentry
         }
         else{
             $centry_id = $this->getIdCentry($this->id);
-
-            $centry = new AuthorizationCentry();
-
             $endpoint = "conexion/v1/webhooks/" . $centry_id . ".json ";
-            $method = "DELETE";
-            $resp = $centry->sdk()->request($endpoint, $method);
+            $resp = AuthorizationCentry::sdk()->delete($endpoint);
             // TODO: Verificar request exitoso
             $this->delete();
             return true;
