@@ -227,7 +227,7 @@ class CentrySDK {
      * @return mixed|string
      */
     public function updateProduct($product_id, $params=null, $payload){
-        return $this->update("https://www.centry.cl/conexion/v1/products/". $product_id .".json", $params, $payload);
+        return $this->update("conexion/v1/products/". $product_id .".json", $params, $payload);
     }
 
     /**
