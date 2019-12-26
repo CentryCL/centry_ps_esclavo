@@ -13,16 +13,16 @@ class BrandCentry extends AbstractCentry{
    * @param int $id Identificador de Prestashop
    * @param string $id_centry Identificador de Centry
    */
-  public function __construct($id = null, $id_centry = null) {
-    if (!is_null($id)){
-      $this->id = $id;
-      $this->id_centry = $this->getIdCentry($id)[0]["id_centry"];
-    }
-    if(!is_null($id_centry)){
-      $this->id_centry = $id_centry;
-      $this->id = $this->getId($id_centry)[0]["id"];
-    }
-  }
+   public function __construct($id = null, $id_centry = null) {
+     $this->id = $id;
+     $this->id_centry = $id_centry;
+     if (is_null($this->id)){
+       $this->id = $this->getId($id_centry)[0]["id"];
+     }
+     if(is_null($id_centry)){
+       $this->id_centry = $this->getIdCentry($id)[0]["id_centry"];
+     }
+   }
 
 
 /**

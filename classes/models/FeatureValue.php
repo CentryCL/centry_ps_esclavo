@@ -16,18 +16,20 @@ class FeatureValueCentry extends AbstractCentry{
  * @param [type] $centry_value Valor en Centry
  */
   public function __construct($id = null, $id_centry = null,$centry_value = null) {
-    if (!is_null($id)){
-      $this->id = $id;
+    $this->id = $id;
+    $this->id_centry = $id_centry;
+    $this->centry_value = $centry_value;
+    if(is_null($id)){
+      $this->id = $this->getId($id_centry)[0]["id"];
+      if(!$this->id){
+        $this->id = $this->getId($centry_value)[0]["id"];
+      }
+    }
+    if(is_null($id_centry)){
       $this->id_centry = $this->getIdCentry($id)[0]["id_centry"];
-      $this->centry_value = $this->getCentryValue($id)["centry_value"];
     }
-    if(!is_null($id_centry)){
-      $this->id_centry = $id_centry;
-      $this->id = $this->getId($id_centry)[0]["id"];
-    }
-    if(!is_null($centry_value)){
-      $this->centry_value = $centry_value;
-      $this->id = $this->getId($id_centry)[0]["id"];
+    if(is_null($centry_value)){
+      $this->centry_value = $this->getCentryValue($id)[0]["centry_value"];
     }
   }
 

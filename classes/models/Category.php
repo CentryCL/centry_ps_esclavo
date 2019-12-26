@@ -13,10 +13,8 @@ class CategoryCentry extends AbstractCentry{
    * @param string $id_centry Identificador de Centry
    */
   public function __construct($id_centry = null) {
-    if(!is_null($id_centry)){
-      $this->id_centry = $id_centry;
-      $this->id = $this->getId($id_centry)[0]["id"];
-    }
+    $this->id_centry = $id_centry;
+    $this->id = $this->getId($id_centry)[0]["id"];
   }
 
 

@@ -7,24 +7,24 @@ class ConfigurationCentry  {
 
   /**
    *  Creación o actualización del campo en la base de datos para la sincronizacion del nombre en la creación de un producto.
-   * @param boolean $value: Indica si se utiliza el nombre para la creacion del producto.
+   * @param  $value: Indica si se utiliza el nombre para la creacion del producto.
    */
-  public static function setSyncOnCreateName(boolean $value) {
+  public static function setSyncOnCreateName( $value) {
     Configuration::updateValue("CENTRY_SYNC_ONCREATE_name",$value);
   }
 
 /**
  * Creación o actualización del campo en la base de datos para la sincronizacion del nombre en la actualización de un producto.
- * @param boolean $value: Indica si se utiliza el nombre para la actualización del producto.
+ * @param  $value: Indica si se utiliza el nombre para la actualización del producto.
  */
-  public static function setSyncOnUpdateName(boolean $value) {
+  public static function setSyncOnUpdateName( $value) {
     Configuration::updateValue("CENTRY_SYNC_ONUPDATE_name",$value);
   }
 
 
 /**
  * Función que obtiene el valor de la base de datos del campo nombre para la creación de un producto.
- * @return boolean valor que indica si el campo nombre se utiliza para la creación de un producto.
+ * @return string valor que indica si el campo nombre se utiliza para la creación de un producto.
  */
   public static function getSyncOnCreateName(){
     return Configuration::get("CENTRY_SYNC_ONCREATE_name");
@@ -33,7 +33,7 @@ class ConfigurationCentry  {
 
   /**
    * Función que obtiene el valor de la base de datos del campo nombre para la actualización de un producto.
-   * @return boolean valor que indica si el campo nombre se utiliza para la actualización de un producto.
+   * @return string valor que indica si el campo nombre se utiliza para la actualización de un producto.
    */
   public static function getSyncOnUpdateName(){
     return Configuration::get("CENTRY_SYNC_ONUPDATE_name");
@@ -41,25 +41,25 @@ class ConfigurationCentry  {
 
   /**
    *  Creación o actualización del campo precio en la base de datos para su sincronizacion en la creación de un producto.
-   * @param boolean $value: Indica si se utiliza el precio para la creacion del producto.
+   * @param  $value: Indica si se utiliza el precio para la creacion del producto.
    */
-  public static function setSyncOnCreatePrice(boolean $value) {
+  public static function setSyncOnCreatePrice( $value) {
     Configuration::updateValue("CENTRY_SYNC_ONCREATE_price",$value);
   }
 
 
   /**
    * Creación o actualización del campo precio en la base de datos para su sincronizacion en la actualización de un producto.
-   * @param boolean $value: Indica si se utiliza el precio para la actualización del producto.
+   * @param  $value: Indica si se utiliza el precio para la actualización del producto.
    */
-  public static function setSyncOnUpdatePrice(boolean $value) {
+  public static function setSyncOnUpdatePrice( $value) {
     Configuration::updateValue("CENTRY_SYNC_ONUPDATE_price",$value);
   }
 
 
   /**
    * Función que obtiene el valor de la base de datos del campo precio para la creación de un producto.
-   * @return boolean valor que indica si el campo precio se utiliza para la creación de un producto.
+   * @return string valor que indica si el campo precio se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreatePrice(){
     return Configuration::get("CENTRY_SYNC_ONCREATE_price");
@@ -68,7 +68,7 @@ class ConfigurationCentry  {
 
   /**
    * Función que obtiene el valor de la base de datos del campo precio para la actualización de un producto.
-   * @return boolean valor que indica si el campo precio se utiliza para la actualización de un producto.
+   * @return string valor que indica si el campo precio se utiliza para la actualización de un producto.
    */
   public static function getSyncOnUpdatePrice(){
     return Configuration::get("CENTRY_SYNC_ONUPDATE_price");
@@ -76,25 +76,25 @@ class ConfigurationCentry  {
 
   /**
    *  Creación o actualización del campo precio oferta en la base de datos para su sincronizacion en la creación de un producto.
-   * @param boolean $value: Indica si se utiliza el precio oferta para la creacion del producto.
+   * @param  $value: Indica si se utiliza el precio oferta para la creacion del producto.
    */
-  public static function setSyncOnCreatePriceOffer(boolean $value) {
+  public static function setSyncOnCreatePriceOffer( $value) {
     Configuration::updateValue("CENTRY_SYNC_ONCREATE_priceoffer",$value);
   }
 
 
   /**
    * Creación o actualización del campo precio oferta en la base de datos para su sincronizacion en la actualización de un producto.
-   * @param boolean $value: Indica si se utiliza el precio oferta para la actualización del producto.
+   * @param  $value: Indica si se utiliza el precio oferta para la actualización del producto.
    */
-  public static function setSyncOnUpdatePriceOffer(boolean $value) {
+  public static function setSyncOnUpdatePriceOffer( $value) {
     Configuration::updateValue("CENTRY_SYNC_ONUPDATE_priceoffer",$value);
   }
 
 
   /**
    * Función que obtiene el valor de la base de datos del campo precio oferta para la creación de un producto.
-   * @return boolean valor que indica si el campo precio oferta se utiliza para la creación de un producto.
+   * @return string valor que indica si el campo precio oferta se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreatePriceOffer(){
     return Configuration::get("CENTRY_SYNC_ONCREATE_priceoffer");
@@ -103,7 +103,7 @@ class ConfigurationCentry  {
 
   /**
    * Función que obtiene el valor de la base de datos del campo precio oferta para la actualizacion de un producto.
-   * @return boolean valor que indica si el campo precio oferta se utiliza para la actualizacion de un producto.
+   * @return string valor que indica si el campo precio oferta se utiliza para la actualizacion de un producto.
    */
   public static function getSyncOnUpdatePriceOffer(){
     return Configuration::get("CENTRY_SYNC_ONUPDATE_priceoffer");
@@ -112,25 +112,25 @@ class ConfigurationCentry  {
 
   /**
    *  Creación o actualización del campo descripción en la base de datos para su sincronizacion en la creación de un producto.
-   * @param boolean $value: Indica si se utiliza la descripción para la creacion del producto.
+   * @param  $value: Indica si se utiliza la descripción para la creacion del producto.
    */
-  public static function setSyncOnCreateDescription(boolean $value) {
+  public static function setSyncOnCreateDescription( $value) {
     Configuration::updateValue("CENTRY_SYNC_ONCREATE_description",$value);
   }
 
 
   /**
    * Creación o actualización del campo descripcion en la base de datos para su sincronizacion en la actualización de un producto.
-   * @param boolean $value: Indica si se utiliza la descripcion para la actualización del producto.
+   * @param  $value: Indica si se utiliza la descripcion para la actualización del producto.
    */
-  public static function setSyncOnUpdateDescription(boolean $value) {
+  public static function setSyncOnUpdateDescription( $value) {
     Configuration::updateValue("CENTRY_SYNC_ONUPDATE_description",$value);
   }
 
 
   /**
    * Función que obtiene el valor de la base de datos del campo descripcion para la creación de un producto.
-   * @return boolean valor que indica si el campo descripcion se utiliza para la creación de un producto.
+   * @return string valor que indica si el campo descripcion se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreateDescription(){
     return Configuration::get("CENTRY_SYNC_ONCREATE_description");
@@ -139,7 +139,7 @@ class ConfigurationCentry  {
 
   /**
    * Función que obtiene el valor de la base de datos del campo descripcion para la actualizacion de un producto.
-   * @return boolean valor que indica si el campo descripcion se utiliza para la actualizacion de un producto.
+   * @return string valor que indica si el campo descripcion se utiliza para la actualizacion de un producto.
    */
   public static function getSyncOnUpdateDescription(){
     return Configuration::get("CENTRY_SYNC_ONUPDATE_description");
@@ -147,25 +147,25 @@ class ConfigurationCentry  {
 
   /**
    *  Creación o actualización del campo sku del producto en la base de datos para su sincronizacion en la creación de un producto.
-   * @param boolean $value: Indica si se utiliza el sku del producto para la creacion del producto.
+   * @param  $value: Indica si se utiliza el sku del producto para la creacion del producto.
    */
-  public static function setSyncOnCreateSkuProduct(boolean $value) {
+  public static function setSyncOnCreateSkuProduct( $value) {
     Configuration::updateValue("CENTRY_SYNC_ONCREATE_skuproduct",$value);
   }
 
 
   /**
    * Creación o actualización del campo sku del producto en la base de datos para su sincronizacion en la actualización de un producto.
-   * @param boolean $value: Indica si se utiliza el sku del producto para la actualización del producto.
+   * @param  $value: Indica si se utiliza el sku del producto para la actualización del producto.
    */
-  public static function setSyncOnUpdateSkuProduct(boolean $value) {
+  public static function setSyncOnUpdateSkuProduct( $value) {
     Configuration::updateValue("CENTRY_SYNC_ONUPDATE_skuproduct",$value);
   }
 
 
   /**
    * Función que obtiene el valor de la base de datos del campo sku del producto para la creación de un producto.
-   * @return boolean valor que indica si el campo sku del producto se utiliza para la creación de un producto.
+   * @return string valor que indica si el campo sku del producto se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreateSkuProduct(){
     return Configuration::get("CENTRY_SYNC_ONCREATE_skuproduct");
@@ -174,7 +174,7 @@ class ConfigurationCentry  {
 
   /**
    * Función que obtiene el valor de la base de datos del campo sku del producto para la actualizacion de un producto.
-   * @return boolean valor que indica si el campo sku del producto se utiliza para la actualizacion de un producto.
+   * @return string valor que indica si el campo sku del producto se utiliza para la actualizacion de un producto.
    */
   public static function getSyncOnUpdateSkuProduct(){
     return Configuration::get("CENTRY_SYNC_ONUPDATE_skuproduct");
@@ -183,25 +183,25 @@ class ConfigurationCentry  {
 
   /**
    *  Creación o actualización del campo características en la base de datos para su sincronizacion en la creación de un producto.
-   * @param boolean $value: Indica si se utiliza características para la creacion del producto.
+   * @param  $value: Indica si se utiliza características para la creacion del producto.
    */
-  public static function setSyncOnCreateCharacteristics(boolean $value) {
+  public static function setSyncOnCreateCharacteristics( $value) {
     Configuration::updateValue("CENTRY_SYNC_ONCREATE_characteristics",$value);
   }
 
 
   /**
    * Creación o actualización del campo caracteristicas en la base de datos para su sincronizacion en la actualización de un producto.
-   * @param boolean $value: Indica si se utilizan las caracteristicas para la actualización del producto.
+   * @param  $value: Indica si se utilizan las caracteristicas para la actualización del producto.
    */
-  public static function setSyncOnUpdateCharacteristics(boolean $value) {
+  public static function setSyncOnUpdateCharacteristics( $value) {
     Configuration::updateValue("CENTRY_SYNC_ONUPDATE_characteristics",$value);
   }
 
 
   /**
    * Función que obtiene el valor de la base de datos del campo caracteristicas para la act de un producto.
-   * @return boolean valor que indica si el campo características se utiliza para la creación de un producto.
+   * @return string valor que indica si el campo características se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreateCharacteristics(){
     return Configuration::get("CENTRY_SYNC_ONCREATE_characteristics");
@@ -210,7 +210,7 @@ class ConfigurationCentry  {
 
   /**
    * Función que obtiene el valor de la base de datos del campo características para la actualizacion de un producto.
-   * @return boolean valor que indica si el campo características se utiliza para la actualizacion de un producto.
+   * @return string valor que indica si el campo características se utiliza para la actualizacion de un producto.
    */
   public static function getSyncOnUpdateCharacteristics(){
     return Configuration::get("CENTRY_SYNC_ONUPDATE_characteristics");
@@ -218,25 +218,25 @@ class ConfigurationCentry  {
 
   /**
    *  Creación o actualización del campo stock en la base de datos para su sincronizacion en la creación de un producto.
-   * @param boolean $value: Indica si se utiliza el stock para la creacion del producto.
+   * @param  $value: Indica si se utiliza el stock para la creacion del producto.
    */
-  public static function setSyncOnCreateStock(boolean $value) {
+  public static function setSyncOnCreateStock( $value) {
     Configuration::updateValue("CENTRY_SYNC_ONCREATE_stock",$value);
   }
 
 
   /**
    * Creación o actualización del campo stock en la base de datos para su sincronizacion en la actualización de un producto.
-   * @param boolean $value: Indica si se utiliza el stock para la actualización del producto.
+   * @param  $value: Indica si se utiliza el stock para la actualización del producto.
    */
-  public static function setSyncOnUpdateStock(boolean $value) {
+  public static function setSyncOnUpdateStock( $value) {
     Configuration::updateValue("CENTRY_SYNC_ONUPDATE_stock",$value);
   }
 
 
   /**
    * Función que obtiene el valor de la base de datos del campo stock para la creación de un producto.
-   * @return boolean valor que indica si el campo stock se utiliza para la creación de un producto.
+   * @return string valor que indica si el campo stock se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreateStock(){
     return Configuration::get("CENTRY_SYNC_ONCREATE_stock");
@@ -245,7 +245,7 @@ class ConfigurationCentry  {
 
   /**
    * Función que obtiene el valor de la base de datos del campo stock para la actualizacion de un producto.
-   * @return boolean valor que indica si el campo stock se utiliza para la actualizacion de un producto.
+   * @return string valor que indica si el campo stock se utiliza para la actualizacion de un producto.
    */
   public static function getSyncOnUpdateStock(){
     return Configuration::get("CENTRY_SYNC_ONUPDATE_stock");
@@ -253,25 +253,25 @@ class ConfigurationCentry  {
 
   /**
    *  Creación o actualización del campo sku de la variante en la base de datos para su sincronizacion en la creación de un producto.
-   * @param boolean $value: Indica si se utiliza el sku de la variante para la creacion del producto.
+   * @param  $value: Indica si se utiliza el sku de la variante para la creacion del producto.
    */
-  public static function setSyncOnCreateVariantSku(boolean $value) {
+  public static function setSyncOnCreateVariantSku( $value) {
     Configuration::updateValue("CENTRY_SYNC_ONCREATE_variantsku",$value);
   }
 
 
   /**
    * Creación o actualización del campo sku de la variante en la base de datos para su sincronizacion en la actualización de un producto.
-   * @param boolean $value: Indica si se utiliza el sku de la variante para la actualización del producto.
+   * @param  $value: Indica si se utiliza el sku de la variante para la actualización del producto.
    */
-  public static function setSyncOnUpdateVariantSku(boolean $value) {
+  public static function setSyncOnUpdateVariantSku( $value) {
     Configuration::updateValue("CENTRY_SYNC_ONUPDATE_variantsku",$value);
   }
 
 
   /**
    * Función que obtiene el valor de la base de datos del campo sku de la variante para la creación de un producto.
-   * @return boolean valor que indica si el campo sku de la variante se utiliza para la creación de un producto.
+   * @return string valor que indica si el campo sku de la variante se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreateVariantSku(){
     return Configuration::get("CENTRY_SYNC_ONCREATE_variantsku");
@@ -280,7 +280,7 @@ class ConfigurationCentry  {
 
   /**
    * Función que obtiene el valor de la base de datos del campo sku de la variante para la actualizacion de un producto.
-   * @return boolean valor que indica si el campo sku de la variante se utiliza para la actualizacion de un producto.
+   * @return string valor que indica si el campo sku de la variante se utiliza para la actualizacion de un producto.
    */
   public static function getSyncOnUpdateVariantSku(){
     return Configuration::get("CENTRY_SYNC_ONUPDATE_variantsku");
@@ -288,25 +288,25 @@ class ConfigurationCentry  {
 
   /**
    *  Creación o actualización del campo talla en la base de datos para su sincronizacion en la creación de un producto.
-   * @param boolean $value: Indica si se utiliza la talla para la creacion del producto.
+   * @param  $value: Indica si se utiliza la talla para la creacion del producto.
    */
-  public static function setSyncOnCreateSize(boolean $value) {
+  public static function setSyncOnCreateSize( $value) {
     Configuration::updateValue("CENTRY_SYNC_ONCREATE_size",$value);
   }
 
 
   /**
    * Creación o actualización del campo talla en la base de datos para su sincronizacion en la actualización de un producto.
-   * @param boolean $value: Indica si se utiliza la talla para la actualización del producto.
+   * @param  $value: Indica si se utiliza la talla para la actualización del producto.
    */
-  public static function setSyncOnUpdateSize(boolean $value) {
+  public static function setSyncOnUpdateSize( $value) {
     Configuration::updateValue("CENTRY_SYNC_ONUPDATE_size",$value);
   }
 
 
   /**
    * Función que obtiene el valor de la base de datos del campo talla para la creación de un producto.
-   * @return boolean valor que indica si el campo talla se utiliza para la creación de un producto.
+   * @return string valor que indica si el campo talla se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreateSize(){
     return Configuration::get("CENTRY_SYNC_ONCREATE_size");
@@ -315,7 +315,7 @@ class ConfigurationCentry  {
 
   /**
    * Función que obtiene el valor de la base de datos del campo talla para la actualizacion de un producto.
-   * @return boolean valor que indica si el campo talla se utiliza para la actualizacion de un producto.
+   * @return string valor que indica si el campo talla se utiliza para la actualizacion de un producto.
    */
   public static function getSyncOnUpdateSize(){
     return Configuration::get("CENTRY_SYNC_ONUPDATE_size");
@@ -323,25 +323,25 @@ class ConfigurationCentry  {
 
   /**
    *  Creación o actualización del campo color en la base de datos para su sincronizacion en la creación de un producto.
-   * @param boolean $value: Indica si se utiliza el color para la creacion del producto.
+   * @param  $value: Indica si se utiliza el color para la creacion del producto.
    */
-  public static function setSyncOnCreateColor(boolean $value) {
+  public static function setSyncOnCreateColor( $value) {
     Configuration::updateValue("CENTRY_SYNC_ONCREATE_color",$value);
   }
 
 
   /**
    * Creación o actualización del campo color en la base de datos para su sincronizacion en la actualización de un producto.
-   * @param boolean $value: Indica si se utiliza el color para la actualización del producto.
+   * @param  $value: Indica si se utiliza el color para la actualización del producto.
    */
-  public static function setSyncOnUpdateColor(boolean $value) {
+  public static function setSyncOnUpdateColor( $value) {
     Configuration::updateValue("CENTRY_SYNC_ONUPDATE_color",$value);
   }
 
 
   /**
    * Función que obtiene el valor de la base de datos del campo color para la creación de un producto.
-   * @return boolean valor que indica si el campo color se utiliza para la creación de un producto.
+   * @return string valor que indica si el campo color se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreateColor(){
     return Configuration::get("CENTRY_SYNC_ONCREATE_color");
@@ -350,7 +350,7 @@ class ConfigurationCentry  {
 
   /**
    * Función que obtiene el valor de la base de datos del campo color para la actualizacion de un producto.
-   * @return boolean valor que indica si el campo color se utiliza para la actualizacion de un producto.
+   * @return string valor que indica si el campo color se utiliza para la actualizacion de un producto.
    */
   public static function getSyncOnUpdateColor(){
     return Configuration::get("CENTRY_SYNC_ONUPDATE_color");
@@ -358,25 +358,25 @@ class ConfigurationCentry  {
 
   /**
    *  Creación o actualización del campo código de barras en la base de datos para su sincronizacion en la creación de un producto.
-   * @param boolean $value: Indica si se utiliza el código de barras para la creacion del producto.
+   * @param  $value: Indica si se utiliza el código de barras para la creacion del producto.
    */
-  public static function setSyncOnCreateBarcode(boolean $value) {
+  public static function setSyncOnCreateBarcode( $value) {
     Configuration::updateValue("CENTRY_SYNC_ONCREATE_barcode",$value);
   }
 
 
   /**
    * Creación o actualización del campo codigo de barras en la base de datos para su sincronizacion en la actualización de un producto.
-   * @param boolean $value: Indica si se utiliza el codigo de barras para la actualización del producto.
+   * @param  $value: Indica si se utiliza el codigo de barras para la actualización del producto.
    */
-  public static function setSyncOnUpdateBarcode(boolean $value) {
+  public static function setSyncOnUpdateBarcode( $value) {
     Configuration::updateValue("CENTRY_SYNC_ONUPDATE_barcode",$value);
   }
 
 
   /**
    * Función que obtiene el valor de la base de datos del campo codigo de barras para la creación de un producto.
-   * @return boolean valor que indica si el campo codigo de barras se utiliza para la creación de un producto.
+   * @return string valor que indica si el campo codigo de barras se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreateBarcode(){
     return Configuration::get("CENTRY_SYNC_ONCREATE_barcode");
@@ -385,7 +385,7 @@ class ConfigurationCentry  {
 
   /**
    * Función que obtiene el valor de la base de datos del campo codigo de barras para la actualizacion de un producto.
-   * @return boolean valor que indica si el campo codigo de barras se utiliza para la actualizacion de un producto.
+   * @return string valor que indica si el campo codigo de barras se utiliza para la actualizacion de un producto.
    */
   public static function getSyncOnUpdateBarcode(){
     return Configuration::get("CENTRY_SYNC_ONUPDATE_barcode");
@@ -394,25 +394,25 @@ class ConfigurationCentry  {
 
   /**
    *  Creación o actualización del campo Imagenes del producto en la base de datos para su sincronizacion en la creación de un producto.
-   * @param boolean $value: Indica si se utilizan las imagenes del producto para la creacion del producto.
+   * @param  $value: Indica si se utilizan las imagenes del producto para la creacion del producto.
    */
-  public static function setSyncOnCreateProductImages(boolean $value) {
+  public static function setSyncOnCreateProductImages( $value) {
     Configuration::updateValue("CENTRY_SYNC_ONCREATE_productimages",$value);
   }
 
 
   /**
    * Creación o actualización del campo imagenes del producto en la base de datos para su sincronizacion en la actualización de un producto.
-   * @param boolean $value: Indica si se utilizan las imagenes del producto para la actualización del producto.
+   * @param  $value: Indica si se utilizan las imagenes del producto para la actualización del producto.
    */
-  public static function setSyncOnUpdateProductImages(boolean $value) {
+  public static function setSyncOnUpdateProductImages( $value) {
     Configuration::updateValue("CENTRY_SYNC_ONUPDATE_productimages",$value);
   }
 
 
   /**
    * Función que obtiene el valor de la base de datos del campo imagenes del producto para la creación de un producto.
-   * @return boolean valor que indica si el campo imagenes del producto se utiliza para la creación de un producto.
+   * @return string valor que indica si el campo imagenes del producto se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreateProductImages(){
     return Configuration::get("CENTRY_SYNC_ONCREATE_productimages");
@@ -421,7 +421,7 @@ class ConfigurationCentry  {
 
   /**
    * Función que obtiene el valor de la base de datos del campo imagenes del producto para la actualizacion de un producto.
-   * @return boolean valor que indica si el campo imagenes del producto se utiliza para la actualizacion de un producto.
+   * @return string valor que indica si el campo imagenes del producto se utiliza para la actualizacion de un producto.
    */
   public static function getSyncOnUpdateProductImages(){
     return Configuration::get("CENTRY_SYNC_ONUPDATE_productimages");
@@ -429,25 +429,25 @@ class ConfigurationCentry  {
 
   /**
    *  Creación o actualización del campo condición en la base de datos para su sincronizacion en la creación de un producto.
-   * @param boolean $value: Indica si se utiliza la condición para la creacion del producto.
+   * @param  $value: Indica si se utiliza la condición para la creacion del producto.
    */
-  public static function setSyncOnCreateCondition(boolean $value) {
+  public static function setSyncOnCreateCondition( $value) {
     Configuration::updateValue("CENTRY_SYNC_ONCREATE_condition",$value);
   }
 
 
   /**
    * Creación o actualización del campo condicion en la base de datos para su sincronizacion en la actualización de un producto.
-   * @param boolean $value: Indica si se utiliza la condicion del producto para la actualización del producto.
+   * @param  $value: Indica si se utiliza la condicion del producto para la actualización del producto.
    */
-  public static function setSyncOnUpdateCondition(boolean $value) {
+  public static function setSyncOnUpdateCondition( $value) {
     Configuration::updateValue("CENTRY_SYNC_ONUPDATE_condition",$value);
   }
 
 
   /**
    * Función que obtiene el valor de la base de datos del campo condicion para la creación de un producto.
-   * @return boolean valor que indica si el campo condicion se utiliza para la creación de un producto.
+   * @return string valor que indica si el campo condicion se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreateCondition(){
     return Configuration::get("CENTRY_SYNC_ONCREATE_condition");
@@ -456,7 +456,7 @@ class ConfigurationCentry  {
 
   /**
    * Función que obtiene el valor de la base de datos del campo condicion para la actualizacion de un producto.
-   * @return boolean valor que indica si el campo condicion se utiliza para la actualizacion de un producto.
+   * @return string valor que indica si el campo condicion se utiliza para la actualizacion de un producto.
    */
   public static function getSyncOnUpdateCondition(){
     return Configuration::get("CENTRY_SYNC_ONUPDATE_condition");
@@ -465,25 +465,25 @@ class ConfigurationCentry  {
 
   /**
    *  Creación o actualización del campo garantía en la base de datos para su sincronizacion en la creación de un producto.
-   * @param boolean $value: Indica si se utiliza la garantía para la creacion del producto.
+   * @param  $value: Indica si se utiliza la garantía para la creacion del producto.
    */
-  public static function setSyncOnCreateWarranty(boolean $value) {
+  public static function setSyncOnCreateWarranty( $value) {
     Configuration::updateValue("CENTRY_SYNC_ONCREATE_warranty",$value);
   }
 
 
   /**
    * Creación o actualización del campo garantia en la base de datos para su sincronizacion en la actualización de un producto.
-   * @param boolean $value: Indica si se utilizan la garantia para la actualización del producto.
+   * @param  $value: Indica si se utilizan la garantia para la actualización del producto.
    */
-  public static function setSyncOnUpdateWarranty(boolean $value) {
+  public static function setSyncOnUpdateWarranty( $value) {
     Configuration::updateValue("CENTRY_SYNC_ONUPDATE_warranty",$value);
   }
 
 
   /**
    * Función que obtiene el valor de la base de datos del campo garantia para la creación de un producto.
-   * @return boolean valor que indica si el campo garantia se utiliza para la creación de un producto.
+   * @return string valor que indica si el campo garantia se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreateWarranty(){
     return Configuration::get("CENTRY_SYNC_ONCREATE_warranty");
@@ -492,7 +492,7 @@ class ConfigurationCentry  {
 
   /**
    * Función que obtiene el valor de la base de datos del campo garantia para la actualizacion de un producto.
-   * @return boolean valor que indica si el campo garantia se utiliza para la actualizacion de un producto.
+   * @return string valor que indica si el campo garantia se utiliza para la actualizacion de un producto.
    */
   public static function getSyncOnUpdateWarranty(){
     return Configuration::get("CENTRY_SYNC_ONUPDATE_warranty");
@@ -500,25 +500,25 @@ class ConfigurationCentry  {
 
   /**
    *  Creación o actualización del campo imagenes de la variante en la base de datos para su sincronizacion en la creación de un producto.
-   * @param boolean $value: Indica si se utilizan las imagenes de la variante para la creacion del producto.
+   * @param  $value: Indica si se utilizan las imagenes de la variante para la creacion del producto.
    */
-  public static function setSyncOnCreateVariantImages(boolean $value) {
+  public static function setSyncOnCreateVariantImages( $value) {
     Configuration::updateValue("CENTRY_SYNC_ONCREATE_variantimages",$value);
   }
 
 
   /**
    * Creación o actualización del campo imagenes de la variante en la base de datos para su sincronizacion en la actualización de un producto.
-   * @param boolean $value: Indica si se utilizan las imagenes de la variante para la actualización del producto.
+   * @param  $value: Indica si se utilizan las imagenes de la variante para la actualización del producto.
    */
-  public static function setSyncOnUpdateVariantImages(boolean $value) {
+  public static function setSyncOnUpdateVariantImages( $value) {
     Configuration::updateValue("CENTRY_SYNC_ONUPDATE_variantimages",$value);
   }
 
 
   /**
    * Función que obtiene el valor de la base de datos del campo imagenes de la variante para la creación de un producto.
-   * @return boolean valor que indica si el campo imagenes de la variante se utiliza para la creación de un producto.
+   * @return string valor que indica si el campo imagenes de la variante se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreateVariantImages(){
     return Configuration::get("CENTRY_SYNC_ONCREATE_variantimages");
@@ -527,7 +527,7 @@ class ConfigurationCentry  {
 
   /**
    * Función que obtiene el valor de la base de datos del campo imagenes de la variante para la actualizacion de un producto.
-   * @return boolean valor que indica si el campo imagenes de la variante se utiliza para la actualizacion de un producto.
+   * @return string valor que indica si el campo imagenes de la variante se utiliza para la actualizacion de un producto.
    */
   public static function getSyncOnUpdateVariantImages(){
     return Configuration::get("CENTRY_SYNC_ONUPDATE_variantimages");
@@ -536,25 +536,25 @@ class ConfigurationCentry  {
 
   /**
    *  Creación o actualización del campo estado en la base de datos para su sincronizacion en la creación de un producto.
-   * @param boolean $value: Indica si se utiliza el estado para la creacion del producto.
+   * @param  $value: Indica si se utiliza el estado para la creacion del producto.
    */
-  public static function setSyncOnCreateStatus(boolean $value) {
+  public static function setSyncOnCreateStatus( $value) {
     Configuration::updateValue("CENTRY_SYNC_ONCREATE_status",$value);
   }
 
 
   /**
    * Creación o actualización del campo estado en la base de datos para su sincronizacion en la actualización de un producto.
-   * @param boolean $value: Indica si se utiliza el estado para la actualización del producto.
+   * @param  $value: Indica si se utiliza el estado para la actualización del producto.
    */
-  public static function setSyncOnUpdateStatus(boolean $value) {
+  public static function setSyncOnUpdateStatus($value) {
     Configuration::updateValue("CENTRY_SYNC_ONUPDATE_status",$value);
   }
 
 
   /**
    * Función que obtiene el valor de la base de datos del campo estado para la creación de un producto.
-   * @return boolean valor que indica si el campo estado se utiliza para la creación de un producto.
+   * @return string valor que indica si el campo estado se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreateStatus(){
     return Configuration::get("CENTRY_SYNC_ONCREATE_status");
@@ -563,12 +563,120 @@ class ConfigurationCentry  {
 
   /**
    * Función que obtiene el valor de la base de datos del campo estado para la actualizacion de un producto.
-   * @return boolean valor que indica si el campo estado se utiliza para la actualizacion de un producto.
+   * @return string valor que indica si el campo estado se utiliza para la actualizacion de un producto.
    */
   public static function getSyncOnUpdateStatus(){
     return Configuration::get("CENTRY_SYNC_ONUPDATE_status");
   }
 
+
+
+  /**
+   *  Creación o actualización del campo medidas del paquete en la base de datos para su sincronizacion en la creación de un producto.
+   * @param  $value: Indica si se utilizan las medidas del paquete para la creacion del producto.
+   */
+  public static function setSyncOnCreatePackage($value) {
+    Configuration::updateValue("CENTRY_SYNC_ONCREATE_package",$value);
+  }
+
+
+  /**
+   * Creación o actualización del campo medidas del paquete en la base de datos para su sincronizacion en la actualización de un producto.
+   * @param  $value: Indica si se utiliza las medidas del paquete para la actualización del producto.
+   */
+  public static function setSyncOnUpdatePackage($value) {
+    Configuration::updateValue("CENTRY_SYNC_ONUPDATE_package",$value);
+  }
+
+
+  /**
+   * Función que obtiene el valor de la base de datos del campo medidas del paquete para la creación de un producto.
+   * @return string valor que indica si el campo medidas del paquete se utiliza para la creación de un producto.
+   */
+  public static function getSyncOnCreatePackage(){
+    return Configuration::get("CENTRY_SYNC_ONCREATE_package");
+  }
+
+
+  /**
+   * Función que obtiene el valor de la base de datos del campo medidas del paquete para la actualizacion de un producto.
+   * @return string valor que indica si el campo medidas del paquete se utiliza para la actualizacion de un producto.
+   */
+  public static function getSyncOnUpdatePackage(){
+    return Configuration::get("CENTRY_SYNC_ONUPDATE_package");
+  }
+
+
+  /**
+   * Indica el comportamiento que tendrán las ofertas para los productos
+   * @param string $value: Indica el tipo de oferta que se generarán, pueden ser "reduced", "discount", "percentage"
+   */
+  public static function setPriceBehavior($value) {
+    Configuration::updateValue("CENTRY_SYNC_price_behavior",$value);
+  }
+
+
+  /**
+   * Función que obtiene el valor del comportamiento para la creacion de ofertas en los productos
+   * @return string valor que indica comportamiento.
+   */
+  public static function getPriceBehavior(){
+    return Configuration::get("CENTRY_SYNC_price_behavior");
+  }
+
+
+/**
+ * Funcion para obtener los valores desde la base de datos para saber si un atributo se debe sincronizar en la actualización de un producto.
+ * @return array Arreglo que indica el nombre del atributo y si se debe sincronizar
+ */
+  public static function getSyncOnUpdate(){
+    $sync = [];
+    $sync["name"] = ConfigurationCentry::getSyncOnUpdateName();
+    $sync["price"] = ConfigurationCentry::getSyncOnUpdatePrice();
+    $sync["price_offer"] = ConfigurationCentry::getSyncOnUpdatePriceOffer();
+    $sync["characteristics"] = ConfigurationCentry::getSyncOnUpdateCharacteristics();
+    $sync["description"] = ConfigurationCentry::getSyncOnUpdateDescription();
+    $sync["sku_product"] = ConfigurationCentry::getSyncOnUpdateSkuProduct();
+    $sync["stock"] = ConfigurationCentry::getSyncOnUpdateStock();
+    $sync["size"] = ConfigurationCentry::getSyncOnUpdateSize();
+    $sync["color"] = ConfigurationCentry::getSyncOnUpdateColor();
+    $sync["barcode"] = ConfigurationCentry::getSyncOnUpdateBarcode();
+    $sync["product_images"] = ConfigurationCentry::getSyncOnUpdateProductImages();
+    $sync["condition"] = ConfigurationCentry::getSyncOnUpdateCondition();
+    $sync["warranty"] = ConfigurationCentry::getSyncOnUpdateWarranty();
+    $sync["variant_images"] = ConfigurationCentry::getSyncOnUpdateVariantImages();
+    $sync["variant_sku"] = ConfigurationCentry::getSyncOnUpdateVariantSku();
+    $sync["status"] = ConfigurationCentry::getSyncOnUpdateStatus();
+    $sync["package"] = ConfigurationCentry::getSyncOnUpdatePackage();
+    return $sync;
+  }
+
+
+  /**
+   * Funcion para obtener los valores desde la base de datos para saber si un atributo se debe sincronizar en la creación de un producto.
+   * @return array Arreglo que indica el nombre del atributo y si se debe sincronizar
+   */
+  public static function getSyncOnCreate(){
+    $sync = [];
+    $sync["name"] = ConfigurationCentry::getSyncOnCreateName();
+    $sync["price"] = ConfigurationCentry::getSyncOnCreatePrice();
+    $sync["price_offer"] = ConfigurationCentry::getSyncOnCreatePriceOffer();
+    $sync["characteristics"] = ConfigurationCentry::getSyncOnCreateCharacteristics();
+    $sync["description"] = ConfigurationCentry::getSyncOnCreateDescription();
+    $sync["sku_product"] = ConfigurationCentry::getSyncOnCreateSkuProduct();
+    $sync["stock"] = ConfigurationCentry::getSyncOnCreateStock();
+    $sync["size"] = ConfigurationCentry::getSyncOnCreateSize();
+    $sync["color"] = ConfigurationCentry::getSyncOnCreateColor();
+    $sync["barcode"] = ConfigurationCentry::getSyncOnCreateBarcode();
+    $sync["product_images"] = ConfigurationCentry::getSyncOnCreateProductImages();
+    $sync["condition"] = ConfigurationCentry::getSyncOnCreateCondition();
+    $sync["warranty"] = ConfigurationCentry::getSyncOnCreateWarranty();
+    $sync["variant_images"] = ConfigurationCentry::getSyncOnCreateVariantImages();
+    $sync["variant_sku"] = ConfigurationCentry::getSyncOnCreateVariantSku();
+    $sync["status"] = ConfigurationCentry::getSyncOnCreateStatus();
+    $sync["package"] = ConfigurationCentry::getSyncOnCreatePackage();
+    return $sync;
+  }
 
 
 
