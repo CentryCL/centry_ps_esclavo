@@ -41,7 +41,9 @@ class Centry_PS_esclavo extends Module
 
       if (!parent::install() ||
           !$this->registerHook('leftColumn') ||
-          !$this->registerHook('header')
+          !$this->registerHook('header') ||
+          !$this->registerHook('actionValidateOrder') ||
+          !$this->registerHook('actionOrderHistoryAddAfter')
       ) {
           return false;
       }
@@ -58,5 +60,64 @@ class Centry_PS_esclavo extends Module
         }
 
         return true;
+    }
+
+    public function hookactionValidateOrder($params){
+        error_log(print_r("hookactionValidateOrder", true));
+        error_log(print_r($params, true));
+
+        $payload = array(
+            "status_origin" => $params["orderStatus"]->name,
+            "address_billing" => $this->addressBilling($params["cart"]->id_address_delivery),
+            "address_shipping" => $this->addressShipping($params),
+            "buyer_dni" => $params["customer"]->rut,
+            "buyer_email" => $params["customer"]->email,
+            "buyer_first_name" => $params["customer"]->firstname,
+            "buyer_last_name" => $params["customer"]->lastname,
+            "buyer_birth_date" => $params["customer"]->birthday,
+            "_buyer_gender" => $params["customer"]->id_gender == 1 ? "male" : "female",
+            "_payment_mode" => $this->paymentMode($params["order"]->payment),
+            "items" => $this->items($params),
+            "origin" => "Prestashop",
+            "original_data" => $params,
+            "id_origin" => $params["order"]->id_cart,
+            "number_origin" => $params["order"]->reference,
+            "total_amount" => $params["order"]->total_products_wt,
+            "shipping_amount" => $params["order"]->total_shipping,
+            "discount_amount" => $params["order"]->total_discounts,
+            "paid_amount" => $params["order"]->total_paid,
+        );
+    }
+
+    private function addressBilling($id){
+        $ps_address = new Address($id);
+        $centry_address = array(
+
+        );
+        return $centry_address;
+    }
+
+    private function addressShipping($params){
+        $shipping = array();
+        return $shipping;
+    }
+
+    private function items($params){
+        $items = array();
+        return $items;
+    }
+
+    private function paymentMode($payment){
+        switch ($payment){
+            case "Bank Transfer":
+                return "transfer";
+            default:
+                return "undefined";
+        }
+    }
+
+    public function hookactionOrderHistoryAddAfter($params){
+        error_log(print_r("hookactionOrderHistoryAddAfter", true));
+        error_log(print_r($params, true));
     }
 }
