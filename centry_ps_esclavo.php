@@ -67,6 +67,7 @@ class Centry_PS_esclavo extends Module
         error_log(print_r($params, true));
 
         $payload = array(
+            "_status" => $this->status($params["orderStatus"]->id),
             "status_origin" => $params["orderStatus"]->name,
             "address_billing" => $this->address($params["cart"]->id_address_invoice),
             "address_shipping" => $this->address($params["cart"]->id_address_delivery),
@@ -136,6 +137,10 @@ class Centry_PS_esclavo extends Module
             default:
                 return "undefined";
         }
+    }
+
+    private function status($id_order_state){
+
     }
 
     public function hookactionOrderHistoryAddAfter($params){

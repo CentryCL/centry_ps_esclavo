@@ -15,5 +15,7 @@ require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Category.php';
 class Centry_PS_esclavoTestModuleFrontController extends FrontController {
 
     public function initContent() {
+        $order = AuthorizationCentry::sdk()->getOrder("5d3f73e62a38376ea983373e");
+        error_log(print_r($order, true));
     }
 }
