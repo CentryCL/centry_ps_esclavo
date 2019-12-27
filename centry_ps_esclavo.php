@@ -68,8 +68,8 @@ class Centry_PS_esclavo extends Module
 
         $payload = array(
             "status_origin" => $params["orderStatus"]->name,
-            "address_billing" => $this->addressBilling($params["cart"]->id_address_delivery),
-            "address_shipping" => $this->addressShipping($params),
+            "address_billing" => $this->address($params["cart"]->id_address_invoice),
+            "address_shipping" => $this->address($params["cart"]->id_address_delivery),
             "buyer_dni" => $params["customer"]->rut,
             "buyer_email" => $params["customer"]->email,
             "buyer_first_name" => $params["customer"]->firstname,
@@ -77,7 +77,7 @@ class Centry_PS_esclavo extends Module
             "buyer_birth_date" => $params["customer"]->birthday,
             "_buyer_gender" => $params["customer"]->id_gender == 1 ? "male" : "female",
             "_payment_mode" => $this->paymentMode($params["order"]->payment),
-            "items" => $this->items($params),
+            "items" => $this->items($params["order"]->id),
             "origin" => "Prestashop",
             "original_data" => $params,
             "id_origin" => $params["order"]->id_cart,
@@ -89,22 +89,44 @@ class Centry_PS_esclavo extends Module
         );
     }
 
-    private function addressBilling($id){
-        $ps_address = new Address($id);
-        $centry_address = array(
-
+    private function address($id){
+        $address = new \Address($id);
+        $state = new \State($address->id_state);
+        $country = new \Country($address->id_country);
+        $array = array(
+            "first_name" => $address->firstname,
+            "last_name" => $address->lastname,
+            "phone1" => $address->phone,
+            "phone2" => $address->phone_mobile,
+            "line1" => $address->address1,
+            "line2" => $address->address2,
+            "zip_code" => $address->postcode,
+            "city" => $address->city,
+            "state" => $state->name,
+            "country" => $country->name[(int) \Configuration::get('PS_LANG_DEFAULT')]
         );
-        return $centry_address;
+        return $array;
     }
 
-    private function addressShipping($params){
-        $shipping = array();
-        return $shipping;
-    }
-
-    private function items($params){
+    private function items($order_id){
         $items = array();
-        return $items;
+        $order = new Order($order_id);
+        $currency = new Currency($order->id_currency);
+        $products = $order.$this->getCartProducts();
+        foreach ($products as $product){
+            $item = array(
+                "id_origin" => $product->product_id,
+                "sku" => $product->reference,
+                "name" => $product->product_name,
+                "unit_price" => $product->unit_price_tax_incl,
+                "paid_price" => $product->total_price_tax_incl,
+                "tax_amount" => $product->total_price_tax_incl - $product->total_price_tax_excl,
+                "shipping_amount" => $product->total_shipping_price_tax_incl,
+                "currency" => $currency->iso_code,
+                "quantity" => $product->product_quantity,
+            );
+        }
+        return products;
     }
 
     private function paymentMode($payment){
