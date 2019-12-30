@@ -83,7 +83,7 @@ class OrderStatusCentry extends AbstractCentry
       `id` INT(10) UNSIGNED NOT NULL,
       `centry_status` VARCHAR(200) NOT NULL
       );
-      ALTER TABLE  " . _DB_PREFIX_ . "order_status_centry"." ADD UNIQUE INDEX (`id`) ;
+      ALTER TABLE `" . _DB_PREFIX_ . "order_status_centry"."` ADD UNIQUE INDEX `id` (`id`) ;
       ALTER TABLE `" . _DB_PREFIX_ . "order_status_centry"."` ADD FOREIGN KEY (`id`) REFERENCES `" . _DB_PREFIX_ . "order_state"."`(`id_order_state`) ON DELETE CASCADE ON UPDATE NO ACTION;
       ";
         return Db::getInstance()->execute($sql);
