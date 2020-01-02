@@ -1,6 +1,6 @@
 <?php
 
-require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/system/PendingTask.php';
+require_once(dirname(__FILE__) . '/../../vendor/autoload.php');
 
 /**
  * Controlador encargado de ateneder y registrar las notificaciones denviadas
@@ -13,8 +13,8 @@ class Centry_Ps_EsclavoWebhookCallbackModuleFrontController extends ModuleFrontC
     $data = $this->getRequestPayload();
     try {
       $topic = $this->translateTopic($data['topic']);
-      (new CentryPs\System\PendingTask(
-              CentryPs\System\PendingTaskOrigin::Centry,
+      (new CentryPs\models\system\PendingTask(
+              CentryPs\enums\system\PendingTaskOrigin::Centry,
               $topic, $this->getNotificationResourceId($data, $topic))
       )->save();
       $this->ajaxDie(json_encode(['status' => 'ok']));
@@ -45,13 +45,13 @@ class Centry_Ps_EsclavoWebhookCallbackModuleFrontController extends ModuleFrontC
   private function translateTopic($centryTopic) {
     switch ($centryTopic) {
       case 'on_product_delete':
-        return \CentryPs\System\PendingTaskTopic::ProductDelete;
+        return CentryPs\enums\system\PendingTaskTopic::ProductDelete;
       case 'on_product_save':
-        return \CentryPs\System\PendingTaskTopic::ProductSave;
+        return CentryPs\enums\system\PendingTaskTopic::ProductSave;
       case 'on_order_delete':
-        return \CentryPs\System\PendingTaskTopic::OrderDelete;
+        return CentryPs\enums\system\PendingTaskTopic::OrderDelete;
       case 'on_order_save':
-        return \CentryPs\System\PendingTaskTopic::OrderSave;
+        return CentryPs\enums\system\PendingTaskTopic::OrderSave;
       default:
         throw new Exception('Undefined topic');
     }
@@ -65,16 +65,22 @@ class Centry_Ps_EsclavoWebhookCallbackModuleFrontController extends ModuleFrontC
    * @throws Exception
    */
   private function getNotificationResourceId($notification, $topic) {
+    $ri = null;
     switch ($topic) {
-      case \CentryPs\System\PendingTaskTopic::ProductDelete:
-      case \CentryPs\System\PendingTaskTopic::ProductSave:
-        return $notification['product_id'];
-      case \CentryPs\System\PendingTaskTopic::OrderDelete:
-      case \CentryPs\System\PendingTaskTopic::OrderSave:
-        return $notification['order_id'];
-      default:
-        throw new Exception('Undefined resource id');
+      case \CentryPs\enums\system\PendingTaskTopic::ProductDelete:
+      case \CentryPs\enums\system\PendingTaskTopic::ProductSave:
+        $ri = isset($notification['product_id']) ? $notification['product_id'] : null;
+        break;
+      case \CentryPs\enums\system\PendingTaskTopic::OrderDelete:
+      case \CentryPs\enums\system\PendingTaskTopic::OrderSave:
+        $ri = isset($notification['order_id']) ? $notification['order_id'] : null;
+        break;
     }
+    if (!isset($ri)) {
+      throw new Exception('Undefined resource id');
+    }
+    
+    return $ri;
   }
 
 }

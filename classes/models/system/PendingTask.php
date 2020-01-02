@@ -1,22 +1,6 @@
 <?php
 
-namespace CentryPs\System;
-
-abstract class PendingTaskOrigin {
-
-  const Centry = 'centry';
-  const PrestaShop = 'prestashop';
-
-}
-
-abstract class PendingTaskTopic {
-
-  const OrderDelete = 'order_delete';
-  const OrderSave = 'order_save';
-  const ProductDelete = 'product_delete';
-  const ProductSave = 'product_save';
-
-}
+namespace CentryPs\models\system;
 
 /**
  * Representa una tarea que está pendiente de ser ejecutada
@@ -68,9 +52,9 @@ class PendingTask {
     $db = \Db::getInstance();
     $sql = "INSERT INTO `{$table_name}` (`origin`, `topic`, `resource_id`) "
             . "VALUES ("
-            . " '{$db->escape($this->origin)}',"
-            . " '{$db->escape($this->topic)}',"
-            . " '{$db->escape($this->resource_id)}'"
+            . " {$this->escape($this->origin, $db)},"
+            . " {$this->escape($this->topic, $db)},"
+            . " {$this->escape($this->resource_id, $db)}"
             . ")";
     return $db->execute($sql) != false;
   }
@@ -84,10 +68,38 @@ class PendingTask {
     $table_name = _DB_PREFIX_ . static::$TABLE;
     $db = \Db::getInstance();
     $sql = "DELETE FROM `{$table_name}` WHERE"
-            . " `origin` = '{$db->escape($this->origin)}' AND"
-            . " `topic` = '{$db->escape($this->topic)}' AND"
-            . " `resource_id` = '{$db->escape($this->resource_id)}'";
+            . " `origin` = {$this->escape($this->origin, $db)} AND"
+            . " `topic` = {$this->escape($this->topic, $db)} AND"
+            . " `resource_id` = {$this->escape($this->resource_id, $db)}";
     return $db->execute($sql) != false;
+  }
+
+  /**
+   * Aplica la función <code>escape</code> de la clase <code>Db</code> pero
+   * agregando dos condiciones adicionales:
+   * <ol>
+   * <li>
+   * Si el valor es <code>null</code>, retorna simplemente <code>NULL</code>
+   * </li>
+   * <li>
+   * Encierra el valor escapado entre comilla si así lo indica el parámetro
+   * <code>$isString</code>
+   * </li>
+   * </ol>
+   * @
+   * @param string|float|integer|boolean|null $value
+   * @param \Db $db
+   * @param boolean $isString
+   * @return string
+   * @see \Db#escape
+   */
+  private function escape($value, $db, $isString = true) {
+    if ($value == null) {
+      return 'NULL';
+    }
+
+    $escaped = $db->escape($value);
+    return $isString ? "'$escaped'" : $escaped;
   }
 
   /**

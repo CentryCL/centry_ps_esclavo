@@ -1,16 +1,17 @@
 <?php
 
-require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/ConfigurationCentry.php';
-require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Product.php';
-require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Webhook.php';
-require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Variant.php';
-require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Size.php';
-require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Color.php';
-require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Brand.php';
-require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Feature.php';
-require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/FeatureValue.php';
-require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Category.php';
+//require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/ConfigurationCentry.php';
+//require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Product.php';
+//require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Webhook.php';
+//require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Variant.php';
+//require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Size.php';
+//require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Color.php';
+//require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Brand.php';
+//require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Feature.php';
+//require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/FeatureValue.php';
+//require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Category.php';
 //require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/AuthorizationCentry.php';
+require_once(dirname(__FILE__) . '/../../vendor/autoload.php');
 
 class Centry_PS_esclavoTestModuleFrontController extends FrontController {
 
@@ -42,7 +43,7 @@ class Centry_PS_esclavoTestModuleFrontController extends FrontController {
         }
 
         error_log(print_r($test->getIdCentry(10),true));
-        //
+//
         // $test = new BrandCentry(null,"male");
         // error_log(print_r($test,true));
         // if($test->delete()){
@@ -53,6 +54,16 @@ class Centry_PS_esclavoTestModuleFrontController extends FrontController {
         // }
 
 
+//        $this->testPendingTasks();
         die();
+    }
+    
+    private function testPendingTasks() {
+      $pt = new CentryPs\models\system\PendingTask(
+              CentryPs\enums\system\PendingTaskOrigin::Centry, 
+              CentryPs\enums\system\PendingTaskTopic::ProductSave, '1');
+      error_log(print_r($pt, true));
+      $pt->save();
+      $pt->delete();
     }
 }
