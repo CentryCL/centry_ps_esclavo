@@ -10,7 +10,12 @@ require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Brand.php';
 require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Feature.php';
 require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/FeatureValue.php';
 require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Category.php';
-//require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/AuthorizationCentry.php';
+require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/OrderStatusValue.php';
+require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/OrderStatus.php';
+require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Order.php';
+require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/controllers/front/order_controller.php';
+require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/AuthorizationCentry.php';
+
 
 class Centry_PS_esclavoTestModuleFrontController extends FrontController {
 
