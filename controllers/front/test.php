@@ -15,44 +15,8 @@ require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Category.php';
 class Centry_PS_esclavoTestModuleFrontController extends FrontController {
 
     public function initContent() {
-        //parent::initContent();
-        // if(BrandCentry::createTable()){
-        //   echo "Tabla creada Exitosamente";
-        // }
-        // else{
-        //   echo "No se pudo crear la Tabla";
-        // }
-        //
-        // if($id=FeatureValueCentry::getId("asdas")){
-        //   echo print_r($id,true);
-        // }
-        // else{
-        //   echo "No existe el dato";
-        // }
-
-        $test = new BrandCentry();
-        $test->id = 4;
-        $test->id_centry = "mallee";
-        // $test->centry_value = "asdasds";
-        if($test->save()){
-          echo "Guardado exitosamente";
-        }
-        else{
-          echo "No se pudo guardar";
-        }
-
-        error_log(print_r($test->getIdCentry(10),true));
-        //
-        // $test = new BrandCentry(null,"male");
-        // error_log(print_r($test,true));
-        // if($test->delete()){
-        //   echo "Borrado exitosamente";
-        // }
-        // else{
-        //   echo "No se pudo borrar";
-        // }
-
-
+        $orderstates = OrderState::getOrderStates((int)Configuration::get('PS_LANG_DEFAULT'));
+        error_log(print_r($orderstates, true));
         die();
     }
 }
