@@ -102,6 +102,7 @@ class Centry_PS_esclavo extends Module
 
             foreach (OrderState::getOrderStates($defaultLang) as $state){
                 $status = new OrderStatusCentry($state['id_order_state'], Tools::getValue($this->l($state['id_order_state'])));
+                //TODO: se crea el objeto pero no se actualiza con el save
                 $status->save();
             }
         }
