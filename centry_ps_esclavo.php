@@ -79,6 +79,7 @@ class Centry_PS_esclavo extends Module
 
     public function getContent()
     {
+        $defaultLang = (int)Configuration::get('PS_LANG_DEFAULT');
         $output = null;
 
         if (Tools::isSubmit('submit'.$this->name)) {
@@ -96,6 +97,11 @@ class Centry_PS_esclavo extends Module
             } else {
                 Configuration::updateValue('CENTRY_SYNC_SECRET_ID', $centrySecretId);
                 $output .= $this->displayConfirmation($this->l('Centry Secret Id updated'));
+            }
+
+            foreach (OrderState::getOrderStates($defaultLang) as $state){
+                $status = new OrderStatusCentry($state['id_order_state'], Tools::getValue($this->l($state['id_order_state'])));
+                $status->save();
             }
         }
 
@@ -156,6 +162,9 @@ class Centry_PS_esclavo extends Module
             )
         );
 
+        // Se insertan las homologaciones de estado al formulario
+        $centryOptions = array();
+
         foreach (OrderState::getOrderStates($defaultLang) as $state){
             $fieldsForm[0]['form']['input'][] = array(
                 'type' => 'select',
@@ -184,18 +193,17 @@ class Centry_PS_esclavo extends Module
                         ),
                         array(
                             'id_option' => 5,
-                            'name' => 'cancelled_before_shipping'
+                            'name' => 'cancelled before shipping'
                         ),
                         array(
                             'id_option' => 6,
-                            'name' => 'cancelled_after_shipping'
+                            'name' => 'cancelled after shipping'
                         ),
                     )
                 ),
                 'required' => true,
             );
         }
-        error_log(print_r( $fieldsForm[0]['form'], true));
         $helper = new HelperForm();
 
         // Module, token and currentIndex
@@ -229,10 +237,9 @@ class Centry_PS_esclavo extends Module
         $helper->fields_value['centryAppId'] = Configuration::get('CENTRY_SYNC_APP_ID');
         $helper->fields_value['centrySecretId'] = Configuration::get('CENTRY_SYNC_SECRET_ID');
         $helper->fields_value['display_show_header'] = true;
-//        foreach (OrderState::getOrderStates($defaultLang) as $state){
-//            $helper->fields_value[$this->l($state["id_order_state"])]['options'] = OrderStatusCentry::getCentryStatus($state["id_order_state"]);
-//        }
-//        $helper->fields_value['10'] = 6;
+        foreach (OrderState::getOrderStates($defaultLang) as $state){
+            $helper->fields_value[$this->l($state["id_order_state"])] = OrderStatusCentry::getIdCentry($state["id_order_state"])[0]["id_centry"];
+        }
 
         return $helper->generateForm($fieldsForm);
     }

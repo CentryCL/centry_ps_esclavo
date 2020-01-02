@@ -20,8 +20,7 @@ require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/AuthorizationCentry.ph
 class Centry_PS_esclavoTestModuleFrontController extends FrontController {
 
     public function initContent() {
-        $orderstates = OrderState::getOrderStates((int)Configuration::get('PS_LANG_DEFAULT'));
-        error_log(print_r($orderstates, true));
+        OrderStatusCentry::createTable();
         die();
     }
 }
