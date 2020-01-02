@@ -34,8 +34,8 @@ class ProductCentry extends AbstractCentry{
       `id` INT(10) UNSIGNED NOT NULL,
       `id_centry` VARCHAR(200) NOT NULL
       );
-      ALTER TABLE  " . _DB_PREFIX_ . "products_centry"." ADD UNIQUE INDEX (`id`) ;
-      ALTER TABLE  " . _DB_PREFIX_ . "products_centry"." ADD UNIQUE INDEX (`id_centry`) ;
+      ALTER TABLE  `" . _DB_PREFIX_ . "products_centry"."` ADD UNIQUE INDEX `id` (`id`) ;
+      ALTER TABLE  `" . _DB_PREFIX_ . "products_centry"."` ADD UNIQUE INDEX `id_centry` (`id_centry`) ;
       ALTER TABLE `" . _DB_PREFIX_ . "products_centry"."` ADD FOREIGN KEY (`id`) REFERENCES `" . _DB_PREFIX_ . "product"."`(`id_product`) ON DELETE CASCADE ON UPDATE NO ACTION;
       ";
         return Db::getInstance()->execute($sql);

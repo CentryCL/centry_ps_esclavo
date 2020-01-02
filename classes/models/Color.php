@@ -33,9 +33,9 @@ class ColorCentry extends AbstractCentry{
       $sql = "CREATE TABLE IF NOT EXISTS `" . _DB_PREFIX_ . static::$TABLE . "`(
       `id` INT(11) NOT NULL,
       `id_centry` VARCHAR(200) NOT NULL
-      );
-      ALTER TABLE  " . _DB_PREFIX_ . "color_centry"." ADD UNIQUE INDEX (`id`) ;
-      ALTER TABLE  " . _DB_PREFIX_ . "color_centry"." ADD UNIQUE INDEX (`id_centry`) ;
+    );
+      ALTER TABLE  `" . _DB_PREFIX_ . "color_centry"."` ADD UNIQUE INDEX `id` (`id`) ;
+      ALTER TABLE  `" . _DB_PREFIX_ . "color_centry"."` ADD UNIQUE INDEX `id_centry` (`id_centry`) ;
       ALTER TABLE `" . _DB_PREFIX_ . "color_centry"."` ADD FOREIGN KEY (`id`) REFERENCES `" . _DB_PREFIX_ . "attribute"."`(`id_attribute`) ON DELETE CASCADE ON UPDATE NO ACTION;
       ";
         return Db::getInstance()->execute($sql);

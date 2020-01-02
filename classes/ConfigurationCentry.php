@@ -570,6 +570,79 @@ class ConfigurationCentry  {
   }
 
 
+  /**
+   *  Creación o actualización de los campos de seo en la base de datos para su sincronizacion en la creación de un producto.
+   * @param  $value: Indica si se utilizan los campos de seo para la creacion del producto.
+   */
+  public static function setSyncOnCreateSeo($value) {
+    Configuration::updateValue("CENTRY_SYNC_ONCREATE_seo",$value);
+  }
+
+
+  /**
+   * Creación o actualización de los campos de seo en la base de datos para su sincronizacion en la actualización de un producto.
+   * @param  $value: Indica si se utilizan los campos de seo para la actualización del producto.
+   */
+  public static function setSyncOnUpdateSeo($value) {
+    Configuration::updateValue("CENTRY_SYNC_ONUPDATE_seo",$value);
+  }
+
+
+  /**
+   * Función que obtiene el valor de la base de datos del campo seo para la creación de un producto.
+   * @return string valor que indica si el campo seo se utiliza para la creación de un producto.
+   */
+  public static function getSyncOnCreateSeo(){
+    return Configuration::get("CENTRY_SYNC_ONCREATE_seo");
+  }
+
+
+  /**
+   * Función que obtiene el valor de la base de datos del campo seo para la actualizacion de un producto.
+   * @return string valor que indica si el campo seo se utiliza para la actualizacion de un producto.
+   */
+  public static function getSyncOnUpdateSeo(){
+    return Configuration::get("CENTRY_SYNC_ONUPDATE_seo");
+  }
+
+
+
+  /**
+   *  Creación o actualización del campo marca en la base de datos para su sincronizacion en la creación de un producto.
+   * @param  $value: Indica si se utilizan los campos de seo para la creacion del producto.
+   */
+  public static function setSyncOnCreateBrand($value) {
+    Configuration::updateValue("CENTRY_SYNC_ONCREATE_brand",$value);
+  }
+
+
+  /**
+   * Creación o actualización del campo marca en la base de datos para su sincronizacion en la actualización de un producto.
+   * @param  $value: Indica si se utiliza el campo de marca para la actualización del producto.
+   */
+  public static function setSyncOnUpdateBrand($value) {
+    Configuration::updateValue("CENTRY_SYNC_ONUPDATE_brand",$value);
+  }
+
+
+  /**
+   * Función que obtiene el valor de la base de datos del campo marca para la creación de un producto.
+   * @return string valor que indica si el campo marca se utiliza para la creación de un producto.
+   */
+  public static function getSyncOnCreateBrand(){
+    return Configuration::get("CENTRY_SYNC_ONCREATE_brand");
+  }
+
+
+  /**
+   * Función que obtiene el valor de la base de datos del campo marca para la actualizacion de un producto.
+   * @return string valor que indica si el campo marca se utiliza para la actualizacion de un producto.
+   */
+  public static function getSyncOnUpdateBrand(){
+    return Configuration::get("CENTRY_SYNC_ONUPDATE_brand");
+  }
+
+
 
   /**
    *  Creación o actualización del campo medidas del paquete en la base de datos para su sincronizacion en la creación de un producto.
@@ -648,6 +721,8 @@ class ConfigurationCentry  {
     $sync["variant_sku"] = ConfigurationCentry::getSyncOnUpdateVariantSku();
     $sync["status"] = ConfigurationCentry::getSyncOnUpdateStatus();
     $sync["package"] = ConfigurationCentry::getSyncOnUpdatePackage();
+    $sync["seo"] = ConfigurationCentry::getSyncOnUpdateSeo();
+    $sync["brand"] = ConfigurationCentry::getSyncOnUpdateBrand();
     return $sync;
   }
 
@@ -675,6 +750,8 @@ class ConfigurationCentry  {
     $sync["variant_sku"] = ConfigurationCentry::getSyncOnCreateVariantSku();
     $sync["status"] = ConfigurationCentry::getSyncOnCreateStatus();
     $sync["package"] = ConfigurationCentry::getSyncOnCreatePackage();
+    $sync["seo"] = ConfigurationCentry::getSyncOnCreateSeo();
+    $sync["brand"] = ConfigurationCentry::getSyncOnCreateBrand();
     return $sync;
   }
 

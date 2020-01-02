@@ -44,7 +44,7 @@ class FeatureValueCentry extends AbstractCentry{
       `id_centry` VARCHAR(200),
       `centry_value` VARCHAR(200)
       );
-      ALTER TABLE  " . _DB_PREFIX_ . "feature_value_centry"." ADD UNIQUE INDEX (`id`) ;
+      ALTER TABLE  `" . _DB_PREFIX_ . "feature_value_centry"."` ADD UNIQUE INDEX `id` (`id`) ;
       ALTER TABLE `" . _DB_PREFIX_ . "feature_value_centry"."` ADD FOREIGN KEY (`id`) REFERENCES `" . _DB_PREFIX_ . "feature_value"."`(`id_feature_value`) ON DELETE CASCADE ON UPDATE NO ACTION;
       ";
         return Db::getInstance()->execute($sql);

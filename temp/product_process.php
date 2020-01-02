@@ -1,11 +1,12 @@
 <?php
 require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/ConfigurationCentry.php';
+
 class ProcessProducts{
 
-  public static function product_save($product_ps,$product,$sync){
+  public static function productSave($product_ps,$product,$sync){
     $taxes = 1 + ($product_ps->getTaxesRate())/100;
-    $product_ps->name = $sync["name"]? $product->name : $product_ps->name;
-    $product_ps->reference = $sync["sku_product"]? $product->sku : $product_ps->reference;
+    $product_ps->name = $sync["name"]? mb_substr($product->name,0,128) : $product_ps->name;
+    $product_ps->reference = $sync["sku_product"]? mb_substr($product->sku,0,64) : $product_ps->reference;
     $product_ps->active = $sync["status"]? $product->status : $product_ps->active;
     $product_ps->description = $sync["description"]? $product->description : $product_ps->description;
     $product_ps->condition = $sync["condition"]? $product->condition : $product_ps->condition;
@@ -14,15 +15,16 @@ class ProcessProducts{
     $product_ps->depth = $sync["package"]? $product->packagelength : $product_ps->depth;
     $product_ps->weight = $sync["package"]? $product->packageweight : $product_ps->weight;
     $product_ps->price = $sync["price"]? round(($product->price_compare)/$taxes,2) : $product_ps->price;
+    $product_ps->meta_title = $sync["seo"]? mb_substr($product->seo_title,0,255) : $product_ps->meta_title;
+    $product_ps->meta_description = $sync["seo"]? mb_substr($product->seo_description,0,512) : $product_ps->meta_description;
 
-    $manufacturer = ProcessProducts::Brand($product);
-    $product_ps->id_manufacturer = $manufacturer->id;
-    $product_ps->manufacturer_name = $manufacturer->name;
+    if($sync["brand"]){
+      $manufacturer = ProcessProducts::Brand($product);
+      $product_ps->id_manufacturer = $manufacturer->id;
+      $product_ps->manufacturer_name = $manufacturer->name;
+    }
 
-    $feature = ProcessProducts::feature("Temporada");
-    $feature_value = ProcessProducts::featureValue($feature,"Invierno",0);
-
-    ProcessProducts::connectFeature($product_ps,$feature,$feature_value);
+    ProcessProducts::characteristics($product,$product_ps,$sync);
 
     if ($product->price){
       ProcessProducts::PriceOffer($product_ps,$product,$taxes,$sync["price_offer"]);
@@ -32,7 +34,18 @@ class ProcessProducts{
       $discount->delete();
     }
 
+
     $response = $product_ps->save();
+
+    ProcessProducts::Assets($product_ps,$product->assets);
+
+    if(count($product->variants) > 1){
+      ProcessProducts::saveVariants($product_ps,$product->variants,$sync);
+    }
+    else{
+      ProcessProducts::saveVariants($product_ps,$product->variants,$sync);
+    }
+
     return $response? $product_ps : false;
   }
 
@@ -60,8 +73,8 @@ class ProcessProducts{
       if ($sync && $config){
         if ($query){
           $discount = new SpecificPrice($query[0]["id_specific_price"]);
-          $discount->price           = ($config == "discount")? $price_offer : -1;       //cuando es reducido es -1, descontado precio final, porcentaje -1
-          $discount->reduction       = ($config == "discount")? 0 : $price_offer;        //reducido precio final, descontado es 0, porcentaje precio final.
+          $discount->price           = ($config == "discount")? $price_offer : -1;          //cuando es reducido es -1, descontado precio final, porcentaje -1
+          $discount->reduction       = ($config == "discount")? 0 : $price_offer;           //reducido precio final, descontado es 0, porcentaje precio final.
           $discount->reduction_type  = ($config == "percentage")? "percentage" : "amount";  // reducido y descontado es amount, porcentaje es percentage
           $discount->from = $from;
           $discount->to = $to;
@@ -112,6 +125,37 @@ class ProcessProducts{
 
 
 
+    public function characteristics($product,$product_ps,$sync){
+      if ($sync["warranty"]){
+        $feature = ProcessProducts::feature("Garantía");
+        $feature_value = ProcessProducts::featureValue($feature,0,$product->warranty,1);
+        ProcessProducts::connectFeature($product_ps,$feature,$feature_value);
+      }
+
+      if ($sync["characteristics"]){
+        $feature = ProcessProducts::feature("Año Temporada");
+        $feature_value = ProcessProducts::featureValue($feature,0,$product->seasonyear,1);
+        ProcessProducts::connectFeature($product_ps,$feature,$feature_value);
+      }
+
+      if($sync["characteristics"]){
+        $feature = ProcessProducts::feature("Temporada");
+        $feature_value = ProcessProducts::featureValue($feature,0,$product->season,0);
+        ProcessProducts::connectFeature($product_ps,$feature,$feature_value);
+      }
+
+      if($sync["characteristics"]){
+        $feature = ProcessProducts::feature("Género");
+        $feature_value = ProcessProducts::featureValue($feature,$product->gender_id,$product->gender_name,0);
+        ProcessProducts::connectFeature($product_ps,$feature,$feature_value);
+      }
+
+
+
+    }
+
+
+
     public static function feature($charact){
       $feature = FeatureCentry::getId($charact);
       if($feature){
@@ -131,8 +175,11 @@ class ProcessProducts{
 
 
 
-    public function featureValue($feature,$value,$custom){
-      $feature_value = FeatureValueCentry::getId($value);
+    public function featureValue($feature,$id_value,$value,$custom){
+      $value = mb_substr($value,0,255);
+      error_log($value);
+      $search = $id_value? $id_value : $value;
+      $feature_value = FeatureValueCentry::getId($search);
       if($feature_value){
         $feature_value = new FeatureValue($feature_value[0]["id"]);
       }
@@ -147,7 +194,7 @@ class ProcessProducts{
             $feature_valueC = new FeatureValueCentry($feature_value->id,null,$value);
           }
           else{
-            $feature_valueC = new FeatureValueCentry($feature_value->id,$value);
+            $feature_valueC = new FeatureValueCentry($feature_value->id,$id_value,$value);
           }
           $feature_valueC->save();
         }
@@ -160,7 +207,6 @@ class ProcessProducts{
 
     public function connectFeature($product_ps,$feature,$feature_value){
       $features = $product_ps->getFeatures();
-      error_log(print_r($features,true));
       foreach ($features as $featureProd){
         if ($featureProd["id_feature"] == $feature->id and $featureProd["id_feature_value"] != $feature_value->id){
           (new FeatureValue($featureProd["id_feature_value"]))->delete();
@@ -168,6 +214,164 @@ class ProcessProducts{
       }
 
       $feature_prod = $product_ps->addFeatureProductImport($product_ps->id,$feature->id,$feature_value->id);
+    }
+
+
+    public function Assets($product_ps,$assets){
+      $cont = 0;
+      foreach($assets as $asset){
+        $image = new Image();
+        $image->id_product = $product_ps->id;
+        $image->position = Image::getHighestPosition($product_ps->id) + 1;
+        $image->url = $asset->url;
+        $image->cover = ($cont == 0)? 1 : 0;
+        $image->save();
+        $cont++;
+      }
+
+    }
+
+
+    public function saveVariants($product_ps,$variants,$sync){
+      foreach($variants as $variant){
+        $combination = VariantCentry::getId($variant->_id);
+        if($combination){
+          $combination = new Combination($combination[0]["id"]);
+        }
+        else{
+          $combination = new Combination();
+          $combination->id_product = $product_ps->id;
+        }
+
+        $resp = $combination->save();
+        if ($resp){
+          $variantC = new VariantCentry($combination->id,$variant->_id);
+          $variantC->save();
+          ProcessProducts::saveVariant($combination,$variant,$sync);
+        }
+      }
+    }
+
+
+
+
+    public function saveVariant($variant_ps,$variant,$sync){
+      $variant_ps->reference = $sync["variant_sku"]? mb_substr($variant->sku,0,64) : $variant_ps->reference;
+      $variant_ps->ean13 = $sync["barcode"]? mb_substr($variant->barcode,0,13) : $variant_ps->ean13;
+      if($sync["stock"]){
+        StockAvailable::setQuantity($variant_ps->id_product,$variant_ps->id,$variant->quantity);
+      }
+      $attributes = ProcessProducts::Attributes($variant_ps,$variant,$sync);
+      $color = ProcessProducts::Color($variant)? ProcessProducts::Color($variant)->id : false;
+      //TODO: hacer la configuración para que reemplace solo lo necesario (si no se sincroniza no borrar ese atributo)
+      $variant_ps->setAttributes($attributes);
+      $variant_ps->save();
+
+    }
+
+
+
+    public static function Attributes($variant_ps,$variant,$sync){
+      $attr = [];
+      $old_color = null;
+      $old_size = null;
+
+      $color = ProcessProducts::Color($variant)? ProcessProducts::Color($variant)->id : false;
+      $color_attr_group = AttributeGroupCentry::getId("Color")[0]["id"];
+      $size = ProcessProducts::Size($variant)? ProcessProducts::Size($variant)->id : false;
+      $size_attr_group = AttributeGroupCentry::getId("Size")[0]["id"];
+
+      $attributes = $variant_ps->getAttributesName(Configuration::get('PS_LANG_DEFAULT'));
+      foreach ($attributes as $attribute){
+        $attr_ps = new Attribute($attribute["id_attribute"]);
+        if ($attr_ps->id_attribute_group == $color_attr_group){
+          $old_color = $attribute["id_attribute"];
+        }
+        elseif ($attr_ps->id_attribute_group == $size_attr_group){
+            $old_size = $attribute["id_attribute"];
+        }
+        array_push($attr,$attribute["id_attribute"]);
+      }
+
+
+      if($sync["color"]){
+        $attr = array_diff($attr,array($old_color));
+        array_push($attr,$color);
+      }
+
+      if($sync["size"]){
+        $attr = array_diff($attr,array($old_size));
+        array_push($attr,$size);
+      }
+
+      return array_unique($attr);
+    }
+
+
+    public static function AttributeGroup($value){
+      $name = ($value == "color")? "Color" : "Size";
+      if ($id = AttributeGroupCentry::getId($value)[0]["id"]){
+        $group = new AttributeGroup($id);
+      }
+      else{
+        $group = new AttributeGroup();
+        $group->name = array_fill_keys(Language::getIDs(false), $name);
+        $group->public_name = array_fill_keys(Language::getIDs(false), $name);
+        $group->is_color_group = ($value == "color")? 1 : 0;
+        $group->group_type = ($value == "color")? "color" : "select";
+        $resp = $group->save();
+        if($resp){
+            $groupC = new AttributeGroupCentry($group->id,$name);
+            $groupC->save();
+        }
+      }
+      return $group;
+    }
+
+
+
+
+    public static function Color($variant){
+      $group = ProcessProducts::AttributeGroup("color");
+      $color = ColorCentry::getId($variant->color_id);
+      if($color){
+        $color = new Attribute($color[0]["id"]);
+      }
+      else{
+        if($variant->color_id){
+          $color = new Attribute();
+          $color->name = array_fill_keys(Language::getIDs(false), $variant->color_name);;
+          $color->id_attribute_group = $group->id;
+          $resp = $color->save();
+          if ($resp){
+            $colorC = new ColorCentry($color->id,$variant->color_id);
+            $colorC->save();
+          }
+        }
+      }
+      return $color;
+    }
+
+
+    public static function Size($variant){
+      $group = ProcessProducts::AttributeGroup("size");
+      $size = SizeCentry::getId($variant->size_id);
+      if($size){
+        $size = new Attribute($size[0]["id"]);
+      }
+      else{
+        if($variant->size_id){
+          $size = new Attribute();
+          $size->name = array_fill_keys(Language::getIDs(false), $variant->size_name);;
+          $size->id_attribute_group = $group->id;
+          $resp = $size->save();
+          if ($resp){
+            $sizeC = new SizeCentry($size->id,$variant->size_id);
+            $sizeC->save();
+          }
+        }
+      }
+      return $size;
     }
 
   }
