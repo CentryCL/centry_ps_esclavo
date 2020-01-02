@@ -16,11 +16,22 @@ require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Order.php';
 require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/controllers/front/order_controller.php';
 require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/AuthorizationCentry.php';
 
+//require_once(dirname(__FILE__) . '/../../vendor/autoload.php');
 
 class Centry_PS_esclavoTestModuleFrontController extends FrontController {
 
-    public function initContent() {
-        die();
-    }
+  public function initContent() {
+//        $this->testPendingTasks();
+    die();
+  }
+
+  private function testPendingTasks() {
+    $pt = new CentryPs\models\system\PendingTask(
+            CentryPs\enums\system\PendingTaskOrigin::Centry,
+            CentryPs\enums\system\PendingTaskTopic::ProductSave, '1');
+    error_log(print_r($pt, true));
+    $pt->save();
+    $pt->delete();
+  }
 
 }

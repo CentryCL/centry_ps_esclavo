@@ -1,4 +1,5 @@
 <?php
+require_once(dirname(__FILE__) . '/vendor/autoload.php');
 require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/ConfigurationCentry.php';
 
 if (!defined('_PS_VERSION_')) {
