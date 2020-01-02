@@ -1,6 +1,7 @@
 <?php
 
-
+require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Abstract.php';
+require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/OrderStatusValue.php';
 
 
 class OrderStatusCentry extends AbstractCentry{
@@ -15,13 +16,17 @@ class OrderStatusCentry extends AbstractCentry{
      * @param string $id_centry Identificador de Centry
      */
     public function __construct($id = null, $id_centry = null) {
-        if (!is_null($id)){
+        if (!is_null($id) && is_null($id_centry)){
             $this->id = $id;
             $this->id_centry = $this->getIdCentry($id)[0]["id_centry"];
         }
-        if(!is_null($id_centry)){
+        elseif(is_null($id) && !is_null($id_centry)){
             $this->id_centry = $id_centry;
             $this->id = $this->getId($id_centry)[0]["id"];
+        }
+        else{
+            $this->id = $id;
+            $this->id_centry = $id_centry;
         }
     }
 
