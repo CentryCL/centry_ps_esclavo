@@ -1,5 +1,6 @@
 <?php
 require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/ConfigurationCentry.php';
+require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/OrderStatus.php';
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -157,10 +158,40 @@ class Centry_PS_esclavo extends Module
 
         foreach (OrderState::getOrderStates($defaultLang) as $state){
             $fieldsForm[0]['form']['input'][] = array(
-                'type' => 'text',
+                'type' => 'select',
                 'label' => $this->l($state["name"]),
                 'name' => $this->l($state["id_order_state"]),
                 'id' => $this->l($state["id_order_state"]),
+                'options' => array(
+                    'id' => 'id_option',
+                    'name' => 'name',
+                    'query' => array(
+                        array(
+                            'id_option' => 1,
+                            'name' => 'pending',
+                        ),
+                        array(
+                            'id_option' => 2,
+                            'name' => 'shipped'
+                        ),
+                        array(
+                            'id_option' => 3,
+                            'name' => 'recieved'
+                        ),
+                        array(
+                            'id_option' => 4,
+                            'name' => 'cancelled'
+                        ),
+                        array(
+                            'id_option' => 5,
+                            'name' => 'cancelled_before_shipping'
+                        ),
+                        array(
+                            'id_option' => 6,
+                            'name' => 'cancelled_after_shipping'
+                        ),
+                    )
+                ),
                 'required' => true,
             );
         }
@@ -198,9 +229,10 @@ class Centry_PS_esclavo extends Module
         $helper->fields_value['centryAppId'] = Configuration::get('CENTRY_SYNC_APP_ID');
         $helper->fields_value['centrySecretId'] = Configuration::get('CENTRY_SYNC_SECRET_ID');
         $helper->fields_value['display_show_header'] = true;
-        foreach (OrderState::getOrderStates($defaultLang) as $state){
-            $helper->fields_value[$this->l($state["id_order_state"])] = "ols";
-        }
+//        foreach (OrderState::getOrderStates($defaultLang) as $state){
+//            $helper->fields_value[$this->l($state["id_order_state"])]['options'] = OrderStatusCentry::getCentryStatus($state["id_order_state"]);
+//        }
+//        $helper->fields_value['10'] = 6;
 
         return $helper->generateForm($fieldsForm);
     }
