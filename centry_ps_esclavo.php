@@ -135,6 +135,7 @@ class Centry_PS_esclavo extends Module
                     'name' => 'centrySecretId',
                     'required' => true
                 ),
+                //ejemplo de checkbox
                 array(
                     'type' => 'checkbox',
                     'label' => $this->l('Options'),
