@@ -338,6 +338,16 @@ class CentrySDK {
     }
 
     /**
+     * @param $order_id
+     * @param null $params
+     * @param $payload
+     * @return mixed|string
+     */
+    public function updateOrder($order_id, $params=null, $payload){
+        return $this->update("conexion/v1/orders/" . $order_id . ".json", $params, $payload);
+    }
+
+    /**
      * Elimina orden en Centry.
      * @param $order_id
      * @param null $params

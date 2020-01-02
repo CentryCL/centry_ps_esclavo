@@ -42,7 +42,9 @@ class Centry_PS_esclavo extends Module
 
       if (!parent::install() ||
           !$this->registerHook('leftColumn') ||
-          !$this->registerHook('header')
+          !$this->registerHook('header') ||
+          !$this->registerHook('actionValidateOrder') ||
+          !$this->registerHook('actionOrderHistoryAddAfter')
       ) {
           return false;
       }
@@ -59,5 +61,19 @@ class Centry_PS_esclavo extends Module
         }
 
         return true;
+    }
+
+    public function hookactionValidateOrder($params){
+        //TODO: encolar notificacion, todo el seteo de info de la orden se va al controlador
+        error_log(print_r("hookactionValidateOrder", true));
+        error_log(print_r($params, true));
+    }
+
+
+
+    public function hookactionOrderHistoryAddAfter($params){
+        //TODO: encolar notificacion, todo el seteo de info de la orden se va al controlador
+        error_log(print_r("hookactionOrderHistoryAddAfter", true));
+        error_log(print_r($params, true));
     }
 }
