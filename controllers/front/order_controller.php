@@ -3,7 +3,7 @@ require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Order.php';
 
 class OrderController extends FrontController
 {
-    public function createOrderCentry($order_id){
+    public static function createOrderCentry($order_id){
         $order = OrderController::ordertoCentry($order_id);
         if($order){
             $resp = AuthorizationCentry::sdk()->createOrder(null, $order);
@@ -15,9 +15,8 @@ class OrderController extends FrontController
         return false;
     }
 
-    public function updateOrderCentry($order_id){
+    public static function updateOrderCentry($order_id){
         $centry_order_id = OrderCentry::getIdCentry($order_id)[0]["id_centry"];
-        error_log(print_r($centry_order_id,true));
         if($centry_order_id){
             $order = OrderController::ordertoCentry($order_id);
             if($order){
@@ -28,7 +27,7 @@ class OrderController extends FrontController
         return false;
     }
 
-    public function orderToCentry($order_id){
+    private static function orderToCentry($order_id){
         $order = new Order($order_id);
         if($order){
             $order_status = $order->getCurrentStateFull(Configuration::get('PS_LANG_DEFAULT'));
@@ -36,7 +35,7 @@ class OrderController extends FrontController
             $cart = new Cart($order->id_cart);
 
             $payload = array(
-                "_status" => OrderStatusCentry::getCentryStatus($order_status["id_order_state"]),
+                "_status" => OrderStatusCentry::getCentryStatusValue($order_status["id_order_state"]),
                 "status_origin" => $order_status["name"],
                 "address_billing" => OrderController::address($cart->id_address_invoice),
                 "address_shipping" => OrderController::address($cart->id_address_delivery),
@@ -62,7 +61,7 @@ class OrderController extends FrontController
         return false;
     }
 
-    private function address($id){
+    private static function address($id){
         $address = new \Address($id);
         $state = new \State($address->id_state);
         $country = new \Country($address->id_country);
@@ -83,7 +82,7 @@ class OrderController extends FrontController
         return $array;
     }
 
-    private function items($order_id){
+    private static function items($order_id){
         $items = array();
         $order = new Order($order_id);
         $currency = new Currency($order->id_currency);
@@ -106,7 +105,7 @@ class OrderController extends FrontController
         return $items;
     }
 
-    private function paymentMode($payment){
+    private static function paymentMode($payment){
         switch ($payment){
             case "Bank Transfer":
                 return "transfer";
