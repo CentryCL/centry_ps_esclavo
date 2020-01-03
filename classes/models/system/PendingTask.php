@@ -24,15 +24,23 @@ class PendingTask {
   public $topic;
 
   /**
+   * Estado en que se encuentra la tarea
+   * @Enum({"pending", "running"})
+   * @var string
+   */
+  public $status;
+
+  /**
    * Identificador del recurso que tiene que ser procesado
    * @var string
    */
   public $resource_id;
 
-  function __construct($origin, $topic, $resource_id) {
+  function __construct($origin, $topic, $resource_id, $status = \CentryPs\enums\system\PendingTaskStatus::Pending) {
     $this->origin = $origin;
     $this->topic = $topic;
     $this->resource_id = $resource_id;
+    $this->status = $status;
   }
 
   /**
@@ -40,22 +48,44 @@ class PendingTask {
    * @return boolean indica si el objeto pudo ser guardado o no.
    */
   public function save() {
-    return $this->create();
+    if (!$this->update()) {
+      return $this->create();
+    }
+    return true;
   }
 
   /**
    * Crea el objeto en la base de datos.
    * @return boolean indica si el objeto pudo ser guardado o no.
    */
-  private function create() {
+  public function create() {
     $table_name = _DB_PREFIX_ . static::$TABLE;
     $db = \Db::getInstance();
-    $sql = "INSERT INTO `{$table_name}` (`origin`, `topic`, `resource_id`) "
+    $sql = "INSERT INTO `{$table_name}` "
+            . "(`origin`, `topic`, `resource_id`, `status`) "
             . "VALUES ("
             . " {$this->escape($this->origin, $db)},"
             . " {$this->escape($this->topic, $db)},"
-            . " {$this->escape($this->resource_id, $db)}"
+            . " {$this->escape($this->resource_id, $db)},"
+            . " {$this->escape($this->status, $db)}"
             . ")";
+    return $db->execute($sql) != false;
+  }
+
+  /**
+   * Actualiza el objeto en la base de datos.
+   * @return boolean indica si el objeto pudo ser guardado o no.
+   */
+  public function update() {
+    $table_name = _DB_PREFIX_ . static::$TABLE;
+    $db = \Db::getInstance();
+    $sql = "UPDATE `{$table_name}` "
+            . "SET"
+            . " `status` = {$this->escape($this->status, $db)} "
+            . "WHERE"
+            . " `origin` = {$this->escape($this->origin, $db)} AND"
+            . " `topic` = {$this->escape($this->topic, $db)} AND"
+            . " `resource_id` = {$this->escape($this->resource_id, $db)}";
     return $db->execute($sql) != false;
   }
 
@@ -114,9 +144,19 @@ class PendingTask {
             . "`origin` VARCHAR(32) NOT NULL, "
             . "`topic` VARCHAR(32) NOT NULL, "
             . "`resource_id` VARCHAR(32) NOT NULL, "
+            . "`status` VARCHAR(32) NOT NULL, "
             . "PRIMARY KEY (`origin`, `topic`, `resource_id`)"
             . ")";
     return \Db::getInstance()->execute($sql);
+  }
+
+  public static function count($conditions = ['1' => '1']) {
+    $table_name = _DB_PREFIX_ . static::$TABLE;
+    $db = \Db::getInstance(_PS_USE_SQL_SLAVE_);
+    $sql = "SELECT COUNT(*) as count "
+            . "FROM `$table_name` "
+            . "WHERE " . static::equalities($conditions);
+    return $db->executeS($sql)[0]['count'];
   }
 
   /**
@@ -124,12 +164,13 @@ class PendingTask {
    * datos y las retorna como un arrego de instancias de esta clase.
    * @return \CentryPs\System\PendingTask
    */
-  public static function getPendingTasksObjects() {
+  public static function getPendingTasksObjects(array $conditions = null, int $limit = null, int $offset = null) {
     $objects = [];
-    foreach (static::getPendingTasks() as $pending_task) {
+    $tasks = static::getPendingTasks($conditions, $limit, $offset);
+    foreach ($tasks as $pending_task) {
       $objects[] = new PendingTask(
               $pending_task['origin'], $pending_task['topic'],
-              $pending_task['resource_id']
+              $pending_task['resource_id'], $pending_task['status']
       );
     }
     return $objects;
@@ -140,10 +181,27 @@ class PendingTask {
    * datos y las retorna como un arrego de arreglos simple.
    * @return array
    */
-  public static function getPendingTasks() {
+  public static function getPendingTasks(array $conditions = null, int $limit = null, int $offset = null) {
     $table_name = _DB_PREFIX_ . static::$TABLE;
     $sql = "SELECT * FROM `$table_name`";
+    if (isset($conditions)) {
+      $sql .= ' WHERE '. static::equalities($conditions);
+    }
+    if (isset($limit)) {
+      $sql .= " LIMIT $limit";
+    }
+    if (isset($offset)) {
+      $sql .= " OFFSET $offset";
+    }
     return \Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+  }
+  
+  private static function equalities(array $conditions) {
+    $equalities = [];
+    foreach ($conditions as $key => $value) {
+      $equalities[] = "{$key} = {$value}";
+    }
+    return join(' AND ', $equalities);
   }
 
 }

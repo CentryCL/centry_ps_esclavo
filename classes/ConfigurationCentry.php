@@ -608,6 +608,25 @@ class ConfigurationCentry  {
   public static function getSyncAuthSecretId(){
     return Configuration::get("CENTRY_SYNC_SECRET_ID");
   }
+  
+  /**
+   * Registra en la base de datos el número máximo de hilos para procesar tareas
+   * asíncronas que tiene permitido el módulo.
+   * @param int $value
+   */
+  public static function setMaxTaskThreads(int $value) {
+    Configuration::updateValue("CENTRY_MAX_TASK_THREADS", $value);
+  }
+
+  /**
+   * Obtiene el número máximo de hilos para procesar tareas asíncronas que tiene
+   * permitido el módulo. Si no se ha definido nada hasta el momento, retorna
+   * por defecto el valor <code>5<code>.
+   * @return integer
+   */
+  public static function getMaxTaskThreads(){
+    return Configuration::get("CENTRY_MAX_TASK_THREADS", null, null, null, 5);
+  }
 
 
 }
