@@ -11,7 +11,7 @@ use CentryPs\models\system\PendingTask;
  * Controlador encargado de ejecutar la tarea de leer un producto de Centry para
  * crearlo o actualizarlo en Prestashop.
  */
-class Centry_Ps_EsclavoPrestashopOrderSaveModuleFrontController extends AbstractTaskProcessor {
+class Centry_Ps_EsclavoPrestashopOrderDeleteModuleFrontController extends AbstractTaskProcessor {
 
   protected $origin = PendingTaskOrigin::PrestaShop;
   protected $topic = PendingTaskTopic::OrderDelete;
