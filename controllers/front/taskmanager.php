@@ -20,9 +20,7 @@ class Centry_Ps_EsclavoTaskManagerModuleFrontController extends ModuleFrontContr
     $lock = $this->getLock();
     if ($lock->acquire()) {
       foreach ($this->maxTasksToRun() as $task) {
-        $task->status = PendingTaskStatus::Running;
-        $task->update();
-        // Llamar a funcion encargada de procesar la tarea.
+        $this->requestProcessTask($task);
       }
       $lock->release();
     }
@@ -53,6 +51,39 @@ class Centry_Ps_EsclavoTaskManagerModuleFrontController extends ModuleFrontContr
     return PendingTask::getPendingTasksObjects(
                     ['status' => "'pending'"], $limit
     );
+  }
+
+  /**
+   * Solicita a un controllador del módulo que atianda asíncronamente la tarea
+   * pendiente.
+   * @param PendingTask $task
+   */
+  private function requestProcessTask(PendingTask $task) {
+    $task->status = PendingTaskStatus::Running;
+    $task->attempt++;
+    $task->update();
+    $controller = $task->origin . str_replace('_', '', $task->topic);
+    $params = ['id' => $task->resource_id];
+    $this->curlToLocalController($controller, $params);
+  }
+
+  /**
+   * Ejecuta un curl a un controlador de este módulo entregándole ciertos
+   * parámetros y con un timeout de 1 segundo para simular la ejecución de un
+   * hilo paralelo.
+   * @param string $controller
+   * @param array $params
+   */
+  private function curlToLocalController(string $controller, array $params) {
+    $url = $this->context->link->getModuleLink(
+            $this->context->controller->module->name, $controller, $params
+    );
+    $ch = curl_init($url);
+    // Para que la respuesta del servidor sea retornada por `curl_exec`.
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    // Time out de un segundo.
+    curl_setopt($ch, CURLOPT_TIMEOUT, 1);
+    curl_exec($ch);
   }
 
 }

@@ -24,17 +24,24 @@ class PendingTask {
   public $topic;
 
   /**
+   * Identificador del recurso que tiene que ser procesado
+   * @var string
+   */
+  public $resource_id;
+
+  /**
    * Estado en que se encuentra la tarea
-   * @Enum({"pending", "running"})
+   * @Enum({"pending", "running", "failed"})
    * @var string
    */
   public $status;
 
   /**
-   * Identificador del recurso que tiene que ser procesado
-   * @var string
+   * Número de veses que se ha ejecutado la misma notificación. Este campo es
+   * útil para el manejo de reintentos.
+   * @var int
    */
-  public $resource_id;
+  public $attempt;
 
   /**
    * Fecha de creación del registro
@@ -48,11 +55,12 @@ class PendingTask {
    */
   public $date_upd;
 
-  function __construct($origin, $topic, $resource_id, $status = \CentryPs\enums\system\PendingTaskStatus::Pending) {
+  function __construct($origin, $topic, $resource_id, $status = \CentryPs\enums\system\PendingTaskStatus::Pending, $attempt = 0) {
     $this->origin = $origin;
     $this->topic = $topic;
     $this->resource_id = $resource_id;
     $this->status = $status;
+    $this->attempt = $attempt;
   }
 
   /**
@@ -60,8 +68,8 @@ class PendingTask {
    * @return boolean indica si el objeto pudo ser guardado o no.
    */
   public function save() {
-    if (!$this->update()) {
-      return $this->create();
+    if (!$this->create()) {
+      return $this->update();
     }
     return true;
   }
@@ -74,12 +82,13 @@ class PendingTask {
     $table_name = _DB_PREFIX_ . static::$TABLE;
     $db = \Db::getInstance();
     $sql = "INSERT INTO `{$table_name}` "
-            . "(`origin`, `topic`, `resource_id`, `status`, `date_add`, `date_upd`) "
+            . "(`origin`, `topic`, `resource_id`, `status`, `attempt`, `date_add`, `date_upd`) "
             . "VALUES ("
             . " {$this->escape($this->origin, $db)},"
             . " {$this->escape($this->topic, $db)},"
             . " {$this->escape($this->resource_id, $db)},"
             . " {$this->escape($this->status, $db)},"
+            . " {$this->escape($this->attempt, $db, false)},"
             . " '" . date('Y-m-d H:i:s') . "',"
             . " '" . date('Y-m-d H:i:s') . "'"
             . ")";
@@ -95,8 +104,9 @@ class PendingTask {
     $db = \Db::getInstance();
     $sql = "UPDATE `{$table_name}` "
             . "SET"
-            . " `status` = {$this->escape($this->status, $db)}, "
-            . " `date_upd` = '" . date('Y-m-d H:i:s') . "'"
+            . " `status` = {$this->escape($this->status, $db)},"
+            . " `attempt` = {$this->escape($this->attempt, $db, false)},"
+            . " `date_upd` = '" . date('Y-m-d H:i:s') . "' "
             . "WHERE"
             . " `origin` = {$this->escape($this->origin, $db)} AND"
             . " `topic` = {$this->escape($this->topic, $db)} AND"
@@ -139,7 +149,7 @@ class PendingTask {
    * @see \Db#escape
    */
   private function escape($value, $db, $isString = true) {
-    if ($value == null) {
+    if ($value === null) {
       return 'NULL';
     }
 
@@ -160,6 +170,7 @@ class PendingTask {
             . "`topic` VARCHAR(32) NOT NULL, "
             . "`resource_id` VARCHAR(32) NOT NULL, "
             . "`status` VARCHAR(32) NOT NULL, "
+            . "`attempt` TINYINT UNSIGNED NOT NULL, "
             . "`date_add` DATETIME NOT NULL, "
             . "`date_upd` DATETIME NOT NULL, "
             . "PRIMARY KEY (`origin`, `topic`, `resource_id`)"
@@ -187,7 +198,8 @@ class PendingTask {
     foreach ($tasks as $pending_task) {
       $objects[] = new PendingTask(
               $pending_task['origin'], $pending_task['topic'],
-              $pending_task['resource_id'], $pending_task['status']
+              $pending_task['resource_id'], $pending_task['status'],
+              $pending_task['attempt']
       );
     }
     return $objects;

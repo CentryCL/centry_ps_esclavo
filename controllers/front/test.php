@@ -18,11 +18,12 @@
 
 require_once(dirname(__FILE__) . '/../../vendor/autoload.php');
 
-class Centry_PS_esclavoTestModuleFrontController extends FrontController {
+class Centry_PS_esclavoTestModuleFrontController extends ModuleFrontController {
 
   public function initContent() {
-//    $this->testPendingTasks();
-    $this->testLock();
+    $this->testPendingTasks();
+//    $this->testLock();
+//    $this->testUrlGenerator();
     die();
   }
 
@@ -68,4 +69,11 @@ class Centry_PS_esclavoTestModuleFrontController extends FrontController {
     die;
   }
 
+  private function testUrlGenerator() {
+    $params = [
+      'resource_id' => '1'
+    ];
+    $url = $this->context->link->getModuleLink($this->context->controller->module->name,'controller_name', $params);
+    error_log($url);
+  }
 }

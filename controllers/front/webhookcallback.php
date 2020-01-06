@@ -13,6 +13,7 @@ class Centry_Ps_EsclavoWebhookCallbackModuleFrontController extends ModuleFrontC
     $data = $this->getRequestPayload();
     try {
       $topic = $this->translateTopic($data['topic']);
+      // TODO: Revisar caso en que la notificación se esté ejecutando o haya fallado.
       (new CentryPs\models\system\PendingTask(
               CentryPs\enums\system\PendingTaskOrigin::Centry,
               $topic, $this->getNotificationResourceId($data, $topic))
