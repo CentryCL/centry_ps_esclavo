@@ -21,7 +21,8 @@ require_once(dirname(__FILE__) . '/../../vendor/autoload.php');
 class Centry_PS_esclavoTestModuleFrontController extends FrontController {
 
   public function initContent() {
-    $this->testPendingTasks();
+//    $this->testPendingTasks();
+    $this->testLock();
     die();
   }
 
@@ -43,10 +44,28 @@ class Centry_PS_esclavoTestModuleFrontController extends FrontController {
               CentryPs\enums\system\PendingTaskTopic::ProductSave,
               "$i"))->save();
     }
-    
+
     $lim = CentryPs\models\system\PendingTask::getPendingTasksObjects(['status' => "'pending'"], 2);
     error_log('Lim: ' . print_r($lim, true));
     error_log('Lim count: ' . count($lim));
+  }
+
+  private function testLock() {
+    error_log("Hilo {$_GET['hilo']}: inicio");
+    $store = Symfony\Component\Lock\Store\SemaphoreStore::isSupported() ?
+            new Symfony\Component\Lock\Store\SemaphoreStore() :
+            new Symfony\Component\Lock\Store\FlockStore(sys_get_temp_dir());
+    $factory = new Symfony\Component\Lock\Factory($store);
+    $lock = $factory->createLock('centry-test-lock');
+    if ($lock->acquire()) {
+      for ($i = 0; $i < 10; $i++) {
+        error_log("Hilo {$_GET['hilo']}: $i");
+        sleep(1);
+      }
+      $lock->release();
+    }
+    error_log("Hilo {$_GET['hilo']}: fin");
+    die;
   }
 
 }

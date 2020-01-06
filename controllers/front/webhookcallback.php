@@ -3,8 +3,8 @@
 require_once(dirname(__FILE__) . '/../../vendor/autoload.php');
 
 /**
- * Controlador encargado de ateneder y registrar las notificaciones denviadas
- * por Centry a Prestashop.
+ * Controlador encargado de ateneder y registrar las notificaciones enviadas por
+ * Centry a Prestashop.
  */
 class Centry_Ps_EsclavoWebhookCallbackModuleFrontController extends ModuleFrontController {
 

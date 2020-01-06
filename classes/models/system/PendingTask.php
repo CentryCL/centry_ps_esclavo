@@ -36,6 +36,18 @@ class PendingTask {
    */
   public $resource_id;
 
+  /**
+   * Fecha de creación del registro
+   * @var string
+   */
+  public $date_add;
+
+  /**
+   * Fecha de actualización del registro.
+   * @var String
+   */
+  public $date_upd;
+
   function __construct($origin, $topic, $resource_id, $status = \CentryPs\enums\system\PendingTaskStatus::Pending) {
     $this->origin = $origin;
     $this->topic = $topic;
@@ -62,12 +74,14 @@ class PendingTask {
     $table_name = _DB_PREFIX_ . static::$TABLE;
     $db = \Db::getInstance();
     $sql = "INSERT INTO `{$table_name}` "
-            . "(`origin`, `topic`, `resource_id`, `status`) "
+            . "(`origin`, `topic`, `resource_id`, `status`, `date_add`, `date_upd`) "
             . "VALUES ("
             . " {$this->escape($this->origin, $db)},"
             . " {$this->escape($this->topic, $db)},"
             . " {$this->escape($this->resource_id, $db)},"
-            . " {$this->escape($this->status, $db)}"
+            . " {$this->escape($this->status, $db)},"
+            . " '" . date('Y-m-d H:i:s') . "',"
+            . " '" . date('Y-m-d H:i:s') . "'"
             . ")";
     return $db->execute($sql) != false;
   }
@@ -81,7 +95,8 @@ class PendingTask {
     $db = \Db::getInstance();
     $sql = "UPDATE `{$table_name}` "
             . "SET"
-            . " `status` = {$this->escape($this->status, $db)} "
+            . " `status` = {$this->escape($this->status, $db)}, "
+            . " `date_upd` = '" . date('Y-m-d H:i:s') . "'"
             . "WHERE"
             . " `origin` = {$this->escape($this->origin, $db)} AND"
             . " `topic` = {$this->escape($this->topic, $db)} AND"
@@ -145,6 +160,8 @@ class PendingTask {
             . "`topic` VARCHAR(32) NOT NULL, "
             . "`resource_id` VARCHAR(32) NOT NULL, "
             . "`status` VARCHAR(32) NOT NULL, "
+            . "`date_add` DATETIME NOT NULL, "
+            . "`date_upd` DATETIME NOT NULL, "
             . "PRIMARY KEY (`origin`, `topic`, `resource_id`)"
             . ")";
     return \Db::getInstance()->execute($sql);
@@ -185,7 +202,7 @@ class PendingTask {
     $table_name = _DB_PREFIX_ . static::$TABLE;
     $sql = "SELECT * FROM `$table_name`";
     if (isset($conditions)) {
-      $sql .= ' WHERE '. static::equalities($conditions);
+      $sql .= ' WHERE ' . static::equalities($conditions);
     }
     if (isset($limit)) {
       $sql .= " LIMIT $limit";
@@ -195,7 +212,7 @@ class PendingTask {
     }
     return \Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
   }
-  
+
   private static function equalities(array $conditions) {
     $equalities = [];
     foreach ($conditions as $key => $value) {
