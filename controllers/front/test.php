@@ -29,6 +29,7 @@ class Centry_PS_esclavoTestModuleFrontController extends ModuleFrontController {
 
   private function testPendingTasks() {
     CentryPs\models\system\PendingTask::createTable();
+    CentryPs\models\system\FailedTaskLog::createTable();
     $pt = new CentryPs\models\system\PendingTask(
             CentryPs\enums\system\PendingTaskOrigin::Centry,
             CentryPs\enums\system\PendingTaskTopic::ProductSave, '1');

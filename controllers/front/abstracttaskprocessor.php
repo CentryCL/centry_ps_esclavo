@@ -3,6 +3,7 @@
 require_once(dirname(__FILE__) . '/../../vendor/autoload.php');
 
 use CentryPs\enums\system\PendingTaskStatus;
+use CentryPs\models\system\FailedTaskLog;
 use CentryPs\models\system\PendingTask;
 
 /**
@@ -50,14 +51,16 @@ abstract class AbstractTaskProcessor extends ModuleFrontController {
     ];
     return PendingTask::getPendingTasksObjects($conditions, 1, 0)[0];
   }
-  
+
   /**
    * Genera un registro con el motivo del error.
    * @param PendingTask $task
    * @param Exception $ex
    */
   private function generateLog(PendingTask $task, Exception $ex) {
-    throw new Exception('Unimplemented method');
+    (new FailedTaskLog(
+            $task->origin, $task->topic, $task->resource_id,
+            $ex->getMessage(), $ex->getTraceAsString()))->create();
   }
 
 }
