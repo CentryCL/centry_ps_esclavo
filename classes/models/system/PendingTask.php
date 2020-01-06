@@ -55,12 +55,14 @@ class PendingTask {
    */
   public $date_upd;
 
-  function __construct($origin, $topic, $resource_id, $status = \CentryPs\enums\system\PendingTaskStatus::Pending, $attempt = 0) {
+  function __construct($origin, $topic, $resource_id, $status = \CentryPs\enums\system\PendingTaskStatus::Pending, $attempt = 0, $date_add = null, $date_upd = null) {
     $this->origin = $origin;
     $this->topic = $topic;
     $this->resource_id = $resource_id;
     $this->status = $status;
     $this->attempt = $attempt;
+    $this->date_add = $date_add;
+    $this->date_upd = $date_upd;
   }
 
   /**
