@@ -3,11 +3,20 @@
 namespace CentryPs\models\system;
 
 /**
- * Representa una tarea que está pendiente de ser ejecutada
+ * Corresponde al registro de un error en el procesamiento de un
+ * <code>PendingTask</code>.
+ *
+ * @author Elías Lama L. <elias.lama@centry.cl>
  */
-class PendingTask {
+class FailedTaskLog {
 
-  public static $TABLE = "centry_pending_task";
+  public static $TABLE = "centry_failed_task_log";
+  
+  /**
+   * Identificador del registro.
+   * @var int
+   */
+  public $id;
 
   /**
    * Etiqueta que indica el origen de la tarea.
@@ -30,18 +39,16 @@ class PendingTask {
   public $resource_id;
 
   /**
-   * Estado en que se encuentra la tarea
-   * @Enum({"pending", "running", "failed"})
+   * Mensaje que resume el error ocurrido.
    * @var string
    */
-  public $status;
+  public $message;
 
   /**
-   * Número de veses que se ha ejecutado la misma notificación. Este campo es
-   * útil para el manejo de reintentos.
-   * @var int
+   * Traza de la ejecución que originó el error
+   * @var string 
    */
-  public $attempt;
+  public $trace;
 
   /**
    * Fecha de creación del registro
@@ -49,31 +56,14 @@ class PendingTask {
    */
   public $date_add;
 
-  /**
-   * Fecha de actualización del registro.
-   * @var String
-   */
-  public $date_upd;
-
-  function __construct($origin, $topic, $resource_id, $status = \CentryPs\enums\system\PendingTaskStatus::Pending, $attempt = 0, $date_add = null, $date_upd = null) {
+  function __construct($origin, $topic, $resource_id, $message, $trace, $id = null, $date_add = null) {
     $this->origin = $origin;
     $this->topic = $topic;
     $this->resource_id = $resource_id;
-    $this->status = $status;
-    $this->attempt = $attempt;
+    $this->message = $message;
+    $this->trace = $trace;
+    $this->id = $id;
     $this->date_add = $date_add;
-    $this->date_upd = $date_upd;
-  }
-
-  /**
-   * Manda a guardar el objeto, si ya existe retorna true.
-   * @return boolean indica si el objeto pudo ser guardado o no.
-   */
-  public function save() {
-    if (!$this->create()) {
-      return $this->update();
-    }
-    return true;
   }
 
   /**
@@ -84,50 +74,15 @@ class PendingTask {
     $table_name = _DB_PREFIX_ . static::$TABLE;
     $db = \Db::getInstance();
     $sql = "INSERT INTO `{$table_name}` "
-            . "(`origin`, `topic`, `resource_id`, `status`, `attempt`, `date_add`, `date_upd`) "
+            . "(`origin`, `topic`, `resource_id`, `message`, `trace`, `date_add`) "
             . "VALUES ("
             . " {$this->escape($this->origin, $db)},"
             . " {$this->escape($this->topic, $db)},"
             . " {$this->escape($this->resource_id, $db)},"
-            . " {$this->escape($this->status, $db)},"
-            . " {$this->escape($this->attempt, $db, false)},"
-            . " '" . date('Y-m-d H:i:s') . "',"
+            . " {$this->escape($this->message, $db)},"
+            . " {$this->escape($this->trace, $db)},"
             . " '" . date('Y-m-d H:i:s') . "'"
             . ")";
-    return $db->execute($sql) != false;
-  }
-
-  /**
-   * Actualiza el objeto en la base de datos.
-   * @return boolean indica si el objeto pudo ser guardado o no.
-   */
-  public function update() {
-    $table_name = _DB_PREFIX_ . static::$TABLE;
-    $db = \Db::getInstance();
-    $sql = "UPDATE `{$table_name}` "
-            . "SET"
-            . " `status` = {$this->escape($this->status, $db)},"
-            . " `attempt` = {$this->escape($this->attempt, $db, false)},"
-            . " `date_upd` = '" . date('Y-m-d H:i:s') . "' "
-            . "WHERE"
-            . " `origin` = {$this->escape($this->origin, $db)} AND"
-            . " `topic` = {$this->escape($this->topic, $db)} AND"
-            . " `resource_id` = {$this->escape($this->resource_id, $db)}";
-    return $db->execute($sql) != false;
-  }
-
-  /**
-   * Elimina el objeto de la base de datos.
-   * @return boolean indica si el objeto pudo ser eliminado o no. Si no existía
-   * en la base de datos retorna <code>true</code>.
-   */
-  public function delete() {
-    $table_name = _DB_PREFIX_ . static::$TABLE;
-    $db = \Db::getInstance();
-    $sql = "DELETE FROM `{$table_name}` WHERE"
-            . " `origin` = {$this->escape($this->origin, $db)} AND"
-            . " `topic` = {$this->escape($this->topic, $db)} AND"
-            . " `resource_id` = {$this->escape($this->resource_id, $db)}";
     return $db->execute($sql) != false;
   }
 
@@ -169,15 +124,16 @@ class PendingTask {
   public static function createTable() {
     $table_name = _DB_PREFIX_ . static::$TABLE;
     $sql = "CREATE TABLE IF NOT EXISTS `$table_name` ("
+            . "`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT, "
             . "`origin` VARCHAR(32) NOT NULL, "
             . "`topic` VARCHAR(32) NOT NULL, "
             . "`resource_id` VARCHAR(32) NOT NULL, "
-            . "`status` VARCHAR(32) NOT NULL, "
-            . "`attempt` TINYINT UNSIGNED NOT NULL, "
+            . "`message` TEXT NOT NULL, "
+            . "`trace` MEDIUMTEXT NULL, "
             . "`date_add` DATETIME NOT NULL, "
-            . "`date_upd` DATETIME NOT NULL, "
-            . "PRIMARY KEY (`origin`, `topic`, `resource_id`)"
+            . "PRIMARY KEY (`id`)"
             . ")";
+    error_log($sql);
     return \Db::getInstance()->execute($sql);
   }
 
@@ -198,30 +154,30 @@ class PendingTask {
   }
 
   /**
-   * Lista las tareas pendientes que se encuentran registradas en la base de
-   * datos y las retorna como un arrego de instancias de esta clase.
+   * Lista los logs de error de tareas que se encuentren registrados en la base
+   * de datos y los retorna como un arrego de instancias de esta clase.
    * @return \CentryPs\System\PendingTask
    */
-  public static function getPendingTasksObjects(array $conditions = null, int $limit = null, int $offset = null) {
+  public static function getFailedTaskLogsObjects(array $conditions = null, int $limit = null, int $offset = null) {
     $objects = [];
-    $tasks = static::getPendingTasks($conditions, $limit, $offset);
+    $tasks = static::getFailedTaskLogs($conditions, $limit, $offset);
     foreach ($tasks as $pending_task) {
       $objects[] = new PendingTask(
               $pending_task['origin'], $pending_task['topic'],
-              $pending_task['resource_id'], $pending_task['status'],
-              $pending_task['attempt'], $pending_task['date_add'],
-              $pending_task['date_upd']
+              $pending_task['resource_id'], $pending_task['message'],
+              $pending_task['trace'], $pending_task['id'],
+              $pending_task['date_add']
       );
     }
     return $objects;
   }
 
   /**
-   * Lista las tareas pendientes que se encuentran registradas en la base de
-   * datos y las retorna como un arrego de arreglos simple.
+   * Lista los logs de error de tareas que se encuentren registrados en la base
+   * de datos y los retorna como un arrego de arreglos simple.
    * @return array
    */
-  public static function getPendingTasks(array $conditions = null, int $limit = null, int $offset = null) {
+  public static function getFailedTaskLogs(array $conditions = null, int $limit = null, int $offset = null) {
     $table_name = _DB_PREFIX_ . static::$TABLE;
     $sql = "SELECT * FROM `$table_name`";
     if (isset($conditions)) {

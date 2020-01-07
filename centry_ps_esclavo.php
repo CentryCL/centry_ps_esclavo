@@ -16,7 +16,7 @@ class Centry_PS_esclavo extends Module
         $this->author = 'Centry';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = [
-            'min' => '1.6',
+            'min' => '1.7.4', // Upgrade Symfony to 3.4 LTS https://assets.prestashop2.com/es/system/files/ps_releases/changelog_1.7.4.0.txt
             'max' => _PS_VERSION_
         ];
         $this->bootstrap = true;
