@@ -6,6 +6,7 @@ class FeatureValueCentry extends AbstractCentry{
   public $id;
   public $id_centry;
   public $centry_value;
+  public $product_id;
   public static $TABLE = "feature_value_centry";
 
 
@@ -31,6 +32,7 @@ class FeatureValueCentry extends AbstractCentry{
     if(is_null($centry_value)){
       $this->centry_value = $this->getCentryValue($id)[0]["centry_value"];
     }
+    $this->product_id = $this->id? $this->getProductId($this->id): $this->getProductId($this->centry_value);
   }
 
 
@@ -41,11 +43,13 @@ class FeatureValueCentry extends AbstractCentry{
   public static function createTable() {
       $sql = "CREATE TABLE IF NOT EXISTS `" . _DB_PREFIX_ . static::$TABLE . "`(
       `id` INT(10) UNSIGNED NOT NULL,
+      `product_id` INT(10) UNSIGNED NOT NULL,
       `id_centry` VARCHAR(200),
-      `centry_value` VARCHAR(200)
+      `centry_value` VARCHAR(200) NOT NULL
       );
       ALTER TABLE  `" . _DB_PREFIX_ . "feature_value_centry"."` ADD UNIQUE INDEX `id` (`id`) ;
       ALTER TABLE `" . _DB_PREFIX_ . "feature_value_centry"."` ADD FOREIGN KEY (`id`) REFERENCES `" . _DB_PREFIX_ . "feature_value"."`(`id_feature_value`) ON DELETE CASCADE ON UPDATE NO ACTION;
+      ALTER TABLE `" . _DB_PREFIX_ . "feature_value_centry"."` ADD FOREIGN KEY (`product_id`) REFERENCES `" . _DB_PREFIX_ . "product"."`(`id_product`) ON DELETE CASCADE ON UPDATE NO ACTION;
       ";
         return Db::getInstance()->execute($sql);
     }
@@ -90,6 +94,38 @@ class FeatureValueCentry extends AbstractCentry{
 
 
     /**
+     * Funcion que permite obtener el id del producto de Prestashop
+     * @param  int $id         id de prestashop, id de centry, valor de centry.
+     * @return array/boolean   Retorna un arreglo con las coincidencias, si no encontró el valor devuelve falso.
+     */
+        public static function getProductId($id){
+          $db = Db::getInstance();
+          $query = new DbQuery();
+          $query->select('product_id');
+          $query->from(static::$TABLE);
+          $query->where("id_centry = '" . $db->escape($id) . "'");
+          if(!($result = $db->executeS($query))){
+            $query = new DbQuery();
+            $query->select('product_id');
+            $query->from(static::$TABLE);
+            $query->where("centry_value = '" . $db->escape($id) . "'");
+            $result2 = $db->executeS($query);
+            if(!($result = $db->executeS($query))){
+              $query = new DbQuery();
+              $query->select('product_id');
+              $query->from(static::$TABLE);
+              $query->where("id = '" . $db->escape($id) . "'");
+              $result3 = $db->executeS($query);
+              return ($result3) ? $result3 : false;
+            }
+
+            return $result2;
+          }
+          return $result;
+        }
+
+
+    /**
      * Revisa si debe crear el objeto o no consultando por el identificador de centry y/o el valor de centry
      * @return boolean indica si el objeto pudo ser creado.
      */
@@ -111,8 +147,9 @@ class FeatureValueCentry extends AbstractCentry{
     private function create() {
           $db = Db::getInstance();
           $sql = "INSERT INTO `" . _DB_PREFIX_ . static::$TABLE
-                  . "` (`id`, `id_centry`,`centry_value`)"
+                  . "` (`id`,`product_id`,`id_centry`,`centry_value`)"
                   . " VALUES (" . ((int) $this->id) . ", '"
+                  . $db->escape($this->product_id) . "', '"
                   . $db->escape($this->id_centry) . "', '"
                   . $db->escape($this->centry_value) . "')";
           return $db->execute($sql) != false;

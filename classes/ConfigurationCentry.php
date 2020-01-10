@@ -681,6 +681,42 @@ class ConfigurationCentry  {
 
 
   /**
+   *  Creación o actualización del campo categoría en la base de datos para su sincronizacion en la creación de un producto.
+   * @param  $value: Indica si se utilizan la categoría para la creacion del producto.
+   */
+  public static function setSyncOnCreateCategory($value) {
+    Configuration::updateValue("CENTRY_SYNC_ONCREATE_category",$value);
+  }
+
+
+  /**
+   * Creación o actualización del campo categoría en la base de datos para su sincronizacion en la actualización de un producto.
+   * @param  $value: Indica si se utiliza la categoría para la actualización del producto.
+   */
+  public static function setSyncOnUpdateCategory($value) {
+    Configuration::updateValue("CENTRY_SYNC_ONUPDATE_category",$value);
+  }
+
+
+  /**
+   * Función que obtiene el valor de la base de datos del campo categoría para la creación de un producto.
+   * @return string valor que indica si el campo categoría se utiliza para la creación de un producto.
+   */
+  public static function getSyncOnCreateCategory(){
+    return Configuration::get("CENTRY_SYNC_ONCREATE_category");
+  }
+
+
+  /**
+   * Función que obtiene el valor de la base de datos del campo categoría para la actualizacion de un producto.
+   * @return string valor que indica si el campo categoría e utiliza para la actualizacion de un producto.
+   */
+  public static function getSyncOnUpdateCategory(){
+    return Configuration::get("CENTRY_SYNC_ONUPDATE_category");
+  }
+
+
+  /**
    * Indica el comportamiento que tendrán las ofertas para los productos
    * @param string $value: Indica el tipo de oferta que se generarán, pueden ser "reduced", "discount", "percentage"
    */
@@ -723,6 +759,7 @@ class ConfigurationCentry  {
     $sync["package"] = ConfigurationCentry::getSyncOnUpdatePackage();
     $sync["seo"] = ConfigurationCentry::getSyncOnUpdateSeo();
     $sync["brand"] = ConfigurationCentry::getSyncOnUpdateBrand();
+    $sync["category"] = ConfigurationCentry::getSyncOnUpdateCategory();
     return $sync;
   }
 
@@ -752,6 +789,7 @@ class ConfigurationCentry  {
     $sync["package"] = ConfigurationCentry::getSyncOnCreatePackage();
     $sync["seo"] = ConfigurationCentry::getSyncOnCreateSeo();
     $sync["brand"] = ConfigurationCentry::getSyncOnCreateBrand();
+    $sync["category"] = ConfigurationCentry::getSyncOnCreateCategory();
     return $sync;
   }
 

@@ -7,6 +7,7 @@ require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Webhook.php';
 require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Variant.php';
 require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Size.php';
 require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Color.php';
+require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Image.php';
 require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Brand.php';
 require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/Feature.php';
 require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/models/FeatureValue.php';
@@ -18,12 +19,22 @@ require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/temp/product_process.php';
 class Centry_PS_esclavoTestModuleFrontController extends FrontController {
 
     public function initContent() {
-        //parent::initContent();
-
-        die();
+      FeatureValueCentry::createTable();
+      //parent::initContent();
+      die();
     }
 
-    public function classes_testing(){
+    private function image(){
+      //echo print_r($this->context->shop->id,true);
+      $configuration = new PrestaShop\PrestaShop\Adapter\Configuration();
+      $tools = new PrestaShop\PrestaShop\Adapter\Tools();
+      $context_shop_id = $this->context->shop->id;
+      $hook = new PrestaShop\PrestaShop\Adapter\Hook\HookDispatcher();
+      $image_copier = new PrestaShop\PrestaShop\Adapter\Import\ImageCopier($configuration,$tools,$context_shop_id,$hook);
+
+    }
+
+    private function classes_testing(){
       // if(BrandCentry::createTable()){
       //   echo "Tabla creada Exitosamente";
       // }

@@ -22,11 +22,12 @@ class CategoryCentry extends AbstractCentry{
    * Creación de la tabla para la homologación de categorias donde el id y el id_centry deben ser unicos.
    * @return boolean indica si la tabla pudo ser creada o no. si ya estaba creada retorna true.
    */
-  public static function createTable() { //agregar prinicipal
+  public static function createTable() {
       $sql = "CREATE TABLE IF NOT EXISTS `" . _DB_PREFIX_ . static::$TABLE . "`(
       `id` INT(10) UNSIGNED NOT NULL,
       `id_centry` VARCHAR(200) NOT NULL
       );
+      ALTER TABLE  `" . _DB_PREFIX_ . "category_centry"."` ADD UNIQUE INDEX `id` (`id`,`id_centry`) ;
       ALTER TABLE `" . _DB_PREFIX_ . "category_centry"."` ADD FOREIGN KEY (`id`) REFERENCES `" . _DB_PREFIX_ . "category"."`(`id_category`) ON DELETE CASCADE ON UPDATE NO ACTION;
       ";
         return Db::getInstance()->execute($sql);

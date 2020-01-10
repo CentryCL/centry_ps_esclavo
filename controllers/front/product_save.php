@@ -16,36 +16,33 @@ require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/temp/product_process.php';
 
 //require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/AuthorizationCentry.php';
 
-class Centry_PS_esclavoCallbackModuleFrontController extends FrontController {
+class Centry_PS_esclavoProduct_SaveModuleFrontController extends FrontController {
 
     public function initContent() {
-        //parent::initContent();
         $resp = $this->getProduct();
+        if (property_exists($resp,"_id")){
+          if ($id = ProductCentry::getId($resp->_id)){  //Actualizacion
+            $product_ps = new Product($id[0]["id"]);
+            $sync = ConfigurationCentry::getSyncOnUpdate();
+          }
+          else{                                         //Creación
+            $product_ps = new Product();
+            $sync = ConfigurationCentry::getSyncOnCreate();
+          }
 
-        ConfigurationCentry::setSyncOnUpdateSeo("on");
-        ConfigurationCentry::setSyncOnCreateSeo(null); 
+          $res = ProcessProducts::productSave($product_ps,$resp,$sync);
 
-        if ($id = ProductCentry::getId($resp->_id)){  //Actualizacion
-          $product_ps = new Product($id[0]["id"]);
-          $sync = ConfigurationCentry::getSyncOnUpdate();
-        }
-        else{                                         //Creación
-          $product_ps = new Product();
-          $sync = ConfigurationCentry::getSyncOnCreate();
-        }
-
-        $res = ProcessProducts::productSave($product_ps,$resp,$sync);
-
-        if($res){
-          $hom = new ProductCentry($res->id,$resp->_id);
-          $hom->save();
+          if($res){
+            $product_centry = new ProductCentry($res->id,$resp->_id);
+            $product_centry->save();
+          }
         }
         echo print_r($resp,true);
         die("OK");
     }
 
     public function getProduct(){
-      $product_id = "5d49ecde0038e81e36602fc7";
+      $product_id = "5e18774904c84b716da18e5b";
       $centry = new AuthorizationCentry();
       $endpoint = "conexion/v1/products/" . $product_id . ".json ";
       $method = "GET";
