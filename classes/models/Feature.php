@@ -117,7 +117,7 @@ class FeatureCentry extends AbstractCentry{
      * Crea el objeto en la base de datos.
      * @return boolean Indica si el objeto pudo ser creado o no
      */
-    private function create() {
+    protected function create() {
           $db = Db::getInstance();
           $sql = "INSERT INTO `" . _DB_PREFIX_ . static::$TABLE
                   . "` (`id`, `id_centry`,`centry_value`)"

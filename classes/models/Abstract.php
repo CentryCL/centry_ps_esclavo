@@ -50,7 +50,7 @@ abstract class AbstractCentry{
  * Crea el objeto en la base de datos.
  * @return boolean indica si el objeto pudo ser guardado o no.
  */
-  private function create() {
+  protected function create() {
         $db = Db::getInstance();
         $sql = "INSERT INTO `" . _DB_PREFIX_ . static::$TABLE
                 . "` (`id`, `id_centry`)"
