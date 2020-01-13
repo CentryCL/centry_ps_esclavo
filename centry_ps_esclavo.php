@@ -66,26 +66,41 @@ class Centry_PS_esclavo extends Module
 
     public function hookactionValidateOrder($params){
         //TODO: encolar notificacion, todo el seteo de info de la orden se va al controlador
-        error_log(print_r("hookactionValidateOrder", true));
-        error_log(print_r($params, true));
+        // error_log(print_r("hookactionValidateOrder", true));
+        // error_log(print_r($params, true));
     }
 
 
 
     public function hookactionOrderHistoryAddAfter($params){
         //TODO: encolar notificacion, todo el seteo de info de la orden se va al controlador
-        error_log(print_r("hookactionOrderHistoryAddAfter", true));
-        error_log(print_r($params, true));
+        // error_log(print_r("hookactionOrderHistoryAddAfter", true));
+        // error_log(print_r($params, true));
     }
 
     public function getContent()
     {
         $defaultLang = (int)Configuration::get('PS_LANG_DEFAULT');
         $output = null;
+        $fields = ['name','price','priceoffer','description','skuproduct','characteristics','warranty','condition','status',
+        'stock','variantsku','size','color','barcode','productimages','seo','brand','package','category'];
 
         if (Tools::isSubmit('submit'.$this->name)) {
             $centryAppId = strval(Tools::getValue('centryAppId'));
             $centrySecretId = strval(Tools::getValue('centrySecretId'));
+            $name_value = Tools::getAllValues();
+            foreach ($fields as $field){
+              $value_field_create = Tools::getValue("ONCREATE_".$field);
+              $value_field_update = Tools::getValue("ONUPDATE_".$field);
+              Configuration::updateValue('CENTRY_SYNC_ONCREATE_'.$field,$value_field_create);
+              Configuration::updateValue('CENTRY_SYNC_ONUPDATE_'.$field,$value_field_update);
+            }
+
+            $price_behavior = Tools::getValue("price_behavior");
+            Configuration::updateValue('CENTRY_SYNC_price_behavior',$price_behavior);
+
+            $variant_simple = Tools::getValue("VARIANT_SIMPLE");
+            Configuration::updateValue('CENTRY_SYNC_VARIANT_SIMPLE',$variant_simple);
 
             if (!$centryAppId || empty($centryAppId)) {
                 $output .= $this->displayError($this->l('Invalid Centry App Id'));
@@ -102,7 +117,6 @@ class Centry_PS_esclavo extends Module
 
             foreach (OrderState::getOrderStates($defaultLang) as $state){
                 $status = new OrderStatusCentry($state['id_order_state'], Tools::getValue($this->l($state['id_order_state'])));
-                //TODO: se crea el objeto pero no se actualiza con el save
                 $status->save();
             }
         }
@@ -116,6 +130,13 @@ class Centry_PS_esclavo extends Module
         $defaultLang = (int)Configuration::get('PS_LANG_DEFAULT');
 
         $statusFields = array();
+        $sync_fields = [["id"=>"name",'name'=>"Nombre"],["id"=>"price",'name'=>"Precio"],["id"=>"priceoffer",'name'=>"Precio de oferta"],
+        ["id"=>"description",'name'=>"Descripción"],["id"=>"skuproduct",'name'=>"Sku del Producto"],["id"=>"characteristics",'name'=>"Características"],
+        ["id"=>"stock",'name'=>"Stock"],["id"=>"variantsku",'name'=>"Sku de la Variante"],["id"=>"size",'name'=>"Talla"],
+        ["id"=>"color",'name'=>"Color"],["id"=>"barcode",'name'=>"Código de barras"],["id"=>"productimages",'name'=>"Imágenes Producto"],
+        ["id"=>"condition",'name'=>"Condición"],["id"=>"warranty",'name'=>"Garantía"],["id"=>"status",'name'=>"Estado"],
+        ["id"=>"seo",'name'=>"Campos SEO"],["id"=>"brand",'name'=>"Marca"],["id"=>"package",'name'=>"Medidas del paquete"],
+        ["id"=>"category",'name'=>"Categoría"]];
 
 
         // Init Fields form array
@@ -135,41 +156,112 @@ class Centry_PS_esclavo extends Module
                     'label' => $this->l('Centry Secret Id'),
                     'name' => 'centrySecretId',
                     'required' => true
-                ),
-                //ejemplo de checkbox
-                array(
-                    'type' => 'checkbox',
-                    'label' => $this->l('Options'),
-                    'name' => 'Options',
-                    'values' => array(
-                        'query' => array(
-                            array(
-                                'id' => 'show_header',
-                                'name' => $this->l('show header'),
-                                'value' => '1',
-                            ),
-                            array(
-                                'id' => 'header',
-                                'name' => $this->l('header'),
-                                'value' => '1',
-                            ),
-                        ),
-                        'id' => 'id',
-                        'name' => 'name',
-                    )
                 )
+              ),
+              'submit' => array(
+                   'title' => $this->l('Save'),
+                   'class' => 'btn btn-default pull-right'
+               )
+      );
+
+      $fieldsForm[1]['form'] = array(
+          'legend' => array(
+              'title' => $this->l('Synchronization Fields'),
+          ),
+          'input' => array(
+              array(
+                  'type' => 'checkbox',
+                  'label' => $this->l('Creación'),
+                  'name' => 'ONCREATE',
+                  'values' => array(
+                    'query' => array(
+                    ),
+                    'id' => 'id_option',
+                    'name' => 'name'
+                )
+              ),
+              array(
+                  'type' => 'checkbox',
+                  'label' => $this->l('Actualización'),
+                  'name' => 'ONUPDATE',
+                  'values' => array(
+                    'query' => array(
+                    ),
+                    'id' => 'id_option',
+                    'name' => 'name'
+                )
+              ),
+              array(
+                  'type' => 'select',
+                  'label' => $this->l('Comportamiento Precio oferta'),
+                  'name' => 'price_behavior',
+                  'options' => array(
+                      'query' => array(
+                          array(
+                              'id_option' => 'percentage',
+                              'name' => 'Descuento en Porcentaje',
+                          ),
+                          array(
+                              'id_option' => 'discount',
+                              'name' => 'Descuento en precio'
+                          ),
+                          array(
+                              'id_option' => 'reduced',
+                              'name' => 'Reemplazar precio normal'
+                          )
+                      ),
+                      'id' => 'id_option',
+                      'name' => 'name',
+                  ),
+              ),
+              array(
+                  'type' => 'checkbox',
+                  'label' => $this->l('Crear productos con variante única como productos simples'),
+                  'name' => 'VARIANT',
+                  'values' => array(
+                    'query' => array(
+                      array(
+                          'id_option' => $this->l("SIMPLE"),
+                          'name' => $this->l("")
+                      )
+                    ),
+                    'id' => 'id_option',
+                    'name' => 'name'
+                )
+              )
             ),
             'submit' => array(
-                'title' => $this->l('Save'),
-                'class' => 'btn btn-default pull-right'
-            )
+                 'title' => $this->l('Save'),
+                 'class' => 'btn btn-default pull-right'
+             )
+    );
+
+    foreach ($sync_fields as $sync_field){
+        $option = array(
+            'id_option' => $this->l($sync_field['id']),
+            'name' => $this->l($sync_field['name'])
         );
+        array_push($fieldsForm[1]['form']['input'][0]['values']['query'],$option);
+        array_push($fieldsForm[1]['form']['input'][1]['values']['query'],$option);
+
+    }
+
+
 
         // Se insertan las homologaciones de estado al formulario
         $centryOptions = array();
 
+        $fieldsForm[2]['form'] = array(
+            'legend' => array(
+                'title' => $this->l('Order States'),
+            ),
+            'submit' => array(
+                 'title' => $this->l('Save'),
+                 'class' => 'btn btn-default pull-right'
+             )
+        );
         foreach (OrderState::getOrderStates($defaultLang) as $state){
-            $fieldsForm[0]['form']['input'][] = array(
+            $fieldsForm[2]['form']['input'][] = array(
                 'type' => 'select',
                 'label' => $this->l($state["name"]),
                 'name' => $this->l($state["id_order_state"]),
@@ -239,6 +331,12 @@ class Centry_PS_esclavo extends Module
         // Load current value
         $helper->fields_value['centryAppId'] = Configuration::get('CENTRY_SYNC_APP_ID');
         $helper->fields_value['centrySecretId'] = Configuration::get('CENTRY_SYNC_SECRET_ID');
+        foreach($sync_fields as $sync_field){
+          $helper->fields_value['ONCREATE_'.$sync_field['id']] = Configuration::get('CENTRY_SYNC_ONCREATE_'.$sync_field['id']);
+          $helper->fields_value['ONUPDATE_'.$sync_field['id']] = Configuration::get('CENTRY_SYNC_ONUPDATE_'.$sync_field['id']);
+        }
+        $helper->fields_value['price_behavior'] = Configuration::get('CENTRY_SYNC_price_behavior');
+        $helper->fields_value['VARIANT_SIMPLE'] = Configuration::get('CENTRY_SYNC_VARIANT_SIMPLE');
         $helper->fields_value['display_show_header'] = true;
         foreach (OrderState::getOrderStates($defaultLang) as $state){
             $helper->fields_value[$this->l($state["id_order_state"])] = OrderStatusCentry::getIdCentry($state["id_order_state"])[0]["id_centry"];

@@ -41,7 +41,6 @@ abstract class AbstractCentry{
  */
   public function save(){
     if ($this->getId($this->id_centry)){
-      error_log("unu");
       return true;
     }
     return $this->create();
@@ -51,7 +50,7 @@ abstract class AbstractCentry{
  * Crea el objeto en la base de datos.
  * @return boolean indica si el objeto pudo ser guardado o no.
  */
-  private function create() {
+  protected function create() {
         $db = Db::getInstance();
         $sql = "INSERT INTO `" . _DB_PREFIX_ . static::$TABLE
                 . "` (`id`, `id_centry`)"

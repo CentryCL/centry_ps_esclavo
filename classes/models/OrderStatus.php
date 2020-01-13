@@ -40,6 +40,30 @@ class OrderStatusCentry extends AbstractCentry{
     }
 
     /**
+     * Manda a guardar el objeto, si ya existe lo actualiza.
+     * @return boolean indica si el objeto pudo ser guardado o no.
+     */
+    public function save(){
+      if ($this->getIdCentry($this->id)){
+        error_log("actu");
+        return $this->update();
+      }
+      error_log("crear");
+      return $this->create();
+    }
+
+    /**
+     * Actualiza el objeto en la base de datos.
+     * @return boolean indica si el objeto pudo ser actualizado o no.
+     */
+      private function update() {
+            $db = Db::getInstance();
+            $sql = "UPDATE `" . _DB_PREFIX_ . static::$TABLE
+               . "` SET `id_centry` =" . $this->id_centry . " WHERE id =" . $this->id ;
+            return $db->execute($sql) != false;
+      }
+
+    /**
      * Creación de la tabla para la homologación de features donde el id y el id_centry deben ser unicos.
      * @return boolean indica si la tabla pudo ser creada o no. si ya estaba creada retorna true.
      */
