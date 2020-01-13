@@ -41,7 +41,6 @@ abstract class AbstractCentry{
  */
   public function save(){
     if ($this->getId($this->id_centry)){
-      error_log("unu");
       return true;
     }
     return $this->create();

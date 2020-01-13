@@ -9,14 +9,12 @@ class CategoryCentry extends AbstractCentry{
 
 
   /**
-   * Constructor de la clase color que se puede instanciar con el id de centry
+   * Constructor de la clase Categoría que se puede instanciar con el id de centry
    * @param string $id_centry Identificador de Centry
    */
   public function __construct($id_centry = null) {
-    if(!is_null($id_centry)){
-      $this->id_centry = $id_centry;
-      $this->id = $this->getId($id_centry)[0]["id"];
-    }
+    $this->id_centry = $id_centry;
+    $this->id = $this->getId($id_centry)[0]["id"];
   }
 
 
@@ -29,7 +27,7 @@ class CategoryCentry extends AbstractCentry{
       `id` INT(10) UNSIGNED NOT NULL,
       `id_centry` VARCHAR(200) NOT NULL
       );
-      ALTER TABLE  " . _DB_PREFIX_ . "category_centry"." ADD UNIQUE INDEX (`id_centry`) ;
+      ALTER TABLE  `" . _DB_PREFIX_ . "category_centry"."` ADD UNIQUE INDEX `id` (`id`,`id_centry`) ;
       ALTER TABLE `" . _DB_PREFIX_ . "category_centry"."` ADD FOREIGN KEY (`id`) REFERENCES `" . _DB_PREFIX_ . "category"."`(`id_category`) ON DELETE CASCADE ON UPDATE NO ACTION;
       ";
         return Db::getInstance()->execute($sql);

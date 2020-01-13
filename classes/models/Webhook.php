@@ -58,7 +58,7 @@ class WebhookCentry extends AbstractCentry
       `id` INT(10) NOT NULL AUTO_INCREMENT PRIMARY KEY,
       `id_centry` VARCHAR(200) NOT NULL
       );
-      ALTER TABLE  " . _DB_PREFIX_ . "webhook_centry"." ADD UNIQUE INDEX (`id_centry`) ;
+      ALTER TABLE  `" . _DB_PREFIX_ . "webhook_centry"."` ADD UNIQUE INDEX `id_centry` (`id_centry`) ;
       ";
         return Db::getInstance()->execute($sql);
   }

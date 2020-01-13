@@ -13,16 +13,16 @@ class VariantCentry extends AbstractCentry{
    * @param int $id Identificador de Prestashop
    * @param string $id_centry Identificador de Centry
    */
-  public function __construct($id = null, $id_centry = null) {
-    if (!is_null($id)){
-      $this->id = $id;
-      $this->id_centry = $this->getIdCentry($id)[0]["id_centry"];
-    }
-    if(!is_null($id_centry)){
-      $this->id_centry = $id_centry;
-      $this->id = $this->getId($id_centry)[0]["id"];
-    }
-  }
+   public function __construct($id = null, $id_centry = null) {
+     $this->id = $id;
+     $this->id_centry = $id_centry;
+     if (is_null($this->id)){
+       $this->id = $this->getId($id_centry)[0]["id"];
+     }
+     if(is_null($id_centry)){
+       $this->id_centry = $this->getIdCentry($id)[0]["id_centry"];
+     }
+   }
 
 
   /**
@@ -34,8 +34,8 @@ class VariantCentry extends AbstractCentry{
       `id` INT(10) UNSIGNED NOT NULL,
       `id_centry` VARCHAR(200) NOT NULL
       );
-      ALTER TABLE  " . _DB_PREFIX_ . "variant_centry"." ADD UNIQUE INDEX (`id`) ;
-      ALTER TABLE  " . _DB_PREFIX_ . "variant_centry"." ADD UNIQUE INDEX (`id_centry`) ;
+      ALTER TABLE  `" . _DB_PREFIX_ . "variant_centry"."` ADD UNIQUE INDEX `id` (`id`) ;
+      ALTER TABLE  `" . _DB_PREFIX_ . "variant_centry"."` ADD UNIQUE INDEX `id_centry` (`id_centry`) ;
       ALTER TABLE `" . _DB_PREFIX_ . "variant_centry"."` ADD FOREIGN KEY (`id`) REFERENCES `" . _DB_PREFIX_ . "product_attribute"."`(`id_product_attribute`) ON DELETE CASCADE ON UPDATE NO ACTION;
       ";
         return Db::getInstance()->execute($sql);
