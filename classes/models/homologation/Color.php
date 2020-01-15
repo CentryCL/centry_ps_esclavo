@@ -2,7 +2,7 @@
 
 namespace CentryPs\models\homologation;
 
-class ColorCentry extends AbstractHomologation {
+class Color extends AbstractHomologation {
 
   public static $TABLE = "color_centry";
   protected static $ID_PRESTASHOP_DEFINITION = 'INT(11) NOT NULL';

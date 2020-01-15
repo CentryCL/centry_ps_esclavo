@@ -7,6 +7,7 @@ use CentryPs\models\AbstractModel;
 abstract class AbstractHomologation extends AbstractModel {
   
   protected static $ID_PRESTASHOP_DEFINITION = 'INT(10) UNSIGNED NOT NULL';
+  public static $TABLE_EXTRA_FIELDS = "";
 
   /**
    * Identificador del recurso en Prestashop
@@ -29,9 +30,11 @@ abstract class AbstractHomologation extends AbstractModel {
   public static function createTable() {
     $table_name = static::tableName();
     $id_prestashop_definition = static::$ID_PRESTASHOP_DEFINITION;
+    $extra_fields = static::$TABLE_EXTRA_FIELDS;
     $sql = "CREATE TABLE IF NOT EXISTS `{$table_name}`(
       `id_prestashop` {$id_prestashop_definition},
       `id_centry` VARCHAR(32) NOT NULL,
+      {$extra_fields}
       PRIMARY KEY (`id_prestashop`, `id_centry`)
       ); " . static::tableConstraints();
     error_log($sql);
