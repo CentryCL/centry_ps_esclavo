@@ -52,7 +52,7 @@ class Centry_PS_esclavo extends Module
       }
 
       if (!parent::install() ||
-          !$this->whenInstall("\\ProductCentry", "createTable") ||
+          !$this->whenInstall("\\ProductCentry", "createTable") || //TODO: con la refactorizacion esto puede que cambie
           !$this->whenInstall("\\CategoryCentry", "createTable") ||
           !$this->whenInstall("\\ColorCentry", "createTable") ||
           !$this->whenInstall("\\SizeCentry", "createTable") ||
@@ -114,14 +114,67 @@ class Centry_PS_esclavo extends Module
         // error_log(print_r($params, true));
     }
 
-    public function getContent()
-    {
+    public function getContent(){
         $defaultLang = (int)Configuration::get('PS_LANG_DEFAULT');
         $output = null;
         $fields = ['name','price','priceoffer','description','skuproduct','characteristics','warranty','condition','status',
         'stock','variantsku','size','color','barcode','productimages','seo','brand','package','category'];
 
-        if (Tools::isSubmit('submit'.$this->name)) {
+        if (Tools::isSubmit('submit_file')) {
+          $error_prods = null;
+          if (isset($_FILES['upload_file'])){
+            $target_dir = _PS_UPLOAD_DIR_;
+            $target_file = $target_dir . basename($_FILES['upload_file']['name']);
+            $fileType = pathinfo($target_file,PATHINFO_EXTENSION);
+            if ($fileType == "csv"){
+              $table = strval(Tools::getValue('field_to_homologate'));
+              if (move_uploaded_file($_FILES['upload_file']["tmp_name"], $target_file)){
+    						$file_location = basename($_FILES['upload_file']["name"]);
+                if (($handle = fopen($target_file, "r")) !== FALSE){
+                  $file_line = 0;
+                  while (($data = fgetcsv($handle,0,","))){
+                    $file_line++;
+                    try{
+                      $class = ucfirst($table)."Centry"; //TODO: con la refactorizacion esto puede cambiar.
+                      $line = new $class();
+                      if (in_array($table,array("featureValue","attributeGroup","feature"))){
+                        if ($table == "attr_group_centry"){
+                          $line->id = $data[0];
+                          $line->centry_value= $data[1];
+                          $line->save();
+                        }
+                        else{
+                          $line->id = $data[0];
+                          $line->id_centry= $data[1];
+                          $line->centry_value= $data[2];
+                          $line->save();
+                        }
+                      }
+                      else{
+                        $line->id = $data[0];
+                        $line->id_centry= $data[1];
+                        $line->save();
+
+                      }
+                    } catch(Exception $e){
+                      $error_prods.=$file_line.", ";
+                      continue;
+                    }
+                  }
+                  $message = $error_prods? "Revise que los identificadores existan en su página y que el fórmato sea el correcto. Filas con error: ".$error_prods : "";
+                  $output .= $this->displayConfirmation($this->l('Homologación subida. '.$message));
+                  fclose($handle);
+                }
+
+					}
+            }
+            else{
+              $output.=$this->displayError($this->l('Formato invalido de archivo, debe ser csv.'));
+            }
+          }
+        }
+
+        if (Tools::isSubmit('submit')) {
             $centryAppId = strval(Tools::getValue('centryAppId'));
             $centrySecretId = strval(Tools::getValue('centrySecretId'));
             $name_value = Tools::getAllValues();
@@ -196,7 +249,8 @@ class Centry_PS_esclavo extends Module
               ),
               'submit' => array(
                    'title' => $this->l('Save'),
-                   'class' => 'btn btn-default pull-right'
+                   'class' => 'btn btn-default pull-right',
+                   'name' => 'submit'
                )
       );
 
@@ -268,7 +322,8 @@ class Centry_PS_esclavo extends Module
             ),
             'submit' => array(
                  'title' => $this->l('Save'),
-                 'class' => 'btn btn-default pull-right'
+                 'class' => 'btn btn-default pull-right',
+                 'name' => 'submit'
              )
     );
 
@@ -293,7 +348,8 @@ class Centry_PS_esclavo extends Module
             ),
             'submit' => array(
                  'title' => $this->l('Save'),
-                 'class' => 'btn btn-default pull-right'
+                 'class' => 'btn btn-default pull-right',
+                 'name' => 'submit'
              )
         );
         foreach (OrderState::getOrderStates($defaultLang) as $state){
@@ -335,6 +391,75 @@ class Centry_PS_esclavo extends Module
                 'required' => true,
             );
         }
+
+        $fieldsForm[3]['form'] = array(
+            'legend' => array(
+                'title' => $this->l('Upload Homologation File'),
+            ),
+            'input' => array(
+              array(
+                'type' => 'file',
+                'name' => 'upload_file',
+                'label' => $this->l('Archivo homologación'),
+                'lang' => true
+              ),
+              array(
+                'type' => 'select',
+                'name' => 'field_to_homologate',
+                'id' => 'field_to_homologate',
+                'label' => $this->l('Campo a homologar'),
+                'lang' => true,
+                'options' => array(
+                    'id' => 'id_option',
+                    'name' => 'name',
+                    'query' => array(
+                        array(
+                            'id_option' => 'product',
+                            'name' => 'Productos',
+                        ),
+                        array(
+                            'id_option' => 'variant',
+                            'name' => 'Variantes'
+                        ),
+                        array(
+                            'id_option' => 'brand',
+                            'name' => 'Marca'
+                        ),
+                        array(
+                            'id_option' => 'size',
+                            'name' => 'Talla'
+                        ),
+                        array(
+                            'id_option' => 'color',
+                            'name' => 'Color'
+                        ),
+                        array(
+                            'id_option' => 'category',
+                            'name' => 'Categoría'
+                        ),
+                        array(
+                            'id_option' => 'feature',
+                            'name' => 'Característica'
+                        ),
+                        array(
+                            'id_option' => 'featureValue',
+                            'name' => 'Valor de Característica'
+                        ),
+                        array(
+                            'id_option' => 'attributeGroup',
+                            'name' => 'Grupo de Atributo'
+                        ),
+                    )
+                )
+              )
+            ),
+            'submit' => array(
+                 'title' => $this->l('Save'),
+                 'class' => 'btn btn-default pull-right',
+                 'name' => 'submit_file'
+             )
+        );
+
         $helper = new HelperForm();
 
         // Module, token and currentIndex
@@ -373,6 +498,7 @@ class Centry_PS_esclavo extends Module
         }
         $helper->fields_value['price_behavior'] = Configuration::get('CENTRY_SYNC_price_behavior');
         $helper->fields_value['VARIANT_SIMPLE'] = Configuration::get('CENTRY_SYNC_VARIANT_SIMPLE');
+        $helper->fields_value['field_to_homologate'] = 1;
         $helper->fields_value['display_show_header'] = true;
         foreach (OrderState::getOrderStates($defaultLang) as $state){
             $helper->fields_value[$this->l($state["id_order_state"])] = OrderStatusCentry::getIdCentry($state["id_order_state"])[0]["id_centry"];

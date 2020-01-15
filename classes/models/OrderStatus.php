@@ -45,10 +45,8 @@ class OrderStatusCentry extends AbstractCentry{
      */
     public function save(){
       if ($this->getIdCentry($this->id)){
-        error_log("actu");
         return $this->update();
       }
-      error_log("crear");
       return $this->create();
     }
 
