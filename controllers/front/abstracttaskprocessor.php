@@ -2,6 +2,7 @@
 
 require_once(dirname(__FILE__) . '/../../vendor/autoload.php');
 
+use CentryPs\ConfigurationCentry;
 use CentryPs\enums\system\PendingTaskStatus;
 use CentryPs\models\system\FailedTaskLog;
 use CentryPs\models\system\PendingTask;
