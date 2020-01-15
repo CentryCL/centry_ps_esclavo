@@ -9,7 +9,7 @@ use CentryPs\models\AbstractModel;
  */
 class PendingTask extends AbstractModel {
 
-  public static $TABLE = "centry_pending_task";
+  protected static $TABLE = "centry_pending_task";
 
   /**
    * Etiqueta que indica el origen de la tarea.

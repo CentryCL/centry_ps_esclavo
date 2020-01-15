@@ -3,10 +3,19 @@
 class Centry_PS_esclavoTestModuleFrontController extends ModuleFrontController {
 
   public function initContent() {
-    $this->testPendingTasks();
+    $this->tableCreations();
+//    $this->testPendingTasks();
 //    $this->testLock();
 //    $this->testUrlGenerator();
     die();
+  }
+  
+  private function tableCreations() {
+    CentryPs\models\system\PendingTask::createTable();
+    CentryPs\models\system\FailedTaskLog::createTable();
+    
+    CentryPs\models\homologation\Brand::createTable();
+    CentryPs\models\homologation\AttributeGroup::createTable();
   }
 
   private function testPendingTasks() {

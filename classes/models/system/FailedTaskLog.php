@@ -12,7 +12,7 @@ use CentryPs\models\AbstractModel;
  */
 class FailedTaskLog extends AbstractModel {
 
-  public static $TABLE = "centry_failed_task_log";
+  protected static $TABLE = "centry_failed_task_log";
   
   /**
    * Identificador del registro.
