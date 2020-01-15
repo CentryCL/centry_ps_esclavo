@@ -7,7 +7,8 @@ class Category extends AbstractHomologation {
   public static $TABLE = "category_centry";
 
   /**
-   * Constructor de la clase Categoría que se puede instanciar con el id de centry
+   * Constructor de la clase Categoría que se puede instanciar con el id de
+   * centry
    * @param string $id_centry Identificador de Centry
    */
   public function __construct($id_prestashop = null, $id_centry = null) {
