@@ -174,6 +174,92 @@ class Centry_PS_esclavo extends Module
           }
         }
 
+        if (Tools::isSubmit('submit_download')) {
+          //Declaraciones iniciales
+          $lang = $this->context->language->id;
+          $data = array();
+          $products = Product::getProducts($lang,0,0,"id_product","ASC");
+          $header = array("id Prestashop","Nombre del producto","Sku del producto","Código de barras","Descripción","Condicion",
+          "id Marca Prestashop","Marca","Altura","Largo","Ancho","Peso","Precio normal","Estado","id Variante Prestashop","SKU de la variante",
+          "Codigo de barras de la variante","Cantidad","id Talla","Talla","id Color","Color");
+          $filename = "product.csv";
+          header('Content-Type: text/csv');
+          header('Content-Disposition: attachment;filename=' . $filename);
+
+          $fp = fopen('php://output','w');
+          fputcsv($fp,$header,",");
+
+          foreach($products as $product){
+            $line = array();
+            $taxes = 1 + ($product["rate"])/100;
+            $variants = (new Product($product["id_product"]))->getWsCombinations();
+
+            array_push($line,$product["id_product"]);
+            array_push($line,$product["name"]);
+            array_push($line,$product["reference"]);
+            array_push($line,$product["ean13"]);
+            array_push($line,$product["description"]);
+            array_push($line,$product["condition"]);
+            array_push($line,$product["id_manufacturer"]);
+            array_push($line,$product["manufacturer_name"]);
+            array_push($line,$product["height"]);
+            array_push($line,$product["depth"]);
+            array_push($line,$product["width"]);
+            array_push($line,$product["weight"]);
+            array_push($line,round($product["price"]*$taxes,1));
+            array_push($line,$product["state"]? "activo":"pausado");
+
+            if($variants){ //Producto simple o con combinaciones
+              foreach($variants as $variant){
+                $size = "";
+                $color = "";
+                $size_id = "";
+                $color_id = "";
+                $comb_line = array();
+                $combination = new Combination($variant["id"]);
+                $attributes = $combination->getAttributesName($lang);
+
+                //Revisa atributos de talla y color si existen
+                foreach($attributes as $attribute){
+                  $attribute_object = new Attribute($attribute["id_attribute"]);
+                  $attribute_group = new AttributeGroup($attribute_object->id_attribute_group);
+                  $attribute_group_name = strtolower($attribute_group->name[$lang]);
+                  if($attribute_group_name == "talla" || $attribute_group_name == "size"){
+                    $size_id = $attribute["id_attribute"];
+                    $size = $attribute["name"];
+                  }
+                  elseif($attribute_group_name == "color"){
+                    $color_id = $attribute["id_attribute"];
+                    $color = $attribute["name"];
+                  }
+                }
+
+
+                array_push($comb_line, $combination->id);
+                array_push($comb_line, $combination->reference);
+                array_push($comb_line, $combination->barcode);
+                array_push($comb_line, StockAvailable::getQuantityAvailableByProduct($product["id_product"],$combination->id));
+                array_push($comb_line, $size_id);
+                array_push($comb_line, $size);
+                array_push($comb_line, $color_id);
+                array_push($comb_line, $color);
+
+                $line2 = array_merge($line,$comb_line);
+                fputcsv($fp,$line2,",");
+              }
+            }
+            else{
+              array_push($line,"");
+              array_push($line,$product["reference"]);
+              array_push($line,"");
+              array_push($line,StockAvailable::getQuantityAvailableByProduct($product["id_product"]));
+              fputcsv($fp,$line,",");
+            }
+          }
+          exit();
+        }
+
+
         if (Tools::isSubmit('submit')) {
             $centryAppId = strval(Tools::getValue('centryAppId'));
             $centrySecretId = strval(Tools::getValue('centrySecretId'));
@@ -192,22 +278,18 @@ class Centry_PS_esclavo extends Module
             Configuration::updateValue('CENTRY_SYNC_VARIANT_SIMPLE',$variant_simple);
 
             if (!$centryAppId || empty($centryAppId)) {
-                $output .= $this->displayError($this->l('Invalid Centry App Id'));
-            } else {
-                Configuration::updateValue('CENTRY_SYNC_APP_ID', $centryAppId);
-                $output .= $this->displayConfirmation($this->l('Centry App Id updated'));
+                $output .= $this->displayError($this->l('Centry App Id Inválido'));
             }
             if (!$centrySecretId || empty($centrySecretId)) {
-                $output .= $this->displayError($this->l('Invalid Centry Secret Id'));
-            } else {
-                Configuration::updateValue('CENTRY_SYNC_SECRET_ID', $centrySecretId);
-                $output .= $this->displayConfirmation($this->l('Centry Secret Id updated'));
+                $output .= $this->displayError($this->l('Centry Secret Id Inválido'));
             }
 
             foreach (OrderState::getOrderStates($defaultLang) as $state){
                 $status = new OrderStatusCentry($state['id_order_state'], Tools::getValue($this->l($state['id_order_state'])));
                 $status->save();
             }
+
+            $output .= $this->displayConfirmation('Campos actualizados');
         }
 
         return $output.$this->displayForm();
@@ -454,11 +536,22 @@ class Centry_PS_esclavo extends Module
               )
             ),
             'submit' => array(
-                 'title' => $this->l('Save'),
+                 'title' => $this->l('Cargar archivo'),
                  'class' => 'btn btn-default pull-right',
                  'name' => 'submit_file'
              )
         );
+
+        $fieldsForm[4]['form'] = array(
+            'legend' => array(
+                'title' => $this->l('Download CSV Products'),
+            ),
+            'submit' => array(
+                 'title' => $this->l('Descargar CSV'),
+                 'class' => 'btn btn-default center-block',
+                 'name' => 'submit_download'
+             )
+          );
 
         $helper = new HelperForm();
 
