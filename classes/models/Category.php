@@ -33,4 +33,19 @@ class CategoryCentry extends AbstractCentry{
         return Db::getInstance()->execute($sql);
     }
 
+    /**
+     * Manda a guardar el objeto, si ya existe retorna true.
+     * @return boolean indica si el objeto pudo ser guardado o no.
+     */
+      public function save(){
+        $ids = $this->getId($this->id_centry);
+        $ids = $ids? $ids : array();
+        foreach($ids as $id){
+          if($this->id == $id["id"]){
+            return true;
+          }
+        }
+        return $this->create();
+      }
+
 }

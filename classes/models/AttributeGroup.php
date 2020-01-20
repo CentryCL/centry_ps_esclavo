@@ -32,12 +32,12 @@ class AttributeGroupCentry extends AbstractCentry{
    */
   public static function createTable() {
       $sql = "CREATE TABLE IF NOT EXISTS `" . _DB_PREFIX_ . static::$TABLE . "`(
-      `id` INT(10) UNSIGNED NOT NULL,
+      `id` INT(11) NOT NULL,
       `centry_value` VARCHAR(200) NOT NULL
       );
       ALTER TABLE  `" . _DB_PREFIX_ . "attr_group_centry"."` ADD UNIQUE INDEX `id` (`id`) ;
-      ALTER TABLE  `" . _DB_PREFIX_ . "attr_group_centry"."` ADD UNIQUE INDEX `id_centry` (`id_centry`) ;
-      ALTER TABLE `" . _DB_PREFIX_ . "attr_group_centry"."` ADD FOREIGN KEY (`id`) REFERENCES `" . _DB_PREFIX_ . "category"."`(`id_category`) ON DELETE CASCADE ON UPDATE NO ACTION;
+      ALTER TABLE  `" . _DB_PREFIX_ . "attr_group_centry"."` ADD UNIQUE INDEX `centry_value` (`centry_value`) ;
+      ALTER TABLE `" . _DB_PREFIX_ . "attr_group_centry"."` ADD FOREIGN KEY (`id`) REFERENCES `" . _DB_PREFIX_ . "attribute_group"."`(`id_attribute_group`) ON DELETE CASCADE ON UPDATE NO ACTION;
       ";
         return Db::getInstance()->execute($sql);
     }

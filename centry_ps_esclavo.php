@@ -134,19 +134,35 @@ class Centry_PS_esclavo extends Module
                   $file_line = 0;
                   while (($data = fgetcsv($handle,0,","))){
                     $file_line++;
+                    if ($file_line < 2){
+                      continue;
+                    }
                     try{
                       $class = ucfirst($table)."Centry"; //TODO: con la refactorizacion esto puede cambiar.
                       $line = new $class();
-                      if (in_array($table,array("featureValue","attributeGroup","feature"))){
-                        if ($table == "attr_group_centry"){
+                      if (in_array($table,array("featureValue","attributeGroup","feature","image"))){
+                        if ($table == "attributeGroup"){
                           $line->id = $data[0];
                           $line->centry_value= $data[1];
                           $line->save();
                         }
-                        else{
+                        elseif($table == "image"){
+                          $line->id = $data[0];
+                          $line->id_centry= $data[1];
+                          $line->fingerprint= $data[2];
+                          $line->save();
+                        }
+                        elseif($table == "feature"){
                           $line->id = $data[0];
                           $line->id_centry= $data[1];
                           $line->centry_value= $data[2];
+                          $line->save();
+                        }
+                        elseif($table == "featureValue"){
+                          $line->id = $data[0];
+                          $line->product_id = $data[1];
+                          $line->id_centry = $data[2];
+                          $line->centry_value= $data[3];
                           $line->save();
                         }
                       }
@@ -280,8 +296,14 @@ class Centry_PS_esclavo extends Module
             if (!$centryAppId || empty($centryAppId)) {
                 $output .= $this->displayError($this->l('Centry App Id Inválido'));
             }
+            else {
+              Configuration::updateValue('CENTRY_SYNC_APP_ID',$centryAppId);
+            }
             if (!$centrySecretId || empty($centrySecretId)) {
                 $output .= $this->displayError($this->l('Centry Secret Id Inválido'));
+            }
+            else{
+              Configuration::updateValue('CENTRY_SYNC_SECRET_ID',$centrySecretId);
             }
 
             foreach (OrderState::getOrderStates($defaultLang) as $state){
@@ -374,11 +396,11 @@ class Centry_PS_esclavo extends Module
                               'name' => 'Descuento en Porcentaje',
                           ),
                           array(
-                              'id_option' => 'discount',
+                              'id_option' => 'reduced',
                               'name' => 'Descuento en precio'
                           ),
                           array(
-                              'id_option' => 'reduced',
+                              'id_option' => 'discount',
                               'name' => 'Reemplazar precio normal'
                           )
                       ),
@@ -490,6 +512,7 @@ class Centry_PS_esclavo extends Module
                 'name' => 'field_to_homologate',
                 'id' => 'field_to_homologate',
                 'label' => $this->l('Campo a homologar'),
+                'desc' => 'Se debe subir el CSV siguiendo el formato establecido.',
                 'lang' => true,
                 'options' => array(
                     'id' => 'id_option',
@@ -531,6 +554,18 @@ class Centry_PS_esclavo extends Module
                             'id_option' => 'attributeGroup',
                             'name' => 'Grupo de Atributo'
                         ),
+                        array(
+                            'id_option' => 'attribute',
+                            'name' => 'Valor Atributo'
+                        ),
+                        array(
+                            'id_option' => 'attributeGroup',
+                            'name' => 'Grupo de Atributo'
+                        ),
+                        array(
+                            'id_option' => 'image',
+                            'name' => 'Imagen'
+                        )
                     )
                 )
               )

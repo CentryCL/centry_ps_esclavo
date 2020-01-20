@@ -75,12 +75,11 @@ class ImageCentry extends AbstractCentry{
      * @return boolean indica si el objeto pudo ser guardado o no.
      */
       protected function create() {
-        error_log($this->fingerprint);
             $db = Db::getInstance();
             $sql = "INSERT INTO `" . _DB_PREFIX_ . static::$TABLE
                     . "` (`id`, `id_centry`,`fingerprint`)"
                     . " VALUES (" . ((int) $this->id) . ", '"
-                    . $db->escape($this->$id_centry) . "', '"
+                    . $db->escape($this->id_centry) . "', '"
                     . $db->escape($this->fingerprint) . "')";
             return $db->execute($sql) != false;
       }

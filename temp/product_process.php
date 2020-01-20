@@ -12,6 +12,7 @@ class ProcessProducts{
  * @return Product/boolean            Si el producto se guardó de forma correcta entrega el producto, de lo contrario retorna falso.
  */
   public static function productSave($product_ps,$product,$sync){
+    $default_lang = Configuration::get('PS_LANG_DEFAULT');
     $taxes = 1 + ($product_ps->getTaxesRate())/100;
     $product_ps->name = ($sync["name"]&&property_exists($product,"name"))? mb_substr($product->name,0,128) : $product_ps->name;
     $product_ps->reference = $sync["sku_product"]? mb_substr($product->sku,0,64) : $product_ps->reference;
@@ -22,14 +23,22 @@ class ProcessProducts{
     $product_ps->height = ($sync["package"]&&property_exists($product,"packageheight"))? $product->packageheight : $product_ps->height;
     $product_ps->depth = ($sync["package"]&&property_exists($product,"packagelength"))? $product->packagelength : $product_ps->depth;
     $product_ps->weight = ($sync["package"]&&property_exists($product,"packageweight"))? $product->packageweight : $product_ps->weight;
-    $product_ps->price = ($sync["price_offer"]&&property_exists($product,"price_compare"))? round(($product->price_compare)/$taxes,2) : $product_ps->price;
+    $product_ps->price = ($sync["price"]&&property_exists($product,"price_compare"))? round(($product->price_compare)/$taxes,2) : $product_ps->price;
     $product_ps->meta_title = ($sync["seo"]&&property_exists($product,"seo_title"))? mb_substr($product->seo_title,0,255) : $product_ps->meta_title;
     $product_ps->meta_description = ($sync["seo"]&&property_exists($product,"seo_description"))? mb_substr($product->seo_description,0,512) : $product_ps->meta_description;
+    $product_ps->available_for_order = 1;
+    $product_ps->available_now = "Disponible";
+    $product_ps->show_price = 1;
+
+    $response = $product_ps->save();
+
 
     if($sync["brand"]){
       $manufacturer = self::Brand($product);
-      $product_ps->id_manufacturer = $manufacturer->id;
-      $product_ps->manufacturer_name = $manufacturer->name;
+      if ($manufacturer){
+        $product_ps->id_manufacturer = $manufacturer->id;
+        $product_ps->manufacturer_name = $manufacturer->name;
+      }
     }
 
     self::characteristics($product,$product_ps,$sync);
@@ -50,6 +59,11 @@ class ProcessProducts{
       if($categories = CategoryCentry::getId($product->category_id)){
         self::category($product_ps,$product,$categories);
       }
+      else{
+        $default_category = $product_ps->getDefaultCategory();
+        $default_category = (getType($default_category) == "array")? $default_category["id_category_default"] : $default_category;
+        self::category($product_ps,$product,array(array("id"=>$default_category)));
+      }
     }
 
     if ($sync["product_images"]){
@@ -67,9 +81,16 @@ class ProcessProducts{
       }
     }
 
-    $response = $product_ps->save();
+    $response = $product_ps->update();
     return $response? $product_ps : false;
   }
+
+    private function generateLinkRewrite($name) {
+      $order = array("\r\n", "\n", "\r", " ", "_");
+      $replace = "-";
+      $newstr = str_replace($order, $replace, $name);
+      return preg_replace("/[^a-zA-Z0-9-]/", "", $newstr);
+    }
 
 
     /**
@@ -110,8 +131,8 @@ class ProcessProducts{
         else {
           $discount = new SpecificPrice();
           $discount->id_product      = $product_ps->id;
-          $discount->price           = ($config == "discount")? $product->price : -1;       //cuando es reducido es -1, descontado precio final, porcentaje -1
-          $discount->reduction       = ($config == "discount")? 0 : $product->price;        //reducido precio final, descontado es 0, porcentaje precio final.
+          $discount->price           = ($config == "discount")? $price_offer : -1;       //cuando es reducido es -1, descontado precio final, porcentaje -1
+          $discount->reduction       = ($config == "discount")? 0 : $price_offer;        //reducido precio final, descontado es 0, porcentaje precio final.
           $discount->reduction_type  = ($config == "percentage")? "percentage" : "amount";  // reducido y descontado es amount, porcentaje es percentage
           $discount->from_quantity = 1;// iguales desde aca uwu
           $discount->from = $from;
@@ -137,6 +158,9 @@ class ProcessProducts{
      * @return Brand                Objeto Brand instanciado (puede ser nuevo o uno ya creado)
      */
     private function Brand($product){
+      if(!property_exists($product,"brand_id")){
+        return false;
+      }
       $brand = BrandCentry::getId($product->brand_id);
       if($brand){
         $manufacturer = new Manufacturer($brand[0]["id"]);
@@ -313,7 +337,7 @@ class ProcessProducts{
       $prod_id = false;
       $search = $id_value? $id_value : $value;
       $feature_value = FeatureValueCentry::getId($search);
-      $prod_ids = FeatureValueCentry::getProductId($search);
+      $prod_ids = FeatureValueCentry::getProductId($search)? FeatureValueCentry::getProductId($search) : array();
       foreach($prod_ids as $id){
         if ($id["product_id"]==$product_id){
           $prod_id = $product_id;
@@ -396,10 +420,12 @@ class ProcessProducts{
       $position = 2;
       foreach($assets as $asset){
         $id_img = ImageCentry::getId($asset->_id)[0]["id"];
-        $image = new Image($id_img);
-        $image->position = $position;
-        $image->save();
-        $position++;
+        if ($id_img){
+          $image = new Image($id_img);
+          $image->position = $position;
+          $image->save();
+          $position++;
+        }
       }
     }
 
@@ -499,7 +525,7 @@ class ProcessProducts{
           $id_category_default = $category["id"];
         }
       }
-      $product_ps->setWsCategories($homologate_categories);
+      $product_ps->updateCategories($homologate_categories);
       $product_ps->id_category_default = $id_category_default;
       $product_ps->save();
     }
@@ -588,13 +614,16 @@ class ProcessProducts{
     private function saveVariant($variant_ps,$variant,$sync){
       $variant_ps->reference = $sync["variant_sku"]? mb_substr($variant->sku,0,64) : $variant_ps->reference;
       $variant_ps->ean13 = $sync["barcode"]? mb_substr($variant->barcode,0,13) : $variant_ps->ean13;
+
       if($sync["stock"]){
         StockAvailable::setQuantity($variant_ps->id_product,$variant_ps->id,$variant->quantity);
       }
       $attributes = self::Attributes($variant_ps,$variant,$sync);
       $variant_ps->setAttributes($attributes);
       $variant_ps->save();
-
+      if ($variant->quantity > 0){
+        (new Product($variant_ps->id_product))->setDefaultAttribute($variant_ps->id);
+      }
     }
 
 
@@ -612,7 +641,7 @@ class ProcessProducts{
       $color = self::Color($variant)? self::Color($variant)->id : false;
       $color_attr_group = AttributeGroupCentry::getId("Color")[0]["id"];
       $size = self::Size($variant)? self::Size($variant)->id : false;
-      $size_attr_group = AttributeGroupCentry::getId("Size")[0]["id"];
+      $size_attr_group = AttributeGroupCentry::getId("Talla")[0]["id"];
 
       $attributes = $variant_ps->getAttributesName(Configuration::get('PS_LANG_DEFAULT'));
       foreach ($attributes as $attribute){
@@ -644,20 +673,19 @@ class ProcessProducts{
      * Busca el grupo del atributo en prestashop devolviendo una instancia nueva si no la encuentra.
      * @param string $value  nombre del atributo, este puede ser color o talla.
      */
-    private  function AttributeGroup($value){
-      $name = ($value == "color")? "Color" : "Size";
+    private function AttributeGroup($value){
       if ($id = AttributeGroupCentry::getId($value)[0]["id"]){
         $group = new AttributeGroup($id);
       }
       else{
         $group = new AttributeGroup();
-        $group->name = array_fill_keys(Language::getIDs(false), $name);
-        $group->private_name = array_fill_keys(Language::getIDs(false), $name);
+        $group->name = array_fill_keys(Language::getIDs(false), $value);
+        $group->public_name = array_fill_keys(Language::getIDs(false), $value);
         $group->is_color_group = ($value == "color")? 1 : 0;
         $group->group_type = ($value == "color")? "color" : "select";
         $resp = $group->save();
         if($resp){
-            $groupC = new AttributeGroupCentry($group->id,$name);
+            $groupC = new AttributeGroupCentry($group->id,$value);
             $groupC->save();
         }
       }
@@ -674,7 +702,7 @@ class ProcessProducts{
       if(!property_exists($variant,"color_name")||!property_exists($variant,"color_id")){
         return false;
       }
-      $group = self::AttributeGroup("color");
+      $group = self::AttributeGroup("Color");
 
       $color = ColorCentry::getId($variant->color_id);
       if($color){
@@ -703,7 +731,7 @@ class ProcessProducts{
       if(!property_exists($variant,"size_name")||!property_exists($variant,"size_id")){
         return false;
       }
-      $group = self::AttributeGroup("size");
+      $group = self::AttributeGroup("Talla");
       $size = SizeCentry::getId($variant->size_id);
       if($size){
         $size = new Attribute($size[0]["id"]);
