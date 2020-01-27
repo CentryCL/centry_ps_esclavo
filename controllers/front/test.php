@@ -17,6 +17,11 @@ class Centry_PS_esclavoTestModuleFrontController extends ModuleFrontController {
     CentryPs\models\homologation\AttributeGroup::createTable();
     CentryPs\models\homologation\Brand::createTable();
     CentryPs\models\homologation\Category::createTable();
+    CentryPs\models\homologation\Color::createTable();
+//    CentryPs\models\homologation\Feature::createTable();
+//    CentryPs\models\homologation\FeatureValue::createTable();
+    CentryPs\models\homologation\Order::createTable();
+    CentryPs\models\homologation\Product::createTable();
   }
 
   private function testPendingTasks() {
