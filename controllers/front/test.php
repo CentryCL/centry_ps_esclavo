@@ -22,6 +22,7 @@ class Centry_PS_esclavoTestModuleFrontController extends ModuleFrontController {
 //    CentryPs\models\homologation\FeatureValue::createTable();
 //    CentryPs\models\homologation\Image::createTable();
 //    CentryPs\models\homologation\Order::createTable();
+//    CentryPs\models\homologation\OrderStatus::createTable();
 //    CentryPs\models\homologation\Product::createTable();
 //    CentryPs\models\homologation\Size::createTable();
 //    CentryPs\models\homologation\Variant::createTable();
