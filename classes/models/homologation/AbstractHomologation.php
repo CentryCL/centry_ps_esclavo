@@ -37,7 +37,6 @@ abstract class AbstractHomologation extends AbstractModel {
       {$extra_fields}
       PRIMARY KEY (`id_prestashop`, `id_centry`)
       ); " . static::tableConstraints();
-    error_log($sql);
     return \Db::getInstance()->execute($sql);
   }
   

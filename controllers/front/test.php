@@ -11,8 +11,8 @@ class Centry_PS_esclavoTestModuleFrontController extends ModuleFrontController {
   }
   
   private function tableCreations() {
-    CentryPs\models\system\PendingTask::createTable();
-    CentryPs\models\system\FailedTaskLog::createTable();
+//    CentryPs\models\system\PendingTask::createTable();
+//    CentryPs\models\system\FailedTaskLog::createTable();
     
 //    CentryPs\models\homologation\AttributeGroup::createTable();
 //    CentryPs\models\homologation\Brand::createTable();
@@ -24,6 +24,7 @@ class Centry_PS_esclavoTestModuleFrontController extends ModuleFrontController {
 //    CentryPs\models\homologation\Product::createTable();
 //    CentryPs\models\homologation\Size::createTable();
 //    CentryPs\models\homologation\Variant::createTable();
+    CentryPs\models\Webhook::createTable();
   }
 
   private function testPendingTasks() {
