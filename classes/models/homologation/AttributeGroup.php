@@ -4,7 +4,7 @@ namespace CentryPs\models\homologation;
 
 class AttributeGroup extends AbstractHomologation {
 
-  protected static $TABLE = "attr_group_centry";
+  protected static $TABLE = "attribute_group_centry";
   protected static $ID_PRESTASHOP_DEFINITION = 'INT(11) NOT NULL';
 
   /**

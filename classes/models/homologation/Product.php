@@ -4,7 +4,7 @@ namespace CentryPs\models\homologation;
 
 class Product extends AbstractHomologation {
 
-  public static $TABLE = "products_centry";
+  public static $TABLE = "product_centry";
 
   /**
    * Constructor de la clase producto que se puede instanciar con el id de

@@ -7,7 +7,7 @@ class FeatureValue extends AbstractHomologation {
   public $centry_value;
   public $product_id;
   public static $TABLE = "feature_value_centry";
-  public static $TABLE_EXTRA_FIELDS = "`centry_value` VARCHAR(200), `centry_value` VARCHAR(200) NOT NULL";
+  public static $TABLE_EXTRA_FIELDS = "`centry_value` VARCHAR(200), `product_id` INT(10) UNSIGNED NOT NULL,";
 
   /**
    * Constructor de la clase Feature Value que puede ser instaciada con el valor del id de ps, el id de centry o el valor de centry. También puede ser instanciada sin ninguno de estos datos. Esta clase se diferencia de las demás porque el valor puede poseer un identificador o puede ser un campo libre.
