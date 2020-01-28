@@ -7,7 +7,7 @@ use CentryPs\models\AbstractModel;
 abstract class AbstractHomologation extends AbstractModel {
   
   protected static $ID_PRESTASHOP_DEFINITION = 'INT(10) UNSIGNED NOT NULL';
-  public static $TABLE_EXTRA_FIELDS = "";
+  public static $TABLE_EXTRA_FIELDS = '';
 
   /**
    * Identificador del recurso en Prestashop
@@ -99,8 +99,8 @@ abstract class AbstractHomologation extends AbstractModel {
   private function create() {
     $db = \Db::getInstance();
     $sql = "INSERT INTO `" . _DB_PREFIX_ . static::tableName()
-            . "` (`id`, `id_centry`)"
-            . " VALUES (" . ((int) $this->id) . ", '"
+            . "` (`id_prestashop`, `id_centry`)"
+            . " VALUES (" . ((int) $this->id_prestashop) . ", '"
             . $db->escape($this->id_centry) . "')";
     return $db->execute($sql) != false;
   }
