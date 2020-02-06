@@ -23,16 +23,16 @@ class Feature extends AbstractHomologation {
     $this->id_centry = $id_centry;
     $this->centry_value = $centry_value;
     if (is_null($id_prestashop)) {
-      $this->id_prestashop = $this->getId($id_centry)[0]["id"];
+      $this->id_prestashop = $this->getIdPrestashop($id_centry);
       if (!$this->id_prestashop) {
-        $this->id_prestashop = $this->getId($centry_value)[0]["id"];
+        $this->id_prestashop = $this->getIdPrestashop($centry_value);
       }
     }
     if (is_null($id_centry)) {
-      $this->id_centry = $this->getIdCentry($id_prestashop)[0]["id_centry"];
+      $this->id_centry = $this->getIdCentry($id_prestashop);
     }
     if (is_null($centry_value)) {
-      $this->centry_value = $this->getCentryValue($id_prestashop)[0]["centry_value"];
+      $this->centry_value = $this->getCentryValue($id_prestashop);
     }
   }
 

@@ -9,11 +9,11 @@ class Centry_PS_esclavoTestModuleFrontController extends ModuleFrontController {
 //    $this->testUrlGenerator();
     die();
   }
-  
+
   private function tableCreations() {
     CentryPs\models\system\PendingTask::createTable();
     CentryPs\models\system\FailedTaskLog::createTable();
-    
+
     CentryPs\models\homologation\AttributeGroup::createTable();
     CentryPs\models\homologation\Brand::createTable();
     CentryPs\models\homologation\Category::createTable();
@@ -76,7 +76,8 @@ class Centry_PS_esclavoTestModuleFrontController extends ModuleFrontController {
     $params = [
       'resource_id' => '1'
     ];
-    $url = $this->context->link->getModuleLink($this->context->controller->module->name,'controller_name', $params);
+    $url = $this->context->link->getModuleLink($this->context->controller->module->name, 'controller_name', $params);
     error_log($url);
   }
+
 }

@@ -18,9 +18,7 @@ class OrderStatus extends AbstractHomologation {
 
   protected static function tableConstraints() {
     $table_name = static::tableName();
-    return "ALTER TABLE `{$table_name}` ADD UNIQUE INDEX (`id_prestashop`);
-      ALTER TABLE `{$table_name}` ADD FOREIGN KEY (`id_prestashop`) REFERENCES `" . _DB_PREFIX_ . "order_state" . "`(`id_order_state`) ON DELETE CASCADE ON UPDATE NO ACTION;
-      ALTER TABLE `{$table_name}` ADD FOREIGN KEY (`id_centry`) REFERENCES `" . _DB_PREFIX_ . "order_status_value_centry" . "`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION;";
+    return "ALTER TABLE `{$table_name}` ADD FOREIGN KEY (`id_prestashop`) REFERENCES `" . _DB_PREFIX_ . "order_state" . "`(`id_order_state`) ON DELETE CASCADE ON UPDATE NO ACTION;";
   }
 
 }

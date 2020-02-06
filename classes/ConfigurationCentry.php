@@ -28,7 +28,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo nombre se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreateName() {
-    return \Configuration::get("CENTRY_SYNC_ONCREATE_name");
+    return \Configuration::get("CENTRY_SYNC_ONCREATE_name", null, null, null, 'on');
   }
 
   /**
@@ -36,7 +36,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo nombre se utiliza para la actualización de un producto.
    */
   public static function getSyncOnUpdateName() {
-    return \Configuration::get("CENTRY_SYNC_ONUPDATE_name");
+    return \Configuration::get("CENTRY_SYNC_ONUPDATE_name", null, null, null, 'on');
   }
 
   /**
@@ -60,7 +60,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo precio se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreatePrice() {
-    return \Configuration::get("CENTRY_SYNC_ONCREATE_price");
+    return \Configuration::get("CENTRY_SYNC_ONCREATE_price", null, null, null, 'on');
   }
 
   /**
@@ -68,7 +68,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo precio se utiliza para la actualización de un producto.
    */
   public static function getSyncOnUpdatePrice() {
-    return \Configuration::get("CENTRY_SYNC_ONUPDATE_price");
+    return \Configuration::get("CENTRY_SYNC_ONUPDATE_price", null, null, null, 'on');
   }
 
   /**
@@ -92,7 +92,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo precio oferta se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreatePriceOffer() {
-    return \Configuration::get("CENTRY_SYNC_ONCREATE_priceoffer");
+    return \Configuration::get("CENTRY_SYNC_ONCREATE_priceoffer", null, null, null, 'on');
   }
 
   /**
@@ -100,7 +100,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo precio oferta se utiliza para la actualizacion de un producto.
    */
   public static function getSyncOnUpdatePriceOffer() {
-    return \Configuration::get("CENTRY_SYNC_ONUPDATE_priceoffer");
+    return \Configuration::get("CENTRY_SYNC_ONUPDATE_priceoffer", null, null, null, 'on');
   }
 
   /**
@@ -124,7 +124,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo descripcion se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreateDescription() {
-    return \Configuration::get("CENTRY_SYNC_ONCREATE_description");
+    return \Configuration::get("CENTRY_SYNC_ONCREATE_description", null, null, null, 'on');
   }
 
   /**
@@ -132,7 +132,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo descripcion se utiliza para la actualizacion de un producto.
    */
   public static function getSyncOnUpdateDescription() {
-    return \Configuration::get("CENTRY_SYNC_ONUPDATE_description");
+    return \Configuration::get("CENTRY_SYNC_ONUPDATE_description", null, null, null, 'on');
   }
 
   /**
@@ -156,7 +156,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo sku del producto se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreateSkuProduct() {
-    return \Configuration::get("CENTRY_SYNC_ONCREATE_skuproduct");
+    return \Configuration::get("CENTRY_SYNC_ONCREATE_skuproduct", null, null, null, 'on');
   }
 
   /**
@@ -164,7 +164,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo sku del producto se utiliza para la actualizacion de un producto.
    */
   public static function getSyncOnUpdateSkuProduct() {
-    return \Configuration::get("CENTRY_SYNC_ONUPDATE_skuproduct");
+    return \Configuration::get("CENTRY_SYNC_ONUPDATE_skuproduct", null, null, null, 'on');
   }
 
   /**
@@ -188,7 +188,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo características se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreateCharacteristics() {
-    return \Configuration::get("CENTRY_SYNC_ONCREATE_characteristics");
+    return \Configuration::get("CENTRY_SYNC_ONCREATE_characteristics", null, null, null, 'on');
   }
 
   /**
@@ -196,7 +196,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo características se utiliza para la actualizacion de un producto.
    */
   public static function getSyncOnUpdateCharacteristics() {
-    return \Configuration::get("CENTRY_SYNC_ONUPDATE_characteristics");
+    return \Configuration::get("CENTRY_SYNC_ONUPDATE_characteristics", null, null, null, 'on');
   }
 
   /**
@@ -220,7 +220,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo stock se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreateStock() {
-    return \Configuration::get("CENTRY_SYNC_ONCREATE_stock");
+    return \Configuration::get("CENTRY_SYNC_ONCREATE_stock", null, null, null, 'on');
   }
 
   /**
@@ -228,7 +228,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo stock se utiliza para la actualizacion de un producto.
    */
   public static function getSyncOnUpdateStock() {
-    return \Configuration::get("CENTRY_SYNC_ONUPDATE_stock");
+    return \Configuration::get("CENTRY_SYNC_ONUPDATE_stock", null, null, null, 'on');
   }
 
   /**
@@ -252,7 +252,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo sku de la variante se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreateVariantSku() {
-    return \Configuration::get("CENTRY_SYNC_ONCREATE_variantsku");
+    return \Configuration::get("CENTRY_SYNC_ONCREATE_variantsku", null, null, null, 'on');
   }
 
   /**
@@ -260,7 +260,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo sku de la variante se utiliza para la actualizacion de un producto.
    */
   public static function getSyncOnUpdateVariantSku() {
-    return \Configuration::get("CENTRY_SYNC_ONUPDATE_variantsku");
+    return \Configuration::get("CENTRY_SYNC_ONUPDATE_variantsku", null, null, null, 'on');
   }
 
   /**
@@ -284,7 +284,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo talla se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreateSize() {
-    return \Configuration::get("CENTRY_SYNC_ONCREATE_size");
+    return \Configuration::get("CENTRY_SYNC_ONCREATE_size", null, null, null, 'on');
   }
 
   /**
@@ -292,7 +292,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo talla se utiliza para la actualizacion de un producto.
    */
   public static function getSyncOnUpdateSize() {
-    return \Configuration::get("CENTRY_SYNC_ONUPDATE_size");
+    return \Configuration::get("CENTRY_SYNC_ONUPDATE_size", null, null, null, 'on');
   }
 
   /**
@@ -316,7 +316,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo color se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreateColor() {
-    return \Configuration::get("CENTRY_SYNC_ONCREATE_color");
+    return \Configuration::get("CENTRY_SYNC_ONCREATE_color", null, null, null, 'on');
   }
 
   /**
@@ -324,7 +324,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo color se utiliza para la actualizacion de un producto.
    */
   public static function getSyncOnUpdateColor() {
-    return \Configuration::get("CENTRY_SYNC_ONUPDATE_color");
+    return \Configuration::get("CENTRY_SYNC_ONUPDATE_color", null, null, null, 'on');
   }
 
   /**
@@ -348,7 +348,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo codigo de barras se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreateBarcode() {
-    return \Configuration::get("CENTRY_SYNC_ONCREATE_barcode");
+    return \Configuration::get("CENTRY_SYNC_ONCREATE_barcode", null, null, null, 'on');
   }
 
   /**
@@ -356,7 +356,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo codigo de barras se utiliza para la actualizacion de un producto.
    */
   public static function getSyncOnUpdateBarcode() {
-    return \Configuration::get("CENTRY_SYNC_ONUPDATE_barcode");
+    return \Configuration::get("CENTRY_SYNC_ONUPDATE_barcode", null, null, null, 'on');
   }
 
   /**
@@ -380,7 +380,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo imagenes del producto se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreateProductImages() {
-    return \Configuration::get("CENTRY_SYNC_ONCREATE_productimages");
+    return \Configuration::get("CENTRY_SYNC_ONCREATE_productimages", null, null, null, 'on');
   }
 
   /**
@@ -388,7 +388,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo imagenes del producto se utiliza para la actualizacion de un producto.
    */
   public static function getSyncOnUpdateProductImages() {
-    return \Configuration::get("CENTRY_SYNC_ONUPDATE_productimages");
+    return \Configuration::get("CENTRY_SYNC_ONUPDATE_productimages", null, null, null, 'on');
   }
 
   /**
@@ -412,7 +412,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo condicion se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreateCondition() {
-    return \Configuration::get("CENTRY_SYNC_ONCREATE_condition");
+    return \Configuration::get("CENTRY_SYNC_ONCREATE_condition", null, null, null, 'on');
   }
 
   /**
@@ -420,7 +420,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo condicion se utiliza para la actualizacion de un producto.
    */
   public static function getSyncOnUpdateCondition() {
-    return \Configuration::get("CENTRY_SYNC_ONUPDATE_condition");
+    return \Configuration::get("CENTRY_SYNC_ONUPDATE_condition", null, null, null, 'on');
   }
 
   /**
@@ -444,7 +444,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo garantia se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreateWarranty() {
-    return \Configuration::get("CENTRY_SYNC_ONCREATE_warranty");
+    return \Configuration::get("CENTRY_SYNC_ONCREATE_warranty", null, null, null, 'on');
   }
 
   /**
@@ -452,7 +452,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo garantia se utiliza para la actualizacion de un producto.
    */
   public static function getSyncOnUpdateWarranty() {
-    return \Configuration::get("CENTRY_SYNC_ONUPDATE_warranty");
+    return \Configuration::get("CENTRY_SYNC_ONUPDATE_warranty", null, null, null, 'on');
   }
 
   /**
@@ -476,7 +476,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo imagenes de la variante se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreateVariantImages() {
-    return \Configuration::get("CENTRY_SYNC_ONCREATE_variantimages");
+    return \Configuration::get("CENTRY_SYNC_ONCREATE_variantimages", null, null, null, 'on');
   }
 
   /**
@@ -484,7 +484,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo imagenes de la variante se utiliza para la actualizacion de un producto.
    */
   public static function getSyncOnUpdateVariantImages() {
-    return \Configuration::get("CENTRY_SYNC_ONUPDATE_variantimages");
+    return \Configuration::get("CENTRY_SYNC_ONUPDATE_variantimages", null, null, null, 'on');
   }
 
   /**
@@ -508,7 +508,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo estado se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreateStatus() {
-    return \Configuration::get("CENTRY_SYNC_ONCREATE_status");
+    return \Configuration::get("CENTRY_SYNC_ONCREATE_status", null, null, null, 'on');
   }
 
   /**
@@ -516,7 +516,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo estado se utiliza para la actualizacion de un producto.
    */
   public static function getSyncOnUpdateStatus() {
-    return \Configuration::get("CENTRY_SYNC_ONUPDATE_status");
+    return \Configuration::get("CENTRY_SYNC_ONUPDATE_status", null, null, null, 'on');
   }
 
   /**
@@ -540,7 +540,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo seo se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreateSeo() {
-    return \Configuration::get("CENTRY_SYNC_ONCREATE_seo");
+    return \Configuration::get("CENTRY_SYNC_ONCREATE_seo", null, null, null, 'on');
   }
 
   /**
@@ -548,7 +548,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo seo se utiliza para la actualizacion de un producto.
    */
   public static function getSyncOnUpdateSeo() {
-    return \Configuration::get("CENTRY_SYNC_ONUPDATE_seo");
+    return \Configuration::get("CENTRY_SYNC_ONUPDATE_seo", null, null, null, 'on');
   }
 
   /**
@@ -572,7 +572,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo marca se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreateBrand() {
-    return \Configuration::get("CENTRY_SYNC_ONCREATE_brand");
+    return \Configuration::get("CENTRY_SYNC_ONCREATE_brand", null, null, null, 'on');
   }
 
   /**
@@ -580,7 +580,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo marca se utiliza para la actualizacion de un producto.
    */
   public static function getSyncOnUpdateBrand() {
-    return \Configuration::get("CENTRY_SYNC_ONUPDATE_brand");
+    return \Configuration::get("CENTRY_SYNC_ONUPDATE_brand", null, null, null, 'on');
   }
 
   /**
@@ -604,7 +604,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo medidas del paquete se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreatePackage() {
-    return \Configuration::get("CENTRY_SYNC_ONCREATE_package");
+    return \Configuration::get("CENTRY_SYNC_ONCREATE_package", null, null, null, 'on');
   }
 
   /**
@@ -612,7 +612,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo medidas del paquete se utiliza para la actualizacion de un producto.
    */
   public static function getSyncOnUpdatePackage() {
-    return \Configuration::get("CENTRY_SYNC_ONUPDATE_package");
+    return \Configuration::get("CENTRY_SYNC_ONUPDATE_package", null, null, null, 'on');
   }
 
   /**
@@ -636,7 +636,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo categoría se utiliza para la creación de un producto.
    */
   public static function getSyncOnCreateCategory() {
-    return \Configuration::get("CENTRY_SYNC_ONCREATE_category");
+    return \Configuration::get("CENTRY_SYNC_ONCREATE_category", null, null, null, 'on');
   }
 
   /**
@@ -644,7 +644,7 @@ class ConfigurationCentry {
    * @return string valor que indica si el campo categoría e utiliza para la actualizacion de un producto.
    */
   public static function getSyncOnUpdateCategory() {
-    return \Configuration::get("CENTRY_SYNC_ONUPDATE_category");
+    return \Configuration::get("CENTRY_SYNC_ONUPDATE_category", null, null, null, 'on');
   }
 
   /**
@@ -719,6 +719,24 @@ class ConfigurationCentry {
     $sync["brand"] = ConfigurationCentry::getSyncOnCreateBrand();
     $sync["category"] = ConfigurationCentry::getSyncOnCreateCategory();
     return $sync;
+  }
+
+  /**
+   * Registra el campo que determina si es posible crear productos simples
+   * cuando tengan una única variante.
+   * @param type $value
+   */
+  public static function setSyncVaraintSimple($value) {
+    \Configuration::updateValue("CENTRY_SYNC_VARIANT_SIMPLE", $value);
+  }
+
+  /**
+   * Obtiene el campo que determina si es posible crear productos simples cuando
+   * tengan una única variante.
+   * @return string
+   */
+  public static function getSyncVaraintSimple() {
+    return \Configuration::get("CENTRY_SYNC_VARIANT_SIMPLE");
   }
 
 // Auth

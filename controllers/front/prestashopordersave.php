@@ -15,12 +15,10 @@ class Centry_Ps_EsclavoPrestashopOrderSaveModuleFrontController extends Abstract
 
   protected $origin = PendingTaskOrigin::PrestaShop;
   protected $topic = PendingTaskTopic::OrderSave;
-  
+
   protected function processTask(PendingTask $task) {
     error_log(print_r($task, true));
     throw new Exception('Unimplemented method');
   }
 
 }
-
-

@@ -261,7 +261,7 @@ class Centry_PS_esclavo extends Module {
       Configuration::updateValue('CENTRY_SYNC_price_behavior', $price_behavior);
 
       $variant_simple = Tools::getValue("VARIANT_SIMPLE");
-      Configuration::updateValue('CENTRY_SYNC_VARIANT_SIMPLE', $variant_simple);
+      CentryPs\ConfigurationCentry::getSyncVaraintSimple($variant_simple);
 
       if (!$centryAppId || empty($centryAppId)) {
         $output .= $this->displayError($this->l('Centry App Id Inválido'));
@@ -275,7 +275,7 @@ class Centry_PS_esclavo extends Module {
       }
 
       foreach (OrderState::getOrderStates($defaultLang) as $state) {
-        $status = new OrderStatusCentry($state['id_order_state'], Tools::getValue($this->l($state['id_order_state'])));
+        $status = new CentryPs\models\homologation\OrderStatus($state['id_order_state'], Tools::getValue("order_state_" . $state['id_order_state']));
         $status->save();
       }
 
@@ -426,36 +426,36 @@ class Centry_PS_esclavo extends Module {
       $fieldsForm[2]['form']['input'][] = array(
         'type' => 'select',
         'label' => $this->l($state["name"]),
-        'name' => $this->l($state["id_order_state"]),
-        'id' => $this->l($state["id_order_state"]),
+        'name' => "order_state_" . $state["id_order_state"],
+        'id' => "order_state_" . $state["id_order_state"],
         'options' => array(
           'id' => 'id_option',
           'name' => 'name',
           'query' => array(
             array(
-              'id_option' => 1,
+              'id_option' => 'pending',
               'name' => 'pending',
             ),
             array(
-              'id_option' => 2,
+              'id_option' => 'shipped',
               'name' => 'shipped'
             ),
             array(
-              'id_option' => 3,
+              'id_option' => 'recieved',
               'name' => 'recieved'
             ),
             array(
-              'id_option' => 4,
+              'id_option' => 'cancelled',
               'name' => 'cancelled'
-            ),
-            array(
-              'id_option' => 5,
-              'name' => 'cancelled before shipping'
-            ),
-            array(
-              'id_option' => 6,
-              'name' => 'cancelled after shipping'
-            ),
+            )
+//            array(
+//              'id_option' => 'cancelled before shipping',
+//              'name' => 'cancelled before shipping'
+//            ),
+//            array(
+//              'id_option' => 'cancelled after shipping',
+//              'name' => 'cancelled after shipping'
+//            )
           )
         ),
         'required' => true,
@@ -584,18 +584,18 @@ class Centry_PS_esclavo extends Module {
     ];
 
     // Load current value
-    $helper->fields_value['centryAppId'] = Configuration::get('CENTRY_SYNC_APP_ID');
-    $helper->fields_value['centrySecretId'] = Configuration::get('CENTRY_SYNC_SECRET_ID');
+    $helper->fields_value['centryAppId'] = CentryPs\ConfigurationCentry::getSyncAuthAppId();
+    $helper->fields_value['centrySecretId'] = CentryPs\ConfigurationCentry::getSyncAuthSecretId();
     foreach ($sync_fields as $sync_field) {
-      $helper->fields_value['ONCREATE_' . $sync_field['id']] = Configuration::get('CENTRY_SYNC_ONCREATE_' . $sync_field['id']);
-      $helper->fields_value['ONUPDATE_' . $sync_field['id']] = Configuration::get('CENTRY_SYNC_ONUPDATE_' . $sync_field['id']);
+      $helper->fields_value['ONCREATE_' . $sync_field['id']] = Configuration::get('CENTRY_SYNC_ONCREATE_' . $sync_field['id'], null, null, null, 'on');
+      $helper->fields_value['ONUPDATE_' . $sync_field['id']] = Configuration::get('CENTRY_SYNC_ONUPDATE_' . $sync_field['id'], null, null, null, 'on');
     }
-    $helper->fields_value['price_behavior'] = Configuration::get('CENTRY_SYNC_price_behavior');
-    $helper->fields_value['VARIANT_SIMPLE'] = Configuration::get('CENTRY_SYNC_VARIANT_SIMPLE');
+    $helper->fields_value['price_behavior'] = CentryPs\ConfigurationCentry::getPriceBehavior();
+    $helper->fields_value['VARIANT_SIMPLE'] = CentryPs\ConfigurationCentry::getSyncVaraintSimple();
     $helper->fields_value['field_to_homologate'] = 1;
     $helper->fields_value['display_show_header'] = true;
     foreach (OrderState::getOrderStates($defaultLang) as $state) {
-      $helper->fields_value[$this->l($state["id_order_state"])] = OrderStatusCentry::getIdCentry($state["id_order_state"])[0]["id_centry"];
+      $helper->fields_value["order_state_" . $state["id_order_state"]] = CentryPs\models\homologation\OrderStatus::getIdCentry($state["id_order_state"]);
     }
 
     return $helper->generateForm($fieldsForm);

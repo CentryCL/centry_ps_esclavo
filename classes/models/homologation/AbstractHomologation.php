@@ -5,7 +5,7 @@ namespace CentryPs\models\homologation;
 use CentryPs\models\AbstractModel;
 
 abstract class AbstractHomologation extends AbstractModel {
-  
+
   protected static $ID_PRESTASHOP_DEFINITION = 'INT(10) UNSIGNED NOT NULL';
   public static $TABLE_EXTRA_FIELDS = '';
 
@@ -39,7 +39,7 @@ abstract class AbstractHomologation extends AbstractModel {
       ); " . static::tableConstraints();
     return \Db::getInstance()->execute($sql);
   }
-  
+
   protected abstract static function tableConstraints();
 
   /**
@@ -49,11 +49,11 @@ abstract class AbstractHomologation extends AbstractModel {
    */
   public static function getIdCentry($id_prestashop) {
     $db = \Db::getInstance();
-    $query = new DbQuery();
+    $query = new \DbQuery();
     $query->select('id_centry');
-    $query->from(static::tableName());
+    $query->from(static::$TABLE);
     $query->where("id_prestashop = '" . $db->escape($id_prestashop) . "'");
-    return ($id_centry = $db->executeS($query)) ? $id_centry : false;
+    return ($res = $db->executeS($query)) ? $res[0]["id_centry"] : false;
   }
 
   /**
@@ -63,21 +63,25 @@ abstract class AbstractHomologation extends AbstractModel {
    */
   public static function getIdPrestashop($id_centry) {
     $db = \Db::getInstance();
-    $query = new DbQuery();
+    $query = new \DbQuery();
     $query->select('id_prestashop');
-    $query->from(static::tableName());
+    $query->from(static::$TABLE);
     $query->where("id_centry = '" . $db->escape($id_centry) . "'");
-    return ($id_prestashop = $db->executeS($query)) ? $id_prestashop : false;
+    return ($res = $db->executeS($query)) ? $res[0]['id_prestashop'] : false;
   }
-  
+
   protected function basicInit($id_prestashop = null, $id_centry = null) {
     if (!is_null($id_prestashop)) {
       $this->id_prestashop = $id_prestashop;
-      $this->id_centry = $this->getIdCentry($id_prestashop)[0]["id_centry"];
     }
     if (!is_null($id_centry)) {
       $this->id_centry = $id_centry;
-      $this->id_prestashop = $this->getId($id_centry)[0]["id_prestashop"];
+    }
+    if (is_null($id_centry) && !is_null($id_prestashop)) {
+      $this->id_centry = static::getIdCentry($id_prestashop);
+    }
+    if (is_null($id_prestashop) && !is_null($id_centry)) {
+      $this->id_prestashop = static::getIdCentry($id_prestashop);
     }
   }
 
@@ -86,10 +90,13 @@ abstract class AbstractHomologation extends AbstractModel {
    * @return boolean indica si el objeto pudo ser guardado o no.
    */
   public function save() {
-    if ($this->getIdPrestashop($this->id_centry)) {
+    try {
+      return $this->create();
+    } catch (\PrestaShopDatabaseException $ex) {
+      // Se la creación falla porque el par de identificadores ya está
+      // registrado, entonces se considera una "actualización exitosa".
       return true;
     }
-    return $this->create();
   }
 
   /**
@@ -98,7 +105,7 @@ abstract class AbstractHomologation extends AbstractModel {
    */
   private function create() {
     $db = \Db::getInstance();
-    $sql = "INSERT INTO `" . _DB_PREFIX_ . static::tableName()
+    $sql = "INSERT INTO `" . static::tableName()
             . "` (`id_prestashop`, `id_centry`)"
             . " VALUES (" . ((int) $this->id_prestashop) . ", '"
             . $db->escape($this->id_centry) . "')";
@@ -111,7 +118,7 @@ abstract class AbstractHomologation extends AbstractModel {
    * en la base de datos retorna true.
    */
   public function delete() {
-    $sql = "DELETE FROM `" . _DB_PREFIX_ . static::tableName()
+    $sql = "DELETE FROM `" . static::tableName()
             . "` WHERE id_prestashop = " . ((int) $this->id)
             . " AND id_centry = '{$this->id_centry}'";
     return \Db::getInstance()->execute($sql) != false;

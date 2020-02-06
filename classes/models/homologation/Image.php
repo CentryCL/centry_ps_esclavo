@@ -16,11 +16,11 @@ class Image extends AbstractHomologation {
     $this->id_prestashop = $id_prestashop;
     $this->id_centry = $id_centry;
     if (is_null($this->id_prestashop)) {
-      $this->id_prestashop = $this->getId($id_centry)[0]["id"];
+      $this->id_prestashop = $this->getIdPrestashop($id_centry);
       $this->fingerprint = $this->getFingerprint($this->id_centry);
     }
     if (is_null($id_centry)) {
-      $this->id_centry = $this->getIdCentry($id_prestashop)[0]["id_centry"];
+      $this->id_centry = $this->getIdCentry($id_prestashop);
       $this->fingerprint = $this->getFingerprint($this->id_prestashop);
     }
   }

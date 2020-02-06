@@ -20,16 +20,16 @@ class FeatureValue extends AbstractHomologation {
     $this->id_centry = $id_centry;
     $this->centry_value = $centry_value;
     if (is_null($id_prestashop)) {
-      $this->id_prestashop = $this->getId($id_centry)[0]["id"];
+      $this->id_prestashop = $this->getIdPrestashop($id_centry);
       if (!$this->id_prestashop) {
-        $this->id_prestashop = $this->getId($centry_value)[0]["id"];
+        $this->id_prestashop = $this->getIdPrestashop($centry_value);
       }
     }
     if (is_null($id_centry)) {
-      $this->id_centry = $this->getIdCentry($id_prestashop)[0]["id_centry"];
+      $this->id_centry = $this->getIdCentry($id_prestashop);
     }
     if (is_null($centry_value)) {
-      $this->centry_value = $this->getCentryValue($id_prestashop)[0]["centry_value"];
+      $this->centry_value = $this->getCentryValue($id_prestashop);
     }
     $this->product_id = $this->id_prestashop ? $this->getProductId($this->id_prestashop) : $this->getProductId($this->centry_value);
   }
@@ -52,7 +52,7 @@ class FeatureValue extends AbstractHomologation {
     $query->select('centry_value');
     $query->from(static::$TABLE);
     $query->where("id_prestashop = '" . $db->escape($id_prestashop) . "'");
-    return ($centry_value = $db->executeS($query)) ? $centry_value : false;
+    return ($res = $db->executeS($query)) ? $res[0]["centry_value"] : false;
   }
 
   /**
@@ -60,7 +60,7 @@ class FeatureValue extends AbstractHomologation {
    * @param  int/string $id   id de centry o valor de centry
    * @return array/boolean    Retorna un arreglo con las coincidencias, si no encontró el valor devuelve falso.
    */
-  public static function getId($id) {
+  public static function getIdPrestashop($id) {
     $db = Db::getInstance();
     $query = new DbQuery();
     $query->select('id_prestashop');
@@ -74,7 +74,7 @@ class FeatureValue extends AbstractHomologation {
       $result2 = $db->executeS($query);
       return ($result2) ? $result2 : false;
     }
-    return $result;
+    return $result[0]["id_prestashop"];
   }
 
   /**

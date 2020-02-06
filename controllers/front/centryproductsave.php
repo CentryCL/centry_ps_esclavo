@@ -15,12 +15,10 @@ class Centry_Ps_EsclavoCentryProductSaveModuleFrontController extends AbstractTa
 
   protected $origin = PendingTaskOrigin::Centry;
   protected $topic = PendingTaskTopic::ProductSave;
-  
+
   protected function processTask(PendingTask $task) {
     error_log(print_r($task, true));
     throw new Exception('Unimplemented method');
   }
 
 }
-
-
