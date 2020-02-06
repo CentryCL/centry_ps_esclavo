@@ -73,7 +73,8 @@ class Centry_PS_esclavo extends Module {
 
   public function uninstall() {
     if (!parent::uninstall() //||
-//            !Configuration::deleteByName('MYMODULE_NAME')
+    // TODO: Borrar tablas creadas por el módulo y datos de guardado en tabla
+    // configurations
     ) {
       return false;
     }
@@ -221,7 +222,6 @@ class Centry_PS_esclavo extends Module {
               }
             }
 
-
             array_push($comb_line, $combination->id);
             array_push($comb_line, $combination->reference);
             array_push($comb_line, $combination->barcode);
@@ -244,7 +244,6 @@ class Centry_PS_esclavo extends Module {
       }
       exit();
     }
-
 
     if (Tools::isSubmit('submit')) {
       $centryAppId = strval(Tools::getValue('centryAppId'));
@@ -297,7 +296,6 @@ class Centry_PS_esclavo extends Module {
       ["id" => "condition", 'name' => "Condición"], ["id" => "warranty", 'name' => "Garantía"], ["id" => "status", 'name' => "Estado"],
       ["id" => "seo", 'name' => "Campos SEO"], ["id" => "brand", 'name' => "Marca"], ["id" => "package", 'name' => "Medidas del paquete"],
       ["id" => "category", 'name' => "Categoría"]];
-
 
     // Init Fields form array
     $fieldsForm[0]['form'] = array(
@@ -407,8 +405,6 @@ class Centry_PS_esclavo extends Module {
       array_push($fieldsForm[1]['form']['input'][1]['values']['query'], $option);
     }
 
-
-
     // Se insertan las homologaciones de estado al formulario
     $centryOptions = array();
 
@@ -448,14 +444,6 @@ class Centry_PS_esclavo extends Module {
               'id_option' => 'cancelled',
               'name' => 'cancelled'
             )
-//            array(
-//              'id_option' => 'cancelled before shipping',
-//              'name' => 'cancelled before shipping'
-//            ),
-//            array(
-//              'id_option' => 'cancelled after shipping',
-//              'name' => 'cancelled after shipping'
-//            )
           )
         ),
         'required' => true,

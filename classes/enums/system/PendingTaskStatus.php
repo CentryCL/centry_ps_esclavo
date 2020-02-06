@@ -1,6 +1,5 @@
 <?php
 
-
 namespace CentryPs\enums\system;
 
 /**

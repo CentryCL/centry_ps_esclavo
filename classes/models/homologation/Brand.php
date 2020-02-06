@@ -15,7 +15,7 @@ class Brand extends AbstractHomologation {
   public function __construct($id_prestashop = null, $id_centry = null) {
     $this->basicInit($id_prestashop, $id_centry);
   }
-  
+
   protected static function tableConstraints() {
     $table_name = static::tableName();
     return "ALTER TABLE `{$table_name}` ADD UNIQUE INDEX (`id_prestashop`);

@@ -32,7 +32,6 @@ class ProcessProducts {
 
     $response = $product_ps->save();
 
-
     if ($sync["brand"]) {
       $manufacturer = self::Brand($product);
       if ($manufacturer) {
@@ -235,7 +234,6 @@ class ProcessProducts {
         array_push($features_centry, $feature_ps);
       }
     }
-
 
     $product_ps->setWsProductFeatures($features_centry);
   }
@@ -453,8 +451,6 @@ class ProcessProducts {
       $hook = new PrestaShop\PrestaShop\Adapter\Hook\HookDispatcher();
       $image_copier = new PrestaShop\PrestaShop\Adapter\Import\ImageCopier($configuration, $tools, $context_shop_id, $hook);
 
-
-
       if ($asset->position != 0) {
         $image = new Image();
         $image->id_product = $product_ps->id;
@@ -617,7 +613,6 @@ class ProcessProducts {
       }
       array_push($attr, $attribute["id_attribute"]);
     }
-
 
     if ($sync["color"]) {
       $attr = array_diff($attr, array($old_color));

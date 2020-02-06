@@ -184,7 +184,7 @@ class CentrySDK {
     $this->fillInstanceVariables($response);
     return $this;
   }
-  
+
   private function fillInstanceVariables($response) {
     if (property_exists($response, 'access_token')) {
       $this->accessToken = $response->access_token;

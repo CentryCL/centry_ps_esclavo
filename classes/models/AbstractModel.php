@@ -66,7 +66,7 @@ abstract class AbstractModel {
             . "WHERE " . static::equalities($conditions);
     return $db->executeS($sql)[0]['count'];
   }
-  
+
   /**
    * Genera un <code>string</code> con la concatenacion de varias sentencias SQL
    * con unidas por el término <code>AND</code>. Se espera que el arreglo de
