@@ -72,10 +72,11 @@ class PendingTask extends AbstractModel {
    * @return boolean indica si el objeto pudo ser guardado o no.
    */
   public function save() {
-    if (!$this->create()) {
+    try {
+      return $this->create();
+    } catch (\PrestaShopDatabaseException $ex) {
       return $this->update();
     }
-    return true;
   }
 
   /**
@@ -191,8 +192,6 @@ class PendingTask extends AbstractModel {
     }
     return \Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
   }
-  
-  
 
   /**
    * Registra una tarea nueva o deja pendiente una antigua reiniciando su
@@ -226,6 +225,38 @@ class PendingTask extends AbstractModel {
       $task[0]->attempt = 0;
       $task[0]->save();
     }
+  }
+
+  public static function cleanFrozenTasks() {
+    static::markFailedFrozenTasks();
+    static::restartFrozenTasks();
+  }
+
+  private static function markFailedFrozenTasks() {
+    $table_name = static::tableName();
+    $db = \Db::getInstance();
+    $sql = "UPDATE `{$table_name}` "
+            . "SET"
+            . " `status` = '" . \CentryPs\enums\system\PendingTaskStatus::Failed . "' "
+            . "WHERE"
+            . " `date_upd` < '" . date('Y-m-d H:i:s', strtotime("-5 minutes")) . "' AND"
+            . " `status` = '" . \CentryPs\enums\system\PendingTaskStatus::Running . "' AND"
+            . " `attempt` >= " . \CentryPs\ConfigurationCentry::getMaxTaskAttempts();
+    return $db->execute($sql) != false;
+  }
+
+  private static function restartFrozenTasks() {
+    $table_name = static::tableName();
+    $db = \Db::getInstance();
+    $sql = "UPDATE `{$table_name}` "
+            . "SET"
+            . " `status` = '" . \CentryPs\enums\system\PendingTaskStatus::Pending . "',"
+            . " `attempt` = `attempt` + 1 "
+            . "WHERE"
+            . " `date_upd` < '" . date('Y-m-d H:i:s', strtotime("-5 minutes")) . "' AND"
+            . " `status` = '" . \CentryPs\enums\system\PendingTaskStatus::Running . "' AND"
+            . " `attempt` < " . \CentryPs\ConfigurationCentry::getMaxTaskAttempts();
+    return $db->execute($sql) != false;
   }
 
 }

@@ -260,7 +260,9 @@ class Products {
       } else {
         $options = [];
         foreach ($category_attribute->options as $option) {
-          $options[$option->_id] = $option->name;
+          if (property_exists($option, "name")) {
+            $options[$option->_id] = $option->name;
+          }
         }
         if (property_exists($attribute, "value_selected_ids")) {
           foreach ($attribute->value_selected_ids as $option_id) {
@@ -355,13 +357,21 @@ class Products {
    */
   private function saveImages($product_ps, $product) {
     if (property_exists($product, "cover_url")) {
-      self::createCover($product_ps, $product);
+      try {
+        self::createCover($product_ps, $product);
+      } catch (\Exception $ex) {
+        error_log("Products.saveImages(cover): " . $ex->getMessage());
+      }
     }
     self::deleteUnconnectedPhotos($product_ps, $product);
 
     foreach ($product->assets as $asset) {
       if (!CentryPs\models\homologation\Image::getIdPrestashop($asset->_id)) {
-        self::createAsset($product_ps, $asset);
+        try {
+          self::createAsset($product_ps, $asset);
+        } catch (\Exception $ex) {
+          error_log("Products.saveImages(asset_id: '{$asset->_id}'): " . $ex->getMessage());
+        }
       }
     }
 

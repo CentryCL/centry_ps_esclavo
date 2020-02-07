@@ -62,7 +62,7 @@ class Webhook extends AbstractModel {
   public function save() {
     try {
       return $this->create();
-    } catch (PrestaShopDatabaseException $ex) {
+    } catch (\PrestaShopDatabaseException $ex) {
       return $this->update();
     }
   }
@@ -82,7 +82,6 @@ class Webhook extends AbstractModel {
             . ($this->on_product_delete ? 'TRUE' : 'FALSE') . ', '
             . ($this->on_order_save ? 'TRUE' : 'FALSE') . ', '
             . ($this->on_order_delete ? 'TRUE' : 'FALSE') . ')';
-    error_log($sql);
     return $db->execute($sql) != false;
   }
 
@@ -96,7 +95,6 @@ class Webhook extends AbstractModel {
             . " `on_order_save` = " . ($this->on_order_save ? 'TRUE' : 'FALSE') . ","
             . " `on_order_delete` = " . ($this->on_order_delete ? 'TRUE' : 'FALSE') . " "
             . "WHERE id = {$this->escape($this->id, $db)}";
-    error_log($sql);
     return $db->execute($sql) != false;
   }
 
@@ -133,7 +131,6 @@ class Webhook extends AbstractModel {
       );
 
       $resp = AuthorizationCentry::sdk()->post($endpoint, null, $payload);
-      error_log("Webhook->createCentryWebhook(): response " . print_r($resp, true));
       // TODO: Verificar request exitoso
       $this->id = $resp->_id;
       $this->save();

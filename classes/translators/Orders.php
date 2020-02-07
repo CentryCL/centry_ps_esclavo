@@ -32,6 +32,8 @@ class Orders {
         "original_data" => array("order" => $order, "cart" => $cart, "order_status" => $order_status, "customer" => $customer), //TODO: revisar
         "id_origin" => $order->id_cart,
         "number_origin" => $order->reference,
+        "created_at_origin" => $order->date_add,
+        "updated_at_origin" => $order->date_upd,
         "total_amount" => $order->total_products_wt,
         "shipping_amount" => $order->total_shipping,
         "discount_amount" => $order->total_discounts,
@@ -79,10 +81,17 @@ class Orders {
         "shipping_amount" => $product["total_shipping_price_tax_incl"],
         "currency" => $currency->iso_code,
         "quantity" => $product["product_quantity"],
+        "variant_id" => static::centryVariantId($product)
       );
       array_push($items, $item);
     }
     return $items;
+  }
+  
+  private static function centryVariantId($product) {
+    // TODO: Resolver el caso en que un producto con una única variante se
+    // publicó como producto simple en Prestashop.
+    return \CentryPs\models\homologation\Variant::getIdCentry($product['id_product_attribute']);
   }
 
   private static function paymentMode($payment) {

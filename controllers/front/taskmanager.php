@@ -45,6 +45,7 @@ class Centry_Ps_EsclavoTaskManagerModuleFrontController extends ModuleFrontContr
    * @return PendingTask
    */
   private function maxTasksToRun() {
+    PendingTask::cleanFrozenTasks();
     $limit = ConfigurationCentry::getMaxTaskThreads() -
             PendingTask::count(['status' => "'running'"]);
     return PendingTask::getPendingTasksObjects(
