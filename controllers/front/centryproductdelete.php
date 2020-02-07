@@ -8,8 +8,8 @@ use CentryPs\enums\system\PendingTaskTopic;
 use CentryPs\models\system\PendingTask;
 
 /**
- * Controlador encargado de ejecutar la tarea de leer un producto de Centry para
- * crearlo o actualizarlo en Prestashop.
+ * Controlador encargado de ejecutar la tarea de eliminar un producto de
+ * Prestashopde asegurándose de que ya no existe en Centry.
  */
 class Centry_Ps_EsclavoCentryProductdeleteModuleFrontController extends AbstractTaskProcessor {
 

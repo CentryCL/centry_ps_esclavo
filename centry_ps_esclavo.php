@@ -88,15 +88,26 @@ class Centry_PS_esclavo extends Module {
   }
 
   public function hookactionValidateOrder($params) {
-    //TODO: encolar notificacion, todo el seteo de info de la orden se va al controlador
-    // error_log(print_r("hookactionValidateOrder", true));
-    // error_log(print_r($params, true));
+    $this->enqueueOrderToSend($params['order']->id);
   }
 
   public function hookactionOrderHistoryAddAfter($params) {
-    //TODO: encolar notificacion, todo el seteo de info de la orden se va al controlador
-    // error_log(print_r("hookactionOrderHistoryAddAfter", true));
-    // error_log(print_r($params, true));
+    $this->enqueueOrderToSend($params['order_history']->id_order);
+  }
+  
+  private function enqueueOrderToSend($id_order) {
+    try {
+      $origin = CentryPs\enums\system\PendingTaskOrigin::PrestaShop;
+      $topic = CentryPs\enums\system\PendingTaskTopic::OrderSave;
+      $resource_id = $id_order;
+      CentryPs\models\system\PendingTask::registerNotification($origin, $topic, $resource_id);
+    } catch (Exception $ex) {
+      error_log(json_encode([
+        'error' => 'Notification omitted for inconsistent data',
+        'message' => $ex->getMessage(),
+        'request' => $data
+      ]));
+    }
   }
 
   public function getContent() {

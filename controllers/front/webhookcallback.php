@@ -15,7 +15,7 @@ class Centry_Ps_EsclavoWebhookCallbackModuleFrontController extends ModuleFrontC
       $origin = CentryPs\enums\system\PendingTaskOrigin::Centry;
       $topic = $this->translateTopic($data['topic']);
       $resource_id = $this->getNotificationResourceId($data, $topic);
-      $this->registerNotification($origin, $topic, $resource_id);
+      CentryPs\models\system\PendingTask::registerNotification($origin, $topic, $resource_id);
       $this->ajaxDie(json_encode(['status' => 'ok']));
     } catch (Exception $ex) {
       $this->ajaxDie(json_encode([
@@ -80,41 +80,6 @@ class Centry_Ps_EsclavoWebhookCallbackModuleFrontController extends ModuleFrontC
     }
 
     return $ri;
-  }
-
-  /**
-   * Registra una tarea nueva o deja pendiente una antigua reiniciando su
-   * registro de intentos si se cumple uno de los siguientes casos:
-   * <ul>
-   * <li>El procesamiento de la tarea había fallado.</li>
-   * <li>Si se encuentra corriendo y no ha sufrido actualizaciones en los
-   * últimos 5 minutos</li>
-   * </ul>
-   * @param string $origin
-   * @param string $topic
-   * @param string $resource_id
-   */
-  private function registerNotification($origin, $topic, $resource_id) {
-    $conditions = [
-      'origin' => "'{$origin}'",
-      'topic' => "'{$topic}'",
-      'resource_id' => "'{$resource_id}'"
-    ];
-    $task = CentryPs\models\system\PendingTask::getPendingTasksObjects($conditions, 1, 0);
-    if (empty($task)) {
-      (new CentryPs\models\system\PendingTask($origin, $topic, $resource_id)
-      )->save();
-    } elseif (
-            $task[0]->status == \CentryPs\enums\system\PendingTaskStatus::Failed ||
-            (
-            $task[0]->status == \CentryPs\enums\system\PendingTaskStatus::Running &&
-            $task[0]->date_upd < date('Y-m-d H:i:s', strtotime("-5 minutes"))
-            )
-    ) {
-      $task[0]->status = \CentryPs\enums\system\PendingTaskStatus::Pending;
-      $task[0]->attempt = 0;
-      $task[0]->save();
-    }
   }
 
 }
