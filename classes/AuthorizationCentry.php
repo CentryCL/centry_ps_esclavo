@@ -2,6 +2,10 @@
 
 namespace CentryPs;
 
+use CentryPs\ConfigurationCentry;
+
+require_once _PS_MODULE_DIR_ ."centry_ps_esclavo/sdk/CentrySDK.php";
+
 /**
  * Clase que permite crear una instancia con las credenciales de Centry
  * necesarias para utilizar los recursos de la API.

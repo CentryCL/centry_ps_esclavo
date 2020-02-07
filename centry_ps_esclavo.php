@@ -33,21 +33,7 @@ class Centry_PS_esclavo extends Module {
     }
 
     if (!parent::install() ||
-            !$this->whenInstall('CentryPs\models\system\PendingTask', 'createTable') ||
-            !$this->whenInstall('CentryPs\models\system\FailedTaskLog', 'createTable') ||
-            !$this->whenInstall('CentryPs\models\homologation\AttributeGroup', 'createTable') ||
-            !$this->whenInstall('CentryPs\models\homologation\Brand', 'createTable') ||
-            !$this->whenInstall('CentryPs\models\homologation\Category', 'createTable') ||
-            !$this->whenInstall('CentryPs\models\homologation\Color', 'createTable') ||
-            !$this->whenInstall('CentryPs\models\homologation\Feature', 'createTable') ||
-            !$this->whenInstall('CentryPs\models\homologation\FeatureValue', 'createTable') ||
-            !$this->whenInstall('CentryPs\models\homologation\Image', 'createTable') ||
-            !$this->whenInstall('CentryPs\models\homologation\Order', 'createTable') ||
-            !$this->whenInstall('CentryPs\models\homologation\OrderStatus', 'createTable') ||
-            !$this->whenInstall('CentryPs\models\homologation\Product', 'createTable') ||
-            !$this->whenInstall('CentryPs\models\homologation\Size', 'createTable') ||
-            !$this->whenInstall('CentryPs\models\homologation\Variant', 'createTable') ||
-            !$this->whenInstall('CentryPs\models\Webhook', 'createTable') ||
+            $this->createDbTables() ||
             !$this->registerHook('actionValidateOrder') ||
             !$this->registerHook('actionOrderHistoryAddAfter')
     ) {
@@ -55,6 +41,25 @@ class Centry_PS_esclavo extends Module {
     }
 
     return true;
+  }
+
+  private function createDbTables() {
+    return
+            !$this->whenInstall('CentryPs\\models\\system\\PendingTask', 'createTable') ||
+            !$this->whenInstall('CentryPs\\models\\system\\FailedTaskLog', 'createTable') ||
+            !$this->whenInstall('CentryPs\\models\\homologation\\AttributeGroup', 'createTable') ||
+            !$this->whenInstall('CentryPs\\models\\homologation\\Brand', 'createTable') ||
+            !$this->whenInstall('CentryPs\\models\\homologation\\Category', 'createTable') ||
+            !$this->whenInstall('CentryPs\\models\\homologation\\Color', 'createTable') ||
+            !$this->whenInstall('CentryPs\\models\\homologation\\Feature', 'createTable') ||
+            !$this->whenInstall('CentryPs\\models\\homologation\\FeatureValue', 'createTable') ||
+            !$this->whenInstall('CentryPs\\models\\homologation\\Image', 'createTable') ||
+            !$this->whenInstall('CentryPs\\models\\homologation\\Order', 'createTable') ||
+            !$this->whenInstall('CentryPs\\models\\homologation\\OrderStatus', 'createTable') ||
+            !$this->whenInstall('CentryPs\\models\\homologation\\Product', 'createTable') ||
+            !$this->whenInstall('CentryPs\\models\\homologation\\Size', 'createTable') ||
+            !$this->whenInstall('CentryPs\\models\\homologation\\Variant', 'createTable') ||
+            !$this->whenInstall('CentryPs\\models\\Webhook', 'createTable');
   }
 
   private function whenInstall($class, $method) {
@@ -95,200 +100,263 @@ class Centry_PS_esclavo extends Module {
   }
 
   public function getContent() {
-    $defaultLang = (int) Configuration::get('PS_LANG_DEFAULT');
     $output = null;
-    $fields = ['name', 'price', 'priceoffer', 'description', 'skuproduct', 'characteristics', 'warranty', 'condition', 'status',
-      'stock', 'variantsku', 'size', 'color', 'barcode', 'productimages', 'seo', 'brand', 'package', 'category'];
 
     if (Tools::isSubmit('submit_file')) {
-      $error_prods = null;
-      if (isset($_FILES['upload_file'])) {
-        $target_dir = _PS_UPLOAD_DIR_;
-        $target_file = $target_dir . basename($_FILES['upload_file']['name']);
-        $fileType = pathinfo($target_file, PATHINFO_EXTENSION);
-        if ($fileType == "csv") {
-          $table = strval(Tools::getValue('field_to_homologate'));
-          if (move_uploaded_file($_FILES['upload_file']["tmp_name"], $target_file)) {
-            $file_location = basename($_FILES['upload_file']["name"]);
-            if (($handle = fopen($target_file, "r")) !== FALSE) {
-              $file_line = 0;
-              while (($data = fgetcsv($handle, 0, ","))) {
-                $file_line++;
-                if ($file_line < 2) {
-                  continue;
-                }
-                try {
-                  $class = ucfirst($table) . "Centry"; //TODO: con la refactorizacion esto puede cambiar.
-                  $line = new $class();
-                  if (in_array($table, array("featureValue", "attributeGroup", "feature", "image"))) {
-                    if ($table == "attributeGroup") {
-                      $line->id = $data[0];
-                      $line->centry_value = $data[1];
-                      $line->save();
-                    } elseif ($table == "image") {
-                      $line->id = $data[0];
-                      $line->id_centry = $data[1];
-                      $line->fingerprint = $data[2];
-                      $line->save();
-                    } elseif ($table == "feature") {
-                      $line->id = $data[0];
-                      $line->id_centry = $data[1];
-                      $line->centry_value = $data[2];
-                      $line->save();
-                    } elseif ($table == "featureValue") {
-                      $line->id = $data[0];
-                      $line->product_id = $data[1];
-                      $line->id_centry = $data[2];
-                      $line->centry_value = $data[3];
-                      $line->save();
-                    }
-                  } else {
-                    $line->id = $data[0];
-                    $line->id_centry = $data[1];
-                    $line->save();
-                  }
-                } catch (Exception $e) {
-                  $error_prods .= $file_line . ", ";
-                  continue;
-                }
-              }
-              $message = $error_prods ? "Revise que los identificadores existan en su página y que el fórmato sea el correcto. Filas con error: " . $error_prods : "";
-              $output .= $this->displayConfirmation($this->l('Homologación subida. ' . $message));
-              fclose($handle);
-            }
-          }
-        } else {
-          $output .= $this->displayError($this->l('Formato invalido de archivo, debe ser csv.'));
-        }
-      }
+      $output .= $this->uploadHomologationCsv();
     }
 
     if (Tools::isSubmit('submit_download')) {
-      //Declaraciones iniciales
-      $lang = $this->context->language->id;
-      $data = array();
-      $products = Product::getProducts($lang, 0, 0, "id_product", "ASC");
-      $header = array("id Prestashop", "Nombre del producto", "Sku del producto", "Código de barras", "Descripción", "Condicion",
-        "id Marca Prestashop", "Marca", "Altura", "Largo", "Ancho", "Peso", "Precio normal", "Estado", "id Variante Prestashop", "SKU de la variante",
-        "Codigo de barras de la variante", "Cantidad", "id Talla", "Talla", "id Color", "Color");
-      $filename = "product.csv";
-      header('Content-Type: text/csv');
-      header('Content-Disposition: attachment;filename=' . $filename);
-
-      $fp = fopen('php://output', 'w');
-      fputcsv($fp, $header, ",");
-
-      foreach ($products as $product) {
-        $line = array();
-        $taxes = 1 + ($product["rate"]) / 100;
-        $variants = (new Product($product["id_product"]))->getWsCombinations();
-
-        array_push($line, $product["id_product"]);
-        array_push($line, $product["name"]);
-        array_push($line, $product["reference"]);
-        array_push($line, $product["ean13"]);
-        array_push($line, $product["description"]);
-        array_push($line, $product["condition"]);
-        array_push($line, $product["id_manufacturer"]);
-        array_push($line, $product["manufacturer_name"]);
-        array_push($line, $product["height"]);
-        array_push($line, $product["depth"]);
-        array_push($line, $product["width"]);
-        array_push($line, $product["weight"]);
-        array_push($line, round($product["price"] * $taxes, 1));
-        array_push($line, $product["state"] ? "activo" : "pausado");
-
-        if ($variants) { //Producto simple o con combinaciones
-          foreach ($variants as $variant) {
-            $size = "";
-            $color = "";
-            $size_id = "";
-            $color_id = "";
-            $comb_line = array();
-            $combination = new Combination($variant["id"]);
-            $attributes = $combination->getAttributesName($lang);
-
-            //Revisa atributos de talla y color si existen
-            foreach ($attributes as $attribute) {
-              $attribute_object = new Attribute($attribute["id_attribute"]);
-              $attribute_group = new AttributeGroup($attribute_object->id_attribute_group);
-              $attribute_group_name = strtolower($attribute_group->name[$lang]);
-              if ($attribute_group_name == "talla" || $attribute_group_name == "size") {
-                $size_id = $attribute["id_attribute"];
-                $size = $attribute["name"];
-              } elseif ($attribute_group_name == "color") {
-                $color_id = $attribute["id_attribute"];
-                $color = $attribute["name"];
-              }
-            }
-
-            array_push($comb_line, $combination->id);
-            array_push($comb_line, $combination->reference);
-            array_push($comb_line, $combination->barcode);
-            array_push($comb_line, StockAvailable::getQuantityAvailableByProduct($product["id_product"], $combination->id));
-            array_push($comb_line, $size_id);
-            array_push($comb_line, $size);
-            array_push($comb_line, $color_id);
-            array_push($comb_line, $color);
-
-            $line2 = array_merge($line, $comb_line);
-            fputcsv($fp, $line2, ",");
-          }
-        } else {
-          array_push($line, "");
-          array_push($line, $product["reference"]);
-          array_push($line, "");
-          array_push($line, StockAvailable::getQuantityAvailableByProduct($product["id_product"]));
-          fputcsv($fp, $line, ",");
-        }
-      }
-      exit();
+      $this->downloadCsvForCentry();
     }
 
     if (Tools::isSubmit('submit')) {
-      $centryAppId = strval(Tools::getValue('centryAppId'));
-      $centrySecretId = strval(Tools::getValue('centrySecretId'));
-      $name_value = Tools::getAllValues();
-      foreach ($fields as $field) {
-        $value_field_create = Tools::getValue("ONCREATE_" . $field);
-        $value_field_update = Tools::getValue("ONUPDATE_" . $field);
-        Configuration::updateValue('CENTRY_SYNC_ONCREATE_' . $field, $value_field_create);
-        Configuration::updateValue('CENTRY_SYNC_ONUPDATE_' . $field, $value_field_update);
-      }
-
-      $price_behavior = Tools::getValue("price_behavior");
-      Configuration::updateValue('CENTRY_SYNC_price_behavior', $price_behavior);
-
-      $variant_simple = Tools::getValue("VARIANT_SIMPLE");
-      CentryPs\ConfigurationCentry::getSyncVaraintSimple($variant_simple);
-
-      if (!$centryAppId || empty($centryAppId)) {
-        $output .= $this->displayError($this->l('Centry App Id Inválido'));
-      } else {
-        Configuration::updateValue('CENTRY_SYNC_APP_ID', $centryAppId);
-      }
-      if (!$centrySecretId || empty($centrySecretId)) {
-        $output .= $this->displayError($this->l('Centry Secret Id Inválido'));
-      } else {
-        Configuration::updateValue('CENTRY_SYNC_SECRET_ID', $centrySecretId);
-      }
-
-      foreach (OrderState::getOrderStates($defaultLang) as $state) {
-        $status = new CentryPs\models\homologation\OrderStatus($state['id_order_state'], Tools::getValue("order_state_" . $state['id_order_state']));
-        $status->save();
-      }
-
-      $output .= $this->displayConfirmation('Campos actualizados');
+      $output .= $this->saveConfigurationForm();
     }
 
     return $output . $this->displayForm();
+  }
+
+  private function uploadHomologationCsv() {
+    if (!isset($_FILES['upload_file'])) {
+      return '';
+    }
+    $target_dir = _PS_UPLOAD_DIR_;
+    $target_file = $target_dir . basename($_FILES['upload_file']['name']);
+    $fileType = pathinfo($target_file, PATHINFO_EXTENSION);
+    if ($fileType != "csv") {
+      return $this->displayError($this->l('Formato invalido de archivo, debe ser csv.'));
+    }
+
+    if (!move_uploaded_file($_FILES['upload_file']["tmp_name"], $target_file)) {
+      return $this->displayError($this->l('No fue posible mover el archivo temporal a la carpeta de cargas de Prestahsop.'));
+    }
+    $handle = fopen($target_file, "r");
+    if ($handle === FALSE) {
+      return $this->displayError($this->l('No fue posible leer el archivo. Por favor revisa el contenido y vuelve a subirlo.'));
+    }
+
+    $error_prods = $this->processHomologationCsv($handle, strval(Tools::getValue('field_to_homologate')));
+
+    $message = $error_prods ? "Revisa que los identificadores existan en su página y que el fórmato sea el correcto. Filas con error: " . $error_prods : "";
+    return $this->displayConfirmation($this->l('Homologación subida. ' . $message));
+  }
+
+  /**
+   * Itera sobre las líneas un archivo CSV y las registra como homologaciones de
+   * un recurso homologable.
+   * @param resource $handle puntero al archivo.
+   * @param string $table nombre del recurso a homologar.
+   * @return string posible listado de errores encontrados en el proceso.
+   */
+  function processHomologationCsv($handle, $table) {
+    $error_prods = null;
+    $file_line = 0;
+    while (($data = fgetcsv($handle, 0, ","))) {
+      $file_line++;
+      if ($file_line < 2) {
+        continue;
+      }
+      try {
+        $this->processHomologationCsvLine($table, $data);
+      } catch (Exception $e) {
+        $error_prods .= $file_line . ", ";
+        continue;
+      }
+    }
+    fclose($handle);
+    return $error_prods;
+  }
+
+  /**
+   * Toma los datos de una línea del archivo CSV parseados como un arreglo y
+   * registra la información en un modelo de homologación del módulo.
+   * @param string $table nombre del modelo homologable.
+   * @param array $data contenido de la línea del archivo CSV
+   */
+  function processHomologationCsvLine($table, $data) {
+    $class = "CentryPs\\models\\homologation\\${$table}";
+    $line = new $class();
+    $line->id_prestashop = $data[0];
+    $line->id_centry = $data[1];
+    if (in_array($table, ["FeatureValue", "AttributeGroup", "Feature", "Image"])) {
+      if ($table == "image") {
+        $line->fingerprint = $data[2];
+      } elseif ($table == "feature") {
+        $line->centry_value = $data[2];
+      } elseif ($table == "featureValue") {
+        $line->product_id = $data[1];
+        $line->id_centry = $data[2];
+        $line->centry_value = $data[3];
+      }
+    }
+    $line->save();
+  }
+
+  private function downloadCsvForCentry() {
+    //Declaraciones iniciales
+    $lang = $this->context->language->id;
+    $products = Product::getProducts($lang, 0, 0, "id_product", "ASC");
+    $header = array("id Prestashop", "Nombre del producto", "Sku del producto", "Código de barras", "Descripción", "Condicion",
+      "id Marca Prestashop", "Marca", "Altura", "Largo", "Ancho", "Peso", "Precio normal", "Estado", "id Variante Prestashop", "SKU de la variante",
+      "Codigo de barras de la variante", "Cantidad", "id Talla", "Talla", "id Color", "Color");
+    $filename = "product.csv";
+    header('Content-Type: text/csv');
+    header('Content-Disposition: attachment;filename=' . $filename);
+
+    $fp = fopen('php://output', 'w');
+    fputcsv($fp, $header, ",");
+
+    foreach ($products as $product) {
+      $line = array();
+      $taxes = 1 + ($product["rate"]) / 100;
+      $variants = (new Product($product["id_product"]))->getWsCombinations();
+
+      array_push($line, $product["id_product"]);
+      array_push($line, $product["name"]);
+      array_push($line, $product["reference"]);
+      array_push($line, $product["ean13"]);
+      array_push($line, $product["description"]);
+      array_push($line, $product["condition"]);
+      array_push($line, $product["id_manufacturer"]);
+      array_push($line, $product["manufacturer_name"]);
+      array_push($line, $product["height"]);
+      array_push($line, $product["depth"]);
+      array_push($line, $product["width"]);
+      array_push($line, $product["weight"]);
+      array_push($line, round($product["price"] * $taxes, 1));
+      array_push($line, $product["state"] ? "activo" : "pausado");
+
+      if ($variants) { //Producto simple o con combinaciones
+        foreach ($variants as $variant) {
+          $size = "";
+          $color = "";
+          $size_id = "";
+          $color_id = "";
+          $comb_line = array();
+          $combination = new Combination($variant["id"]);
+          $attributes = $combination->getAttributesName($lang);
+
+          //Revisa atributos de talla y color si existen
+          foreach ($attributes as $attribute) {
+            $attribute_object = new Attribute($attribute["id_attribute"]);
+            $attribute_group = new AttributeGroup($attribute_object->id_attribute_group);
+            $attribute_group_name = strtolower($attribute_group->name[$lang]);
+            if ($attribute_group_name == "talla" || $attribute_group_name == "size") {
+              $size_id = $attribute["id_attribute"];
+              $size = $attribute["name"];
+            } elseif ($attribute_group_name == "color") {
+              $color_id = $attribute["id_attribute"];
+              $color = $attribute["name"];
+            }
+          }
+
+          array_push($comb_line, $combination->id);
+          array_push($comb_line, $combination->reference);
+          array_push($comb_line, $combination->barcode);
+          array_push($comb_line, StockAvailable::getQuantityAvailableByProduct($product["id_product"], $combination->id));
+          array_push($comb_line, $size_id);
+          array_push($comb_line, $size);
+          array_push($comb_line, $color_id);
+          array_push($comb_line, $color);
+
+          $line2 = array_merge($line, $comb_line);
+          fputcsv($fp, $line2, ",");
+        }
+      } else {
+        array_push($line, "");
+        array_push($line, $product["reference"]);
+        array_push($line, "");
+        array_push($line, StockAvailable::getQuantityAvailableByProduct($product["id_product"]));
+        fputcsv($fp, $line, ",");
+      }
+    }
+    exit();
+  }
+
+  private function saveConfigurationForm() {
+    $output = $this->saveApiCredentials();
+    $this->saveSynchronizationCheckboxes();
+    $this->saveOrderStatusHomologations();
+
+    CentryPs\ConfigurationCentry::setPriceBehavior(Tools::getValue("price_behavior"));
+    CentryPs\ConfigurationCentry::setSyncVaraintSimple(Tools::getValue("VARIANT_SIMPLE"));
+
+    return $output . $this->displayConfirmation('Campos actualizados');
+  }
+
+  /**
+   * Registra en la base de datos las credenciales de la API ingresadas en el
+   * formulario y si advierten cambios en la información, entonces se solicita
+   * el registro del webhook que necesita el módulo en Centry.
+   */
+  private function saveApiCredentials() {
+    $centryAppId = strval(Tools::getValue('centryAppId'));
+    $centrySecretId = strval(Tools::getValue('centrySecretId'));
+
+    $hasChanges = false;
+    $output = '';
+    if (!$centryAppId || empty($centryAppId)) {
+      $output .= $this->displayError($this->l('Centry App Id Inválido'));
+    } elseif ($centryAppId != CentryPs\ConfigurationCentry::getSyncAuthAppId()) {
+      CentryPs\ConfigurationCentry::setSyncAuthAppId($centryAppId);
+      $hasChanges = true;
+    }
+    if (!$centrySecretId || empty($centrySecretId)) {
+      $output .= $this->displayError($this->l('Centry Secret Id Inválido'));
+    } elseif ($centrySecretId != CentryPs\ConfigurationCentry::getSyncAuthSecretId()) {
+      CentryPs\ConfigurationCentry::setSyncAuthSecretId($centrySecretId);
+      $hasChanges = true;
+    }
+
+    if ($hasChanges) {
+      $url = $this->context->link->getModuleLink($this->name, 'webhookcallback');
+      (new CentryPs\models\Webhook(null, $url))->createCentryWebhook();
+    }
+    return $output;
+  }
+
+  /**
+   * Registra en la base de datos las configuración de sincronización de campos
+   * específicos de los productos tanto en la creación como en la actualización
+   * de éstos los cuales están representados como checkbox en el formulario.
+   */
+  private function saveSynchronizationCheckboxes() {
+    $fields = [
+      'name', 'price', 'priceoffer', 'description', 'skuproduct',
+      'characteristics', 'warranty', 'condition', 'status', 'stock',
+      'variantsku', 'size', 'color', 'barcode', 'productimages', 'seo', 'brand',
+      'package', 'category'
+    ];
+    foreach ($fields as $field) {
+      Configuration::updateValue(
+              'CENTRY_SYNC_ONCREATE_' . $field,
+              Tools::getValue("ONCREATE_" . $field)
+      );
+      Configuration::updateValue(
+              'CENTRY_SYNC_ONUPDATE_' . $field,
+              Tools::getValue("ONUPDATE_" . $field)
+      );
+    }
+  }
+
+  /**
+   * Registra en la base de datos la homologación de los estados de los pedidos
+   * de Prestashop con los estados de los pedidos de Centry.
+   */
+  private function saveOrderStatusHomologations() {
+    $defaultLang = (int) Configuration::get('PS_LANG_DEFAULT');
+    foreach (OrderState::getOrderStates($defaultLang) as $state) {
+      $status = new CentryPs\models\homologation\OrderStatus($state['id_order_state'], Tools::getValue("order_state_" . $state['id_order_state']));
+      $status->save();
+    }
   }
 
   public function displayForm() {
     // Get default language
     $defaultLang = (int) Configuration::get('PS_LANG_DEFAULT');
 
-    $statusFields = array();
+//    $statusFields = array();
     $sync_fields = [["id" => "name", 'name' => "Nombre"], ["id" => "price", 'name' => "Precio"], ["id" => "priceoffer", 'name' => "Precio de oferta"],
       ["id" => "description", 'name' => "Descripción"], ["id" => "skuproduct", 'name' => "Sku del Producto"], ["id" => "characteristics", 'name' => "Características"],
       ["id" => "stock", 'name' => "Stock"], ["id" => "variantsku", 'name' => "Sku de la Variante"], ["id" => "size", 'name' => "Talla"],
@@ -406,7 +474,7 @@ class Centry_PS_esclavo extends Module {
     }
 
     // Se insertan las homologaciones de estado al formulario
-    $centryOptions = array();
+//    $centryOptions = array();
 
     $fieldsForm[2]['form'] = array(
       'legend' => array(
@@ -473,51 +541,43 @@ class Centry_PS_esclavo extends Module {
             'name' => 'name',
             'query' => array(
               array(
-                'id_option' => 'product',
+                'id_option' => 'Product',
                 'name' => 'Productos',
               ),
               array(
-                'id_option' => 'variant',
+                'id_option' => 'Variant',
                 'name' => 'Variantes'
               ),
               array(
-                'id_option' => 'brand',
+                'id_option' => 'Brand',
                 'name' => 'Marca'
               ),
               array(
-                'id_option' => 'size',
+                'id_option' => 'Size',
                 'name' => 'Talla'
               ),
               array(
-                'id_option' => 'color',
+                'id_option' => 'Color',
                 'name' => 'Color'
               ),
               array(
-                'id_option' => 'category',
+                'id_option' => 'Category',
                 'name' => 'Categoría'
               ),
               array(
-                'id_option' => 'feature',
+                'id_option' => 'Feature',
                 'name' => 'Característica'
               ),
               array(
-                'id_option' => 'featureValue',
+                'id_option' => 'FeatureValue',
                 'name' => 'Valor de Característica'
               ),
               array(
-                'id_option' => 'attributeGroup',
+                'id_option' => 'AttributeGroup',
                 'name' => 'Grupo de Atributo'
               ),
               array(
-                'id_option' => 'attribute',
-                'name' => 'Valor Atributo'
-              ),
-              array(
-                'id_option' => 'attributeGroup',
-                'name' => 'Grupo de Atributo'
-              ),
-              array(
-                'id_option' => 'image',
+                'id_option' => 'Image',
                 'name' => 'Imagen'
               )
             )

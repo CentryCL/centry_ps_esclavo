@@ -3,6 +3,7 @@
 namespace CentryPs\models;
 
 use CentryPs\AuthorizationCentry;
+use CentryPs\ConfigurationCentry;
 
 class Webhook extends AbstractModel {
 
@@ -55,6 +56,62 @@ class Webhook extends AbstractModel {
   }
 
   /**
+   * Manda a guardar el objeto, si ya existe retorna true.
+   * @return boolean indica si el objeto pudo ser guardado o no.
+   */
+  public function save() {
+    try {
+      return $this->create();
+    } catch (PrestaShopDatabaseException $ex) {
+      return $this->update();
+    }
+  }
+
+  /**
+   * Crea el objeto en la base de datos.
+   * @return boolean indica si el objeto pudo ser guardado o no.
+   */
+  protected function create() {
+    $db = \Db::getInstance();
+    $sql = "INSERT INTO `" . static::tableName()
+            . "` (`id`, `callback_url`, `on_product_save`, `on_product_delete`, `on_order_save`, `on_order_delete`)"
+            . " VALUES ("
+            . "{$this->escape($this->id, $db)}, "
+            . "{$this->escape($this->callback_url, $db)}, "
+            . ($this->on_product_save ? 'TRUE' : 'FALSE') . ', '
+            . ($this->on_product_delete ? 'TRUE' : 'FALSE') . ', '
+            . ($this->on_order_save ? 'TRUE' : 'FALSE') . ', '
+            . ($this->on_order_delete ? 'TRUE' : 'FALSE') . ')';
+    error_log($sql);
+    return $db->execute($sql) != false;
+  }
+
+  protected function update() {
+    $db = \Db::getInstance();
+    $sql = "UPDATE `" . static::tableName() . "` "
+            . "SET"
+            . " `callback_url` = {$this->escape($this->callback_url, $db)},"
+            . " `on_product_save` = " . ($this->on_product_save ? 'TRUE' : 'FALSE') . ","
+            . " `on_product_delete` = " . ($this->on_product_delete ? 'TRUE' : 'FALSE') . ","
+            . " `on_order_save` = " . ($this->on_order_save ? 'TRUE' : 'FALSE') . ","
+            . " `on_order_delete` = " . ($this->on_order_delete ? 'TRUE' : 'FALSE') . " "
+            . "WHERE id = {$this->escape($this->id, $db)}";
+    error_log($sql);
+    return $db->execute($sql) != false;
+  }
+
+  /**
+   * Elimina el objeto de la base de datos.
+   * @return boolean indica si el objeto pudo ser eliminado o no. Si no existia en la base de datos retorna true.
+   */
+  public function delete() {
+    $db = \Db::getInstance();
+    $sql = "DELETE FROM `" . static::tableName()
+            . "` WHERE id = '{$this->escape($this->id, $db)}'";
+    return $db->execute($sql) != false;
+  }
+
+  /**
    * Crea un webhook en Centry con los valores almacenados en sus propiedades.
    * No creara el webhook en Centry si es que no existen las credenciales de Centry, o si es que no se suscribira a
    * ninguno de los topicos.
@@ -76,6 +133,7 @@ class Webhook extends AbstractModel {
       );
 
       $resp = AuthorizationCentry::sdk()->post($endpoint, null, $payload);
+      error_log("Webhook->createCentryWebhook(): response " . print_r($resp, true));
       // TODO: Verificar request exitoso
       $this->id = $resp->_id;
       $this->save();
