@@ -100,20 +100,20 @@ class Centry_Ps_EsclavoWebhookCallbackModuleFrontController extends ModuleFrontC
       'topic' => "'{$topic}'",
       'resource_id' => "'{$resource_id}'"
     ];
-    $task = CentryPs\models\system\PendingTask::getPendingTasksObjects($conditions, 1, 0)[0];
-    if (!isset($task)) {
+    $task = CentryPs\models\system\PendingTask::getPendingTasksObjects($conditions, 1, 0);
+    if (empty($task)) {
       (new CentryPs\models\system\PendingTask($origin, $topic, $resource_id)
       )->save();
     } elseif (
-            $task->status == \CentryPs\enums\system\PendingTaskStatus::Failed ||
+            $task[0]->status == \CentryPs\enums\system\PendingTaskStatus::Failed ||
             (
-            $task->status == \CentryPs\enums\system\PendingTaskStatus::Running &&
-            $task->date_upd < date('Y-m-d H:i:s', strtotime("-5 minutes"))
+            $task[0]->status == \CentryPs\enums\system\PendingTaskStatus::Running &&
+            $task[0]->date_upd < date('Y-m-d H:i:s', strtotime("-5 minutes"))
             )
     ) {
-      $task->status = \CentryPs\enums\system\PendingTaskStatus::Pending;
-      $task->attempt = 0;
-      $task->save();
+      $task[0]->status = \CentryPs\enums\system\PendingTaskStatus::Pending;
+      $task[0]->attempt = 0;
+      $task[0]->save();
     }
   }
 
