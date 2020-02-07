@@ -360,7 +360,7 @@ class Centry_PS_esclavo extends Module {
     $sync_fields = [["id" => "name", 'name' => "Nombre"], ["id" => "price", 'name' => "Precio"], ["id" => "priceoffer", 'name' => "Precio de oferta"],
       ["id" => "description", 'name' => "Descripción"], ["id" => "skuproduct", 'name' => "Sku del Producto"], ["id" => "characteristics", 'name' => "Características"],
       ["id" => "stock", 'name' => "Stock"], ["id" => "variantsku", 'name' => "Sku de la Variante"], ["id" => "size", 'name' => "Talla"],
-      ["id" => "color", 'name' => "Color"], ["id" => "barcode", 'name' => "Código de barras"], ["id" => "productimages", 'name' => "Imágenes Producto"],
+      ["id" => "color", 'name' => "Color"], ["id" => "barcode", 'name' => "Código de barras (Tiene que ser valores válidos. Si no estás seguro, mejor no los mantengas sincronizados.)"], ["id" => "productimages", 'name' => "Imágenes Producto"],
       ["id" => "condition", 'name' => "Condición"], ["id" => "warranty", 'name' => "Garantía"], ["id" => "status", 'name' => "Estado"],
       ["id" => "seo", 'name' => "Campos SEO"], ["id" => "brand", 'name' => "Marca"], ["id" => "package", 'name' => "Medidas del paquete"],
       ["id" => "category", 'name' => "Categoría"]];

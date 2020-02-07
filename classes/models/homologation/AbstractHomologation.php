@@ -119,7 +119,7 @@ abstract class AbstractHomologation extends AbstractModel {
    */
   public function delete() {
     $sql = "DELETE FROM `" . static::tableName()
-            . "` WHERE id_prestashop = " . ((int) $this->id)
+            . "` WHERE id_prestashop = " . ((int) $this->id_prestashop)
             . " AND id_centry = '{$this->id_centry}'";
     return \Db::getInstance()->execute($sql) != false;
   }

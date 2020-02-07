@@ -38,13 +38,13 @@ class Image extends AbstractHomologation {
    * @return string     valor del fingerprint
    */
   public static function getFingerprint($id) {
-    $db = Db::getInstance();
-    $query = new DbQuery();
+    $db = \Db::getInstance();
+    $query = new \DbQuery();
     $query->select('fingerprint');
     $query->from(static::$TABLE);
     $query->where("id_centry = '" . $db->escape($id) . "'");
     if (!($result = $db->executeS($query))) {
-      $query = new DbQuery();
+      $query = new \DbQuery();
       $query->select('fingerprint');
       $query->from(static::$TABLE);
       $query->where("id_prestashop = '" . $db->escape($id) . "'");
@@ -59,7 +59,7 @@ class Image extends AbstractHomologation {
    * @return boolean indica si el objeto pudo ser guardado o no.
    */
   protected function create() {
-    $db = Db::getInstance();
+    $db = \Db::getInstance();
     $sql = "INSERT INTO `" . _DB_PREFIX_ . static::$TABLE
             . "` (`id`, `id_centry`,`fingerprint`)"
             . " VALUES (" . ((int) $this->id) . ", '"

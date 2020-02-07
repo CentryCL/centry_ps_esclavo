@@ -47,8 +47,8 @@ class FeatureValue extends AbstractHomologation {
    * @return array/boolean   Retorna un arreglo con las coincidencias, si no encontró el valor devuelve falso.
    */
   public static function getCentryValue($id_prestashop) {
-    $db = Db::getInstance();
-    $query = new DbQuery();
+    $db = \Db::getInstance();
+    $query = new \DbQuery();
     $query->select('centry_value');
     $query->from(static::$TABLE);
     $query->where("id_prestashop = '" . $db->escape($id_prestashop) . "'");
@@ -61,13 +61,13 @@ class FeatureValue extends AbstractHomologation {
    * @return array/boolean    Retorna un arreglo con las coincidencias, si no encontró el valor devuelve falso.
    */
   public static function getIdPrestashop($id) {
-    $db = Db::getInstance();
-    $query = new DbQuery();
+    $db = \Db::getInstance();
+    $query = new \DbQuery();
     $query->select('id_prestashop');
     $query->from(static::$TABLE);
     $query->where("id_centry = '" . $db->escape($id) . "'");
     if (!($result = $db->executeS($query))) {
-      $query = new DbQuery();
+      $query = new \DbQuery();
       $query->select('id_prestashop');
       $query->from(static::$TABLE);
       $query->where("centry_value = '" . $db->escape($id) . "'");
@@ -83,19 +83,19 @@ class FeatureValue extends AbstractHomologation {
    * @return array/boolean   Retorna un arreglo con las coincidencias, si no encontró el valor devuelve falso.
    */
   public static function getProductId($id) {
-    $db = Db::getInstance();
-    $query = new DbQuery();
+    $db = \Db::getInstance();
+    $query = new \DbQuery();
     $query->select('product_id');
     $query->from(static::$TABLE);
     $query->where("id_centry = '" . $db->escape($id) . "'");
     if (!($result = $db->executeS($query))) {
-      $query = new DbQuery();
+      $query = new \DbQuery();
       $query->select('product_id');
       $query->from(static::$TABLE);
       $query->where("centry_value = '" . $db->escape($id) . "'");
       $result2 = $db->executeS($query);
       if (!($result = $db->executeS($query))) {
-        $query = new DbQuery();
+        $query = new \DbQuery();
         $query->select('product_id');
         $query->from(static::$TABLE);
         $query->where("id_prestashop = '" . $db->escape($id) . "'");
@@ -126,7 +126,7 @@ class FeatureValue extends AbstractHomologation {
    * @return boolean Indica si el objeto pudo ser creado o no
    */
   protected function create() {
-    $db = Db::getInstance();
+    $db = \Db::getInstance();
     $sql = "INSERT INTO `" . _DB_PREFIX_ . static::$TABLE
             . "` (`id_prestashop`,`product_id`,`id_centry`,`centry_value`)"
             . " VALUES (" . ((int) $this->id_prestashop) . ", '"

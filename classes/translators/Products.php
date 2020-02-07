@@ -1,18 +1,18 @@
 <?php
 
-require_once _PS_MODULE_DIR_ . 'centry_ps_esclavo/classes/ConfigurationCentry.php';
+namespace CentryPs\translators;
 
-class ProcessProducts {
+class Products {
 
   /**
    * Función encargada de guardar toda la información del producto llenando campos y llamando funciones en caso de que sea necesario la sincronización de estos. Se encarga de los datos básicos del producto, variantes y su información, imágenes, caracteristicas.
-   * @param  Product        $product_ps Instancia de Producto que puede ser nuevo, o instancia de uno ya existente.
+   * @param  \Product       $product_ps Instancia de Producto que puede ser nuevo, o instancia de uno ya existente.
    * @param  stdObject      $product    Instancia de objeto que posee el objeto de Centry llamado por API
    * @param  Array          $sync       Arreglo que indica que campos deben sincronizarse o no.
-   * @return Product/boolean            Si el producto se guardó de forma correcta entrega el producto, de lo contrario retorna falso.
+   * @return \Product/boolean           Si el producto se guardó de forma correcta entrega el producto, de lo contrario retorna falso.
    */
   public static function productSave($product_ps, $product, $sync) {
-    $default_lang = Configuration::get('PS_LANG_DEFAULT');
+//    $default_lang = \Configuration::get('PS_LANG_DEFAULT');
     $taxes = 1 + ($product_ps->getTaxesRate()) / 100;
     $product_ps->name = ($sync["name"] && property_exists($product, "name")) ? mb_substr($product->name, 0, 128) : $product_ps->name;
     $product_ps->reference = $sync["sku_product"] ? mb_substr($product->sku, 0, 64) : $product_ps->reference;
@@ -46,15 +46,15 @@ class ProcessProducts {
       if (property_exists($product, "price") && $product->price) {
         self::PriceOffer($product_ps, $product, $taxes);
       } else {
-        $discounts = SpecificPriceCore::getByProductId($product_ps->id);
+        $discounts = \SpecificPriceCore::getByProductId($product_ps->id);
         foreach ($discounts as $discount) {
-          (new SpecificPrice($discount["id_specific_price"]))->delete();
+          (new \SpecificPrice($discount["id_specific_price"]))->delete();
         }
       }
     }
 
     if ($sync["category"] && property_exists($product, "category_id")) {
-      if ($categories = CentryPs\models\homologation\Category::getIdsPrestashop($product->category_id)) {
+      if ($categories = \CentryPs\models\homologation\Category::getIdsPrestashop($product->category_id)) {
         self::category($product_ps, $product, $categories);
       } else {
         $default_category = $product_ps->getDefaultCategory();
@@ -94,14 +94,14 @@ class ProcessProducts {
    * @param float     $taxes      Impuestos asociados al producto.
    */
   private function PriceOffer($product_ps, $product, $taxes) {
-    $query = SpecificPriceCore::getByProductId($product_ps->id);
+    $query = \SpecificPriceCore::getByProductId($product_ps->id);
 
     $from = strtotime($product->salestartdate);
     $from = date('Y-m-d H:i:s', $from);
     $to = strtotime($product->saleenddate);
     $to = date('Y-m-d H:i:s', $to);
 
-    $config = ConfigurationCentry::getPriceBehavior();
+    $config = \CentryPs\ConfigurationCentry::getPriceBehavior();
 
     if ($config == "percentage") {
       $price_offer = round(($product->price_compare - $product->price) / $product->price_compare, 5);
@@ -112,7 +112,7 @@ class ProcessProducts {
     }
     if ($config) {
       if ($query) {
-        $discount = new SpecificPrice($query[0]["id_specific_price"]);
+        $discount = new \SpecificPrice($query[0]["id_specific_price"]);
         $discount->price = ($config == "discount") ? $price_offer : -1;          //cuando es reducido es -1, descontado precio final, porcentaje -1
         $discount->reduction = ($config == "discount") ? 0 : $price_offer;           //reducido precio final, descontado es 0, porcentaje precio final.
         $discount->reduction_type = ($config == "percentage") ? "percentage" : "amount";  // reducido y descontado es amount, porcentaje es percentage
@@ -120,7 +120,7 @@ class ProcessProducts {
         $discount->to = $to;
         $discount->save();
       } else {
-        $discount = new SpecificPrice();
+        $discount = new \SpecificPrice();
         $discount->id_product = $product_ps->id;
         $discount->price = ($config == "discount") ? $price_offer : -1;       //cuando es reducido es -1, descontado precio final, porcentaje -1
         $discount->reduction = ($config == "discount") ? 0 : $price_offer;        //reducido precio final, descontado es 0, porcentaje precio final.
@@ -151,16 +151,16 @@ class ProcessProducts {
     if (!property_exists($product, "brand_id")) {
       return false;
     }
-    $brand_id = CentryPs\models\homologation\Brand::getIdPrestashop($product->brand_id);
+    $brand_id = \CentryPs\models\homologation\Brand::getIdPrestashop($product->brand_id);
     if ($brand_id) {
-      $manufacturer = new Manufacturer($brand_id);
+      $manufacturer = new \Manufacturer($brand_id);
     } else {
-      $manufacturer = new Manufacturer();
+      $manufacturer = new \Manufacturer();
       $manufacturer->active = true;
       $manufacturer->name = $product->brand_name;
       $resp = $manufacturer->save();
       if ($resp) {
-        $brandC = new BrandCentry($manufacturer->id, $product->brand_id);
+        $brandC = new \CentryPs\models\homologation\Brand($manufacturer->id, $product->brand_id);
         $brandC->save();
       }
     }
@@ -186,7 +186,7 @@ class ProcessProducts {
         array_push($features_centry, array("id" => $feature->id, "id_feature_value" => $feature_value->id));
         array_push($new_centry, $feature->id);
       } else {
-        $id = CentryPs\models\homologation\Feature::getIdPrestashop("Garantía");
+        $id = \CentryPs\models\homologation\Feature::getIdPrestashop("Garantía");
         array_push($erase, $id);
       }
     }
@@ -197,7 +197,7 @@ class ProcessProducts {
         array_push($features_centry, array("id" => $feature->id, "id_feature_value" => $feature_value->id));
         array_push($new_centry, $feature->id);
       } else {
-        $id = CentryPs\models\homologation\Feature::getIdPrestashop("Año Temporada");
+        $id = \CentryPs\models\homologation\Feature::getIdPrestashop("Año Temporada");
         array_push($erase, $id);
       }
 
@@ -207,7 +207,7 @@ class ProcessProducts {
         array_push($features_centry, array("id" => $feature->id, "id_feature_value" => $feature_value->id));
         array_push($new_centry, $feature->id);
       } else {
-        $id = CentryPs\models\homologation\Feature::getIdPrestashop("Temporada");
+        $id = \CentryPs\models\homologation\Feature::getIdPrestashop("Temporada");
         array_push($erase, $id);
       }
 
@@ -217,7 +217,7 @@ class ProcessProducts {
         array_push($features_centry, array("id" => $feature->id, "id_feature_value" => $feature_value->id));
         array_push($new_centry, $feature->id);
       } else {
-        $id = CentryPs\models\homologation\Feature::getIdPrestashop("Género");
+        $id = \CentryPs\models\homologation\Feature::getIdPrestashop("Género");
         array_push($erase, $id);
       }
     }
@@ -244,7 +244,7 @@ class ProcessProducts {
    * @param  array   $product_category_attributes  Atributos de categoría correspondiente al producto.
    */
   private function categoryFeatures($product_ps, $product_category_attributes) {
-    $centry = new AuthorizationCentry();
+    $centry = new \CentryPs\AuthorizationCentry();
     $method = "GET";
     $feature_value = false;
     $feature = false;
@@ -262,8 +262,10 @@ class ProcessProducts {
         foreach ($category_attribute->options as $option) {
           $options[$option->_id] = $option->name;
         }
-        foreach ($attribute->value_selected_ids as $option_id) {
-          $feature_value = self::featureValue($product_ps->id, $feature->id, $option_id, $options[$option_id], 0);
+        if (property_exists($attribute, "value_selected_ids")) {
+          foreach ($attribute->value_selected_ids as $option_id) {
+            $feature_value = self::featureValue($product_ps->id, $feature->id, $option_id, $options[$option_id], 0);
+          }
         }
       }
       if ($feature_value) {
@@ -283,15 +285,15 @@ class ProcessProducts {
    * @return Feature           Retorna instancia del objeto nuevo o uno que ya estaba creado.
    */
   private function feature($charact, $id_centry) {
-    $feature = CentryPs\models\homologation\Feature::getIdPrestashop($charact);
+    $feature = \CentryPs\models\homologation\Feature::getIdPrestashop($charact);
     if ($feature) {
-      $feature = new Feature($feature);
+      $feature = new \Feature($feature);
     } else {
-      $feature = new Feature();
-      $feature->name = array_fill_keys(Language::getIDs(), (string) $charact);
+      $feature = new \Feature();
+      $feature->name = array_fill_keys(\Language::getIDs(), (string) $charact);
       $resp = $feature->save();
       if ($resp) {
-        $featureC = new FeatureCentry($feature->id, $id_centry, $charact);
+        $featureC = new \CentryPs\models\homologation\Feature($feature->id, $id_centry, $charact);
         $featureC->save();
       }
     }
@@ -314,8 +316,8 @@ class ProcessProducts {
     $value = mb_substr($value, 0, 255);
     $prod_id = false;
     $search = $id_value ? $id_value : $value;
-    $feature_value = CentryPs\models\homologation\FeatureValue::getIdPrestashop($search);
-    $prod_ids = CentryPs\models\homologation\FeatureValue::getProductId($search);
+    $feature_value = \CentryPs\models\homologation\FeatureValue::getIdPrestashop($search);
+    $prod_ids = \CentryPs\models\homologation\FeatureValue::getProductId($search);
     if (!$prod_ids) {
       $prod_ids = array();
     }
@@ -325,18 +327,18 @@ class ProcessProducts {
       }
     }
     if ($feature_value && ($prod_id || !$custom)) {
-      $feature_value = new FeatureValue($feature_value);
+      $feature_value = new \FeatureValue($feature_value);
     } else {
-      $feature_value = new FeatureValue();
+      $feature_value = new \FeatureValue();
       $feature_value->id_feature = $feature_id;
-      $feature_value->value = array_fill_keys(Language::getIDs(false), $value);
+      $feature_value->value = array_fill_keys(\Language::getIDs(false), $value);
       $feature_value->custom = $custom;
       $resp = $feature_value->save();
       if ($resp) {
         if ($custom) {
-          $feature_valueC = new FeatureValueCentry($feature_value->id, null, $value);
+          $feature_valueC = new \CentryPs\models\homologation\FeatureValue($feature_value->id, null, $value);
         } else {
-          $feature_valueC = new FeatureValueCentry($feature_value->id, $id_value, $value);
+          $feature_valueC = new \CentryPs\models\homologation\FeatureValue($feature_value->id, $id_value, $value);
         }
         $feature_valueC->product_id = $product_id;
         $feature_valueC->save();
@@ -376,14 +378,14 @@ class ProcessProducts {
     $not_erase = [];
 
     foreach ($product->assets as $image) {
-      $img = CentryPs\models\homologation\Image::getIdPrestashop($image->_id);
+      $img = \CentryPs\models\homologation\Image::getIdPrestashop($image->_id);
       if ($img) {
         array_push($not_erase, $img);
       }
     }
     foreach ($images as $image) {
       if ($image["cover"] != 1 && !in_array($image["id_image"], $not_erase)) {
-        (new Image($image["id_image"]))->delete();
+        (new \Image($image["id_image"]))->delete();
       }
     }
   }
@@ -395,9 +397,9 @@ class ProcessProducts {
   private function orderPosition($assets) {
     $position = 2;
     foreach ($assets as $asset) {
-      $id_img = CentryPs\models\homologation\Image::getIdPrestashop($asset->_id);
+      $id_img = \CentryPs\models\homologation\Image::getIdPrestashop($asset->_id);
       if ($id_img) {
-        $image = new Image($id_img);
+        $image = new \Image($id_img);
         $image->position = $position;
         $image->save();
         $position++;
@@ -412,20 +414,20 @@ class ProcessProducts {
    */
   private function createCover($product_ps, $product) {
     try {
-      $configuration = new PrestaShop\PrestaShop\Adapter\Configuration();
-      $tools = new PrestaShop\PrestaShop\Adapter\Tools();
+      $configuration = new \PrestaShop\PrestaShop\Adapter\Configuration();
+      $tools = new \PrestaShop\PrestaShop\Adapter\Tools();
       $context_shop_id = $product_ps->id_shop_default;
-      $hook = new PrestaShop\PrestaShop\Adapter\Hook\HookDispatcher();
-      $image_copier = new PrestaShop\PrestaShop\Adapter\Import\ImageCopier($configuration, $tools, $context_shop_id, $hook);
+      $hook = new \PrestaShop\PrestaShop\Adapter\Hook\HookDispatcher();
+      $image_copier = new \PrestaShop\PrestaShop\Adapter\Import\ImageCopier($configuration, $tools, $context_shop_id, $hook);
 
       $id_cover = $product_ps->getCoverWs();
-      $image = new Image();
+      $image = new \Image();
       $image->id_product = $product_ps->id;
       $image->position = 1;
       $image->url = $product->cover_url;
       $image->cover = true;
       if ($id_cover) {
-        (new Image($id_cover))->delete();
+        (new \Image($id_cover))->delete();
       }
       if (($image->validateFields(false, true)) === true && ($image->validateFieldsLang(false, true)) === true && $image->add()) {
         $image->associateTo($product_ps->id_shop_default);
@@ -445,14 +447,14 @@ class ProcessProducts {
    * */
   private function createAsset($product_ps, $asset) {
     try {
-      $configuration = new PrestaShop\PrestaShop\Adapter\Configuration();
-      $tools = new PrestaShop\PrestaShop\Adapter\Tools();
+      $configuration = new \PrestaShop\PrestaShop\Adapter\Configuration();
+      $tools = new \PrestaShop\PrestaShop\Adapter\Tools();
       $context_shop_id = $product_ps->id_shop_default;
-      $hook = new PrestaShop\PrestaShop\Adapter\Hook\HookDispatcher();
-      $image_copier = new PrestaShop\PrestaShop\Adapter\Import\ImageCopier($configuration, $tools, $context_shop_id, $hook);
+      $hook = new \PrestaShop\PrestaShop\Adapter\Hook\HookDispatcher();
+      $image_copier = new \PrestaShop\PrestaShop\Adapter\Import\ImageCopier($configuration, $tools, $context_shop_id, $hook);
 
       if ($asset->position != 0) {
-        $image = new Image();
+        $image = new \Image();
         $image->id_product = $product_ps->id;
         $image->position = $image->getHighestPosition($product_ps->id) + 1;
         $image->url = $asset->url;
@@ -462,7 +464,7 @@ class ProcessProducts {
           if (!$image_copier->copyImg($product_ps->id, $image->id, $asset->url, 'products', true)) {
             $image->delete();
           } else {
-            $imageC = new ImageCentry ();
+            $imageC = new \CentryPs\models\homologation\Image();
             $imageC->id = $image->id;
             $imageC->id_centry = $asset->_id;
             $imageC->fingerprint = $asset->image_fingerprint;
@@ -488,7 +490,7 @@ class ProcessProducts {
     $homologate_categories = [];
     foreach ($categories as $category) {
       array_push($homologate_categories, $category["id"]);
-      $level = (new Category($category["id"]))->calcLevelDepth();
+      $level = (new \Category($category["id"]))->calcLevelDepth();
       if ($level > $max_level) {
         $max_level = $level;
         $id_category_default = $category["id"];
@@ -508,17 +510,17 @@ class ProcessProducts {
   private function saveVariants($product_ps, $variants, $sync) {
     self::deleteUnconnectedVariants($product_ps, $variants);
     foreach ($variants as $variant) {
-      $combination = CentryPs\models\homologation\Variant::getIdPrestashop($variant->_id);
+      $combination = \CentryPs\models\homologation\Variant::getIdPrestashop($variant->_id);
       if ($combination) {
-        $combination = new Combination($combination);
+        $combination = new \Combination($combination);
       } else {
-        $combination = new Combination();
+        $combination = new \Combination();
         $combination->id_product = $product_ps->id;
       }
 
       $resp = $combination->save();
       if ($resp) {
-        $variantC = new VariantCentry($combination->id, $variant->_id);
+        $variantC = new \CentryPs\models\homologation\Variant($combination->id, $variant->_id);
         $variantC->save();
         self::saveVariant($combination, $variant, $sync);
       }
@@ -535,14 +537,14 @@ class ProcessProducts {
     $not_erase = [];
 
     foreach ($variants as $variant) {
-      $id_comb = CentryPs\models\homologation\Product::getIdPrestashop($variant->_id);
+      $id_comb = \CentryPs\models\homologation\Product::getIdPrestashop($variant->_id);
       if ($id_comb) {
         array_push($not_erase, $id_comb);
       }
     }
     foreach ($variants_ps as $variant_ps) {
       if (!in_array($variant_ps["id"], $not_erase)) {
-        (new Combination($variant_ps["id"]))->delete();
+        (new \Combination($variant_ps["id"]))->delete();
       }
     }
   }
@@ -556,7 +558,7 @@ class ProcessProducts {
   private function saveSimpleVariant($product_ps, $variant, $sync) {
     if ($variants_ps = $product_ps->getWsCombinations()) {
       foreach ($variants_ps as $variant_ps) {
-        (new Combination($variant_ps["id"]))->delete();
+        (new \Combination($variant_ps["id"]))->delete();
       }
     }
     if ($sync["stock"]) {
@@ -568,22 +570,30 @@ class ProcessProducts {
 
   /**
    * Guarda la variante y manda a crear los atributos que estén asociados a esta.
-   * @param  Product   $product_ps  Instancia de Producto que puede ser nuevo, o instancia de uno ya existente.
+   * @param  \Combination $combination_ps  Instancia de Producto que puede ser nuevo, o instancia de uno ya existente.
    * @param  stdObject $variant     Instancia de la variante de Centry.
-   * @param  array     $sync        arreglo que indica que campos se sincronizan.
+   * @param  array $sync        arreglo que indica que campos se sincronizan.
    */
-  private function saveVariant($variant_ps, $variant, $sync) {
-    $variant_ps->reference = $sync["variant_sku"] ? mb_substr($variant->sku, 0, 64) : $variant_ps->reference;
-    $variant_ps->ean13 = $sync["barcode"] ? mb_substr($variant->barcode, 0, 13) : $variant_ps->ean13;
+  private function saveVariant($combination_ps, $variant, $sync) {
+    $combination_ps->reference = $sync["variant_sku"] ? mb_substr($variant->sku, 0, 64) : $combination_ps->reference;
+    $combination_ps->ean13 = $sync["barcode"] ? mb_substr($variant->barcode, 0, 13) : $combination_ps->ean13;
 
     if ($sync["stock"]) {
-      StockAvailable::setQuantity($variant_ps->id_product, $variant_ps->id, $variant->quantity);
+      \StockAvailable::setQuantity($combination_ps->id_product, $combination_ps->id, $variant->quantity);
     }
-    $attributes = self::Attributes($variant_ps, $variant, $sync);
-    $variant_ps->setAttributes($attributes);
-    $variant_ps->save();
+    $attributes = self::Attributes($combination_ps, $variant, $sync);
+    $combination_ps->setAttributes($attributes);
+    try {
+      $combination_ps->save();
+    } catch (\Exception $ex) {
+      error_log($ex->getMessage());
+    }
     if ($variant->quantity > 0) {
-      (new Product($variant_ps->id_product))->setDefaultAttribute($variant_ps->id);
+      try {
+        (new \Product($combination_ps->id_product))->setDefaultAttribute($combination_ps->id);
+      } catch (\Exception $ex) {
+        error_log($ex->getMessage());
+      }
     }
   }
 
@@ -599,13 +609,13 @@ class ProcessProducts {
     $old_size = null;
 
     $color = self::Color($variant) ? self::Color($variant)->id : false;
-    $color_attr_group = CentryPs\models\homologation\AttributeGroup::getIdPrestashop("Color");
+    $color_attr_group = \CentryPs\models\homologation\AttributeGroup::getIdPrestashop("Color");
     $size = self::Size($variant) ? self::Size($variant)->id : false;
-    $size_attr_group = CentryPs\models\homologation\AttributeGroup::getIdPrestashop("Talla");
+    $size_attr_group = \CentryPs\models\homologation\AttributeGroup::getIdPrestashop("Talla");
 
-    $attributes = $variant_ps->getAttributesName(Configuration::get('PS_LANG_DEFAULT'));
+    $attributes = $variant_ps->getAttributesName(\Configuration::get('PS_LANG_DEFAULT'));
     foreach ($attributes as $attribute) {
-      $attr_ps = new Attribute($attribute["id_attribute"]);
+      $attr_ps = new \Attribute($attribute["id_attribute"]);
       if ($attr_ps->id_attribute_group == $color_attr_group) {
         $old_color = $attribute["id_attribute"];
       } elseif ($attr_ps->id_attribute_group == $size_attr_group) {
@@ -632,17 +642,17 @@ class ProcessProducts {
    * @param string $value  nombre del atributo, este puede ser color o talla.
    */
   private function AttributeGroup($value) {
-    if ($id = CentryPs\models\homologation\AttributeGroup::getIdPrestashop($value)) {
-      $group = new AttributeGroup($id);
+    if ($id = \CentryPs\models\homologation\AttributeGroup::getIdPrestashop($value)) {
+      $group = new \AttributeGroup($id);
     } else {
-      $group = new AttributeGroup();
-      $group->name = array_fill_keys(Language::getIDs(false), $value);
-      $group->public_name = array_fill_keys(Language::getIDs(false), $value);
+      $group = new \AttributeGroup();
+      $group->name = array_fill_keys(\Language::getIDs(false), $value);
+      $group->public_name = array_fill_keys(\Language::getIDs(false), $value);
       $group->is_color_group = ($value == "color") ? 1 : 0;
       $group->group_type = ($value == "color") ? "color" : "select";
       $resp = $group->save();
       if ($resp) {
-        $groupC = new AttributeGroupCentry($group->id, $value);
+        $groupC = new \CentryPs\models\homologation\AttributeGroup($group->id, $value);
         $groupC->save();
       }
     }
@@ -659,18 +669,18 @@ class ProcessProducts {
     }
     $group = self::AttributeGroup("Color");
 
-    $color = CentryPs\models\homologation\Color::getIdPrestashop($variant->color_id);
+    $color = \CentryPs\models\homologation\Color::getIdPrestashop($variant->color_id);
     if ($color) {
-      $color = new Attribute($color);
+      $color = new \Attribute($color);
     } else {
       if ($variant->color_id) {
-        $color = new Attribute();
-        $color->name = array_fill_keys(Language::getIDs(false), $variant->color_name);
+        $color = new \Attribute();
+        $color->name = array_fill_keys(\Language::getIDs(false), $variant->color_name);
         ;
         $color->id_attribute_group = $group->id;
         $resp = $color->save();
         if ($resp) {
-          $colorC = new ColorCentry($color->id, $variant->color_id);
+          $colorC = new \CentryPs\models\homologation\Color($color->id, $variant->color_id);
           $colorC->save();
         }
       }
@@ -687,18 +697,18 @@ class ProcessProducts {
       return false;
     }
     $group = self::AttributeGroup("Talla");
-    $size = CentryPs\models\homologation\Size::getIdPrestashop($variant->size_id);
+    $size = \CentryPs\models\homologation\Size::getIdPrestashop($variant->size_id);
     if ($size) {
-      $size = new Attribute($size);
+      $size = new \Attribute($size);
     } else {
       if ($variant->size_id) {
-        $size = new Attribute();
-        $size->name = array_fill_keys(Language::getIDs(false), $variant->size_name);
+        $size = new \Attribute();
+        $size->name = array_fill_keys(\Language::getIDs(false), $variant->size_name);
         ;
         $size->id_attribute_group = $group->id;
         $resp = $size->save();
         if ($resp) {
-          $sizeC = new SizeCentry($size->id, $variant->size_id);
+          $sizeC = new \CentryPs\models\homologation\Size($size->id, $variant->size_id);
           $sizeC->save();
         }
       }
