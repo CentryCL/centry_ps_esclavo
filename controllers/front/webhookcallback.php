@@ -1,7 +1,5 @@
 <?php
 
-require_once(dirname(__FILE__) . '/../../vendor/autoload.php');
-
 /**
  * Controlador encargado de ateneder y registrar las notificaciones enviadas por
  * Centry a Prestashop.
@@ -16,6 +14,7 @@ class Centry_Ps_EsclavoWebhookCallbackModuleFrontController extends ModuleFrontC
       $topic = $this->translateTopic($data['topic']);
       $resource_id = $this->getNotificationResourceId($data, $topic);
       CentryPs\models\system\PendingTask::registerNotification($origin, $topic, $resource_id);
+      $this->context->controller->module->curlToLocalController('taskmanager');
       $this->ajaxDie(json_encode(['status' => 'ok']));
     } catch (Exception $ex) {
       $this->ajaxDie(json_encode([

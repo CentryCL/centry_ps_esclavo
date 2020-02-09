@@ -1,7 +1,5 @@
 <?php
 
-require_once(dirname(__FILE__) . '/../../vendor/autoload.php');
-
 use CentryPs\ConfigurationCentry;
 use CentryPs\enums\system\PendingTaskStatus;
 use CentryPs\models\system\FailedTaskLog;
@@ -30,6 +28,7 @@ abstract class AbstractTaskProcessor extends ModuleFrontController {
                 PendingTaskStatus::Failed : PendingTaskStatus::Pending;
         $task->save();
       }
+      $this->context->controller->module->curlToLocalController('taskmanager');
     }
 
     die;

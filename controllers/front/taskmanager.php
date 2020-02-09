@@ -64,26 +64,7 @@ class Centry_Ps_EsclavoTaskManagerModuleFrontController extends ModuleFrontContr
     $task->update();
     $controller = $task->origin . str_replace('_', '', $task->topic);
     $params = ['id' => $task->resource_id];
-    $this->curlToLocalController($controller, $params);
-  }
-
-  /**
-   * Ejecuta un curl a un controlador de este módulo entregándole ciertos
-   * parámetros y con un timeout de 1 segundo para simular la ejecución de un
-   * hilo paralelo.
-   * @param string $controller
-   * @param array $params
-   */
-  private function curlToLocalController(string $controller, array $params) {
-    $url = $this->context->link->getModuleLink(
-            $this->context->controller->module->name, $controller, $params
-    );
-    $ch = curl_init($url);
-    // Para que la respuesta del servidor sea retornada por `curl_exec`.
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    // Time out de un segundo.
-    curl_setopt($ch, CURLOPT_TIMEOUT, 1);
-    curl_exec($ch);
+    $this->context->controller->module->curlToLocalController($controller, $params);
   }
 
 }

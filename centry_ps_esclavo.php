@@ -94,20 +94,42 @@ class Centry_PS_esclavo extends Module {
   public function hookactionOrderHistoryAddAfter($params) {
     $this->enqueueOrderToSend($params['order_history']->id_order);
   }
-  
+
+  /**
+   * Registra el identificador de un pedido en una tarea pendiente para que sea
+   * sincronizado con Centry posteriormente.
+   * @param int $id_order
+   */
   private function enqueueOrderToSend($id_order) {
     try {
       $origin = CentryPs\enums\system\PendingTaskOrigin::PrestaShop;
       $topic = CentryPs\enums\system\PendingTaskTopic::OrderSave;
       $resource_id = $id_order;
-      CentryPs\models\system\PendingTask::registerNotification($origin, $topic, $resource_id);
+      CentryPs\models\system\PendingTask::registerNotification(
+              $origin, $topic, $resource_id
+      );
+      $this->curlToLocalController('taskmanager');
     } catch (Exception $ex) {
-      error_log(json_encode([
-        'error' => 'Notification omitted for inconsistent data',
-        'message' => $ex->getMessage(),
-        'request' => $data
-      ]));
+      error_log("Centry_PS_esclavo.enqueueOrderToSend($id_order): "
+              . $ex->getMessage());
     }
+  }
+  
+  /**
+   * Ejecuta un curl a un controlador de este módulo entregándole ciertos
+   * parámetros y con un timeout de 1 segundo para simular la ejecución de un
+   * hilo paralelo.
+   * @param string $controller
+   * @param array $params
+   */
+  public function curlToLocalController(string $controller, array $params = array()) {
+    $url = $this->context->link->getModuleLink($this->name, $controller, $params);
+    $ch = curl_init($url);
+    // Para que la respuesta del servidor sea retornada por `curl_exec`.
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    // Time out de un segundo.
+    curl_setopt($ch, CURLOPT_TIMEOUT, 1);
+    curl_exec($ch);
   }
 
   public function getContent() {
@@ -322,7 +344,8 @@ class Centry_PS_esclavo extends Module {
 
     if ($hasChanges) {
       $url = $this->context->link->getModuleLink($this->name, 'webhookcallback');
-      (new CentryPs\models\Webhook(null, $url))->createCentryWebhook();
+      $wh = new CentryPs\models\Webhook(null, $url, true, true, false, false);
+      $wh->createCentryWebhook();
     }
     return $output;
   }
@@ -364,10 +387,8 @@ class Centry_PS_esclavo extends Module {
   }
 
   public function displayForm() {
-    // Get default language
     $defaultLang = (int) Configuration::get('PS_LANG_DEFAULT');
 
-//    $statusFields = array();
     $sync_fields = [["id" => "name", 'name' => "Nombre"], ["id" => "price", 'name' => "Precio"], ["id" => "priceoffer", 'name' => "Precio de oferta"],
       ["id" => "description", 'name' => "Descripción"], ["id" => "skuproduct", 'name' => "Sku del Producto"], ["id" => "characteristics", 'name' => "Características"],
       ["id" => "stock", 'name' => "Stock"], ["id" => "variantsku", 'name' => "Sku de la Variante"], ["id" => "size", 'name' => "Talla"],
@@ -485,7 +506,6 @@ class Centry_PS_esclavo extends Module {
     }
 
     // Se insertan las homologaciones de estado al formulario
-//    $centryOptions = array();
 
     $fieldsForm[2]['form'] = array(
       'legend' => array(
