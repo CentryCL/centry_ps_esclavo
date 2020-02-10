@@ -2,12 +2,12 @@
 
 namespace CentryPs\models\homologation;
 
-class Brand extends AbstractHomologation {
+class Order extends AbstractHomologation {
 
-  protected static $TABLE = "brand_centry";
+  public static $TABLE = "order_centry";
 
   /**
-   * Constructor de la clase marca que se puede instanciar con el id de
+   * Constructor de la clase order que se puede instanciar con el id de
    * prestashop, el id de centry o ambos
    * @param int $id_prestashop Identificador de Prestashop
    * @param string $id_centry Identificador de Centry
@@ -20,7 +20,7 @@ class Brand extends AbstractHomologation {
     $table_name = static::tableName();
     return "ALTER TABLE `{$table_name}` ADD UNIQUE INDEX (`id_prestashop`);
       ALTER TABLE `{$table_name}` ADD UNIQUE INDEX (`id_centry`);
-      ALTER TABLE `{$table_name}` ADD FOREIGN KEY (`id_prestashop`) REFERENCES `" . _DB_PREFIX_ . "manufacturer" . "`(`id_manufacturer`) ON DELETE CASCADE ON UPDATE NO ACTION;";
+      ALTER TABLE `{$table_name}` ADD FOREIGN KEY (`id_prestashop`) REFERENCES `" . _DB_PREFIX_ . "orders" . "`(`id_order`) ON DELETE CASCADE ON UPDATE NO ACTION;";
   }
 
 }

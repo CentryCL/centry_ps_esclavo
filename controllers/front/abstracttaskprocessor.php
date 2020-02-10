@@ -1,7 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__) . '/../../vendor/autoload.php');
-
+use CentryPs\ConfigurationCentry;
 use CentryPs\enums\system\PendingTaskStatus;
 use CentryPs\models\system\FailedTaskLog;
 use CentryPs\models\system\PendingTask;
@@ -22,13 +21,14 @@ abstract class AbstractTaskProcessor extends ModuleFrontController {
       try {
         $this->processTask($task);
         $task->delete();
-      } catch (Exception $ex) {
+      } catch (\Exception $ex) {
         $this->generateLog($task, $ex);
         $maxTaskAttempts = ConfigurationCentry::getMaxTaskAttempts();
         $task->status = $task->attempt >= $maxTaskAttempts ?
                 PendingTaskStatus::Failed : PendingTaskStatus::Pending;
         $task->save();
       }
+      $this->context->controller->module->curlToLocalController('taskmanager');
     }
 
     die;

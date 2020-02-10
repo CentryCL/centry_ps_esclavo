@@ -2,12 +2,14 @@
 
 namespace CentryPs\models\system;
 
+use CentryPs\models\AbstractModel;
+
 /**
  * Representa una tarea que está pendiente de ser ejecutada
  */
-class PendingTask {
+class PendingTask extends AbstractModel {
 
-  public static $TABLE = "centry_pending_task";
+  protected static $TABLE = "centry_pending_task";
 
   /**
    * Etiqueta que indica el origen de la tarea.
@@ -70,10 +72,11 @@ class PendingTask {
    * @return boolean indica si el objeto pudo ser guardado o no.
    */
   public function save() {
-    if (!$this->create()) {
+    try {
+      return $this->create();
+    } catch (\PrestaShopDatabaseException $ex) {
       return $this->update();
     }
-    return true;
   }
 
   /**
@@ -81,9 +84,8 @@ class PendingTask {
    * @return boolean indica si el objeto pudo ser guardado o no.
    */
   public function create() {
-    $table_name = _DB_PREFIX_ . static::$TABLE;
     $db = \Db::getInstance();
-    $sql = "INSERT INTO `{$table_name}` "
+    $sql = "INSERT INTO `{$this->tableName()}` "
             . "(`origin`, `topic`, `resource_id`, `status`, `attempt`, `date_add`, `date_upd`) "
             . "VALUES ("
             . " {$this->escape($this->origin, $db)},"
@@ -102,8 +104,8 @@ class PendingTask {
    * @return boolean indica si el objeto pudo ser guardado o no.
    */
   public function update() {
-    $table_name = _DB_PREFIX_ . static::$TABLE;
     $db = \Db::getInstance();
+    $table_name = static::tableName();
     $sql = "UPDATE `{$table_name}` "
             . "SET"
             . " `status` = {$this->escape($this->status, $db)},"
@@ -122,7 +124,7 @@ class PendingTask {
    * en la base de datos retorna <code>true</code>.
    */
   public function delete() {
-    $table_name = _DB_PREFIX_ . static::$TABLE;
+    $table_name = static::tableName();
     $db = \Db::getInstance();
     $sql = "DELETE FROM `{$table_name}` WHERE"
             . " `origin` = {$this->escape($this->origin, $db)} AND"
@@ -132,42 +134,13 @@ class PendingTask {
   }
 
   /**
-   * Aplica la función <code>escape</code> de la clase <code>Db</code> pero
-   * agregando dos condiciones adicionales:
-   * <ol>
-   * <li>
-   * Si el valor es <code>null</code>, retorna simplemente <code>NULL</code>
-   * </li>
-   * <li>
-   * Encierra el valor escapado entre comilla si así lo indica el parámetro
-   * <code>$isString</code>
-   * </li>
-   * </ol>
-   * @
-   * @param string|float|integer|boolean|null $value
-   * @param \Db $db
-   * @param boolean $isString
-   * @return string
-   * @see \Db#escape
-   * @todo Mover a una clase padre
-   */
-  private function escape($value, $db, $isString = true) {
-    if ($value === null) {
-      return 'NULL';
-    }
-
-    $escaped = $db->escape($value);
-    return $isString ? "'$escaped'" : $escaped;
-  }
-
-  /**
    * Creación de la tabla para mantener registro las tareas pendientes de ser
    * ejecutadas.
    * @return boolean indica si la tabla pudo ser creada o no. Si ya estaba
    * creada retorna <code>true</code>.
    */
   public static function createTable() {
-    $table_name = _DB_PREFIX_ . static::$TABLE;
+    $table_name = static::tableName();
     $sql = "CREATE TABLE IF NOT EXISTS `$table_name` ("
             . "`origin` VARCHAR(32) NOT NULL, "
             . "`topic` VARCHAR(32) NOT NULL, "
@@ -179,22 +152,6 @@ class PendingTask {
             . "PRIMARY KEY (`origin`, `topic`, `resource_id`)"
             . ")";
     return \Db::getInstance()->execute($sql);
-  }
-
-  /**
-   * Cuenta los elementos registrados que coincidan con las condiciones
-   * recibidas como parámetros.
-   * @param array $conditions
-   * @return int
-   * @todo mover a una clase padre.
-   */
-  public static function count($conditions = ['1' => '1']) {
-    $table_name = _DB_PREFIX_ . static::$TABLE;
-    $db = \Db::getInstance(_PS_USE_SQL_SLAVE_);
-    $sql = "SELECT COUNT(*) as count "
-            . "FROM `$table_name` "
-            . "WHERE " . static::equalities($conditions);
-    return $db->executeS($sql)[0]['count'];
   }
 
   /**
@@ -222,7 +179,7 @@ class PendingTask {
    * @return array
    */
   public static function getPendingTasks(array $conditions = null, int $limit = null, int $offset = null) {
-    $table_name = _DB_PREFIX_ . static::$TABLE;
+    $table_name = static::tableName();
     $sql = "SELECT * FROM `$table_name`";
     if (isset($conditions)) {
       $sql .= ' WHERE ' . static::equalities($conditions);
@@ -237,20 +194,69 @@ class PendingTask {
   }
 
   /**
-   * Genera un <code>string</code> con la concatenacion de varias sentencias SQL
-   * con unidas por el término <code>AND</code>. Se espera que el arreglo de
-   * entrada tenga en sus llaves los nombres de las columnas y en los valores
-   * el valor con el que debe coincidir.
-   * @param array $conditions Ej: <code>['name' => "'Joe'", 'age' => 35]</code>
-   * @return string Ej: <code>"name = 'Joe' AND age = 35"</code>
-   * @todo Mover a una clase padre
+   * Registra una tarea nueva o deja pendiente una antigua reiniciando su
+   * registro de intentos si se cumple uno de los siguientes casos:
+   * <ul>
+   * <li>El procesamiento de la tarea había fallado.</li>
+   * <li>Si se encuentra corriendo y no ha sufrido actualizaciones en los
+   * últimos 5 minutos</li>
+   * </ul>
+   * @param string $origin
+   * @param string $topic
+   * @param string $resource_id
    */
-  private static function equalities(array $conditions) {
-    $equalities = [];
-    foreach ($conditions as $key => $value) {
-      $equalities[] = "{$key} = {$value}";
+  public static function registerNotification($origin, $topic, $resource_id) {
+    $conditions = [
+      'origin' => "'{$origin}'",
+      'topic' => "'{$topic}'",
+      'resource_id' => "'{$resource_id}'"
+    ];
+    $task = static::getPendingTasksObjects($conditions, 1, 0);
+    if (empty($task)) {
+      (new PendingTask($origin, $topic, $resource_id))->save();
+    } elseif (
+            $task[0]->status == \CentryPs\enums\system\PendingTaskStatus::Failed ||
+            (
+            $task[0]->status == \CentryPs\enums\system\PendingTaskStatus::Running &&
+            $task[0]->date_upd < date('Y-m-d H:i:s', strtotime("-5 minutes"))
+            )
+    ) {
+      $task[0]->status = \CentryPs\enums\system\PendingTaskStatus::Pending;
+      $task[0]->attempt = 0;
+      $task[0]->save();
     }
-    return join(' AND ', $equalities);
+  }
+
+  public static function cleanFrozenTasks() {
+    static::markFailedFrozenTasks();
+    static::restartFrozenTasks();
+  }
+
+  private static function markFailedFrozenTasks() {
+    $table_name = static::tableName();
+    $db = \Db::getInstance();
+    $sql = "UPDATE `{$table_name}` "
+            . "SET"
+            . " `status` = '" . \CentryPs\enums\system\PendingTaskStatus::Failed . "' "
+            . "WHERE"
+            . " `date_upd` < '" . date('Y-m-d H:i:s', strtotime("-5 minutes")) . "' AND"
+            . " `status` = '" . \CentryPs\enums\system\PendingTaskStatus::Running . "' AND"
+            . " `attempt` >= " . \CentryPs\ConfigurationCentry::getMaxTaskAttempts();
+    return $db->execute($sql) != false;
+  }
+
+  private static function restartFrozenTasks() {
+    $table_name = static::tableName();
+    $db = \Db::getInstance();
+    $sql = "UPDATE `{$table_name}` "
+            . "SET"
+            . " `status` = '" . \CentryPs\enums\system\PendingTaskStatus::Pending . "',"
+            . " `attempt` = `attempt` + 1 "
+            . "WHERE"
+            . " `date_upd` < '" . date('Y-m-d H:i:s', strtotime("-5 minutes")) . "' AND"
+            . " `status` = '" . \CentryPs\enums\system\PendingTaskStatus::Running . "' AND"
+            . " `attempt` < " . \CentryPs\ConfigurationCentry::getMaxTaskAttempts();
+    return $db->execute($sql) != false;
   }
 
 }

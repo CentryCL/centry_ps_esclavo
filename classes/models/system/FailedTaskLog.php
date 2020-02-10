@@ -2,16 +2,18 @@
 
 namespace CentryPs\models\system;
 
+use CentryPs\models\AbstractModel;
+
 /**
  * Corresponde al registro de un error en el procesamiento de un
  * <code>PendingTask</code>.
  *
  * @author Elías Lama L. <elias.lama@centry.cl>
  */
-class FailedTaskLog {
+class FailedTaskLog extends AbstractModel {
 
-  public static $TABLE = "centry_failed_task_log";
-  
+  protected static $TABLE = "centry_failed_task_log";
+
   /**
    * Identificador del registro.
    * @var int
@@ -71,9 +73,8 @@ class FailedTaskLog {
    * @return boolean indica si el objeto pudo ser guardado o no.
    */
   public function create() {
-    $table_name = _DB_PREFIX_ . static::$TABLE;
     $db = \Db::getInstance();
-    $sql = "INSERT INTO `{$table_name}` "
+    $sql = "INSERT INTO `{$this->tableName()}` "
             . "(`origin`, `topic`, `resource_id`, `message`, `trace`, `date_add`) "
             . "VALUES ("
             . " {$this->escape($this->origin, $db)},"
@@ -87,43 +88,14 @@ class FailedTaskLog {
   }
 
   /**
-   * Aplica la función <code>escape</code> de la clase <code>Db</code> pero
-   * agregando dos condiciones adicionales:
-   * <ol>
-   * <li>
-   * Si el valor es <code>null</code>, retorna simplemente <code>NULL</code>
-   * </li>
-   * <li>
-   * Encierra el valor escapado entre comilla si así lo indica el parámetro
-   * <code>$isString</code>
-   * </li>
-   * </ol>
-   * @
-   * @param string|float|integer|boolean|null $value
-   * @param \Db $db
-   * @param boolean $isString
-   * @return string
-   * @see \Db#escape
-   * @todo Mover a una clase padre
-   */
-  private function escape($value, $db, $isString = true) {
-    if ($value === null) {
-      return 'NULL';
-    }
-
-    $escaped = $db->escape($value);
-    return $isString ? "'$escaped'" : $escaped;
-  }
-
-  /**
    * Creación de la tabla para mantener registro las tareas pendientes de ser
    * ejecutadas.
    * @return boolean indica si la tabla pudo ser creada o no. Si ya estaba
    * creada retorna <code>true</code>.
    */
   public static function createTable() {
-    $table_name = _DB_PREFIX_ . static::$TABLE;
-    $sql = "CREATE TABLE IF NOT EXISTS `$table_name` ("
+    $table_name = static::tableName();
+    $sql = "CREATE TABLE IF NOT EXISTS `{$table_name}` ("
             . "`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT, "
             . "`origin` VARCHAR(32) NOT NULL, "
             . "`topic` VARCHAR(32) NOT NULL, "
@@ -133,24 +105,7 @@ class FailedTaskLog {
             . "`date_add` DATETIME NOT NULL, "
             . "PRIMARY KEY (`id`)"
             . ")";
-    error_log($sql);
     return \Db::getInstance()->execute($sql);
-  }
-
-  /**
-   * Cuenta los elementos registrados que coincidan con las condiciones
-   * recibidas como parámetros.
-   * @param array $conditions
-   * @return int
-   * @todo mover a una clase padre.
-   */
-  public static function count($conditions = ['1' => '1']) {
-    $table_name = _DB_PREFIX_ . static::$TABLE;
-    $db = \Db::getInstance(_PS_USE_SQL_SLAVE_);
-    $sql = "SELECT COUNT(*) as count "
-            . "FROM `$table_name` "
-            . "WHERE " . static::equalities($conditions);
-    return $db->executeS($sql)[0]['count'];
   }
 
   /**
@@ -178,8 +133,7 @@ class FailedTaskLog {
    * @return array
    */
   public static function getFailedTaskLogs(array $conditions = null, int $limit = null, int $offset = null) {
-    $table_name = _DB_PREFIX_ . static::$TABLE;
-    $sql = "SELECT * FROM `$table_name`";
+    $sql = "SELECT * FROM `{$this->tableName()}`";
     if (isset($conditions)) {
       $sql .= ' WHERE ' . static::equalities($conditions);
     }
@@ -190,23 +144,6 @@ class FailedTaskLog {
       $sql .= " OFFSET $offset";
     }
     return \Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
-  }
-
-  /**
-   * Genera un <code>string</code> con la concatenacion de varias sentencias SQL
-   * con unidas por el término <code>AND</code>. Se espera que el arreglo de
-   * entrada tenga en sus llaves los nombres de las columnas y en los valores
-   * el valor con el que debe coincidir.
-   * @param array $conditions Ej: <code>['name' => "'Joe'", 'age' => 35]</code>
-   * @return string Ej: <code>"name = 'Joe' AND age = 35"</code>
-   * @todo Mover a una clase padre
-   */
-  private static function equalities(array $conditions) {
-    $equalities = [];
-    foreach ($conditions as $key => $value) {
-      $equalities[] = "{$key} = {$value}";
-    }
-    return join(' AND ', $equalities);
   }
 
 }
