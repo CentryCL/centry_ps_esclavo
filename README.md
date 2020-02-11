@@ -1,6 +1,6 @@
-# centry_ps_esclavo
+# Módulo Centry para Prestahsop
 
-El módulo de Centry para prestashop te permite maneter tu catálogo de productos sincronizados entre ambas plataformas, recibiendo actualizaciones en timepo real para ver reflejados  en el ecommerce los cambios de los productos realizados en Centry y para informar a Centry de las ventas realizadas en Prestashop.
+El módulo de Centry para Prestashop te permite maneter tu catálogo de productos sincronizados entre ambas plataformas, recibiendo actualizaciones en timepo real para ver reflejados  en el ecommerce los cambios de los productos realizados en Centry y para informar a Centry de las ventas realizadas en Prestashop.
 
 Este es un módulo que se considera esclavo de Centry, eso quiere decier que será Centry la fuente de la información de los productos y Prestashop el responsable de informar acerca de cualquier venta que ahí se genere.
 
@@ -40,7 +40,37 @@ Estas credenciales son los datos necesarios para lograr la comunicación segura 
 
 ### Campos a sincronizar
 
+El módulo ofrece controlar en qué momento de la vida de un producto se tomará la información proveniente de Centry para cargarla en Prestashop. Básicamente estos momentos pueden ser en la creación de la publicación en Prestashop o en las posteriores actualizaciones que sufra el producto en Centry.
 
+Los campos disponibles a sincronizar son:
+
+* Nombre
+* Precio
+* Precio de oferta
+* Descripción
+* Sku del Producto
+* Características
+* Stock
+* Sku de la Variante
+* Talla
+* Color
+* Código de barras
+* Imágenes Producto
+* Condición
+* Garantía
+* Estado
+* Campos SEO
+* Marca
+* Medidas del paquete
+* Categoría
+
+**IMORTANTE**
+
+El codigo de barras es especialmente delicado porque Prestashop valida que su valor cumpla con los estándares EAN, UPC, etc. y si el valor que viene desde Centry no es válido entonces tanto la creación como la actualización fallará. La recomendación es que si no se tiene seguridad sobre la correctitud de estos datos, entonces es mejor mantener desseleccionados estos campos y completar directamente en Prestashop estos valores.
+
+### Homologación de estados de pedidos
+
+Como el módulo informa a Centry los pedidos que en Prestashop se generen, es necesario traducir los distintos estados de pedidos que Prestashop maneja a uno específico de Centry. En esta sección se listan todos los estados registrados en Prestashop y se ofrece seleccionar uno de los posibles estados de Centry. Por lo general los Prestashop manejan un número cercano a 10 estado distintos mientras que en Centry sólo se disponen de 4, no existe ningún problema si dos estados distintos están homologados con la misma opción de Centry. Tampoco es necesario que todas las opciones sean usadas una vez, aunque sí es muy recomendado.
 
 ### Carga de archivo de homologación
 
