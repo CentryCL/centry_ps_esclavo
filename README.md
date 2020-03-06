@@ -6,7 +6,7 @@ Este es un módulo que se considera esclavo de Centry, eso quiere decier que ser
 
 ## Requisitos
 
-El único requisito para la instalación de este módulo es tener un Prestashop versión 1.7.4 o superior.
+El único requisito para la instalación de este módulo es tener un Prestashop versión 1.7.5 o superior.
 
 ## Instalación
 
