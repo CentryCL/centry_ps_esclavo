@@ -69,7 +69,7 @@ class Products {
     if (count($product->variants) > 1) {
       self::saveVariants($product_ps, $product->variants, $sync);
     } else {
-      if (CentryPs\ConfigurationCentry::getSyncVaraintSimple()) {
+      if (\CentryPs\ConfigurationCentry::getSyncVaraintSimple()) {
         self::saveSimpleVariant($product_ps, $product->variants[0], $sync);
       } else {
         self::saveVariants($product_ps, $product->variants, $sync);
@@ -366,7 +366,7 @@ class Products {
     self::deleteUnconnectedPhotos($product_ps, $product);
 
     foreach ($product->assets as $asset) {
-      if (!CentryPs\models\homologation\Image::getIdPrestashop($asset->_id)) {
+      if (!\CentryPs\models\homologation\Image::getIdPrestashop($asset->_id)) {
         try {
           self::createAsset($product_ps, $asset);
         } catch (\Exception $ex) {
@@ -445,7 +445,7 @@ class Products {
           $image->delete();
         }
       }
-    } catch (Exception $e) {
+    } catch (\Exception $e) {
       error_log("No se pudo descargar la imagen \n" . $e);
     }
   }
@@ -482,7 +482,7 @@ class Products {
           }
         }
       }
-    } catch (Exception $e) {
+    } catch (\Exception $e) {
       error_log("No se pudo descargar la imagen \n" . $e);
     }
   }
