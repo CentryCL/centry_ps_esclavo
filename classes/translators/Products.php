@@ -80,7 +80,7 @@ class Products {
     return $response ? $product_ps : false;
   }
 
-  private function generateLinkRewrite($name) {
+  private static function generateLinkRewrite($name) {
     $order = array("\r\n", "\n", "\r", " ", "_");
     $replace = "-";
     $newstr = str_replace($order, $replace, $name);
@@ -93,7 +93,7 @@ class Products {
    * @param stdObject $product    Instancia de objeto que posee el objeto de Centry llamado por API.
    * @param float     $taxes      Impuestos asociados al producto.
    */
-  private function PriceOffer($product_ps, $product, $taxes) {
+  private static function PriceOffer($product_ps, $product, $taxes) {
     $query = \SpecificPriceCore::getByProductId($product_ps->id);
 
     $from = strtotime($product->salestartdate);
@@ -147,7 +147,7 @@ class Products {
    * @param  stdObject  $product  Instancia de objeto que posee el objeto de Centry llamado por API
    * @return Brand                Objeto Brand instanciado (puede ser nuevo o uno ya creado)
    */
-  private function Brand($product) {
+  private static function Brand($product) {
     if (!property_exists($product, "brand_id")) {
       return false;
     }
@@ -173,7 +173,7 @@ class Products {
    * @param Product    $product_ps  Instancia de Producto que puede ser nuevo, o instancia de uno ya existente.
    * @param array      $sync        Arreglo que indica que campos deben sincronizarse o no.
    */
-  private function characteristics($product, $product_ps, $sync) {
+  private static function characteristics($product, $product_ps, $sync) {
     $features = $product_ps->getWsProductFeatures();
     $erase = [];
     $new_centry = [];
@@ -243,7 +243,7 @@ class Products {
    * @param  Product $product                      Instancia de objeto que posee el objeto de Centry llamado por API.
    * @param  array   $product_category_attributes  Atributos de categoría correspondiente al producto.
    */
-  private function categoryFeatures($product_ps, $product_category_attributes) {
+  private static function categoryFeatures($product_ps, $product_category_attributes) {
     $centry = new \CentryPs\AuthorizationCentry();
     $method = "GET";
     $feature_value = false;
@@ -286,7 +286,7 @@ class Products {
    * @param  string $id_centry Id de Centry de la característica, puede no existir.
    * @return Feature           Retorna instancia del objeto nuevo o uno que ya estaba creado.
    */
-  private function feature($charact, $id_centry) {
+  private static function feature($charact, $id_centry) {
     $feature = \CentryPs\models\homologation\Feature::getIdPrestashop($charact);
     if ($feature) {
       $feature = new \Feature($feature);
@@ -311,7 +311,7 @@ class Products {
    * @param  boolean $custom      Indica si la caracteristica es de texto libre (true) o un selector(false)
    * @return FeatureValue         Retorna la instancia FeatureValue.
    */
-  private function featureValue($product_id, $feature_id, $id_value, $value, $custom) {
+  private static function featureValue($product_id, $feature_id, $id_value, $value, $custom) {
     if (!$value) {
       return false;
     }
@@ -355,7 +355,7 @@ class Products {
    * @param stdObject  $product     Instancia de objeto que posee el objeto de Centry llamado por API
    * @param Product    $product_ps  Instancia de Producto que puede ser nuevo, o instancia de uno ya existente.
    */
-  private function saveImages($product_ps, $product) {
+  private static function saveImages($product_ps, $product) {
     if (property_exists($product, "cover_url")) {
       try {
         self::createCover($product_ps, $product);
@@ -383,7 +383,7 @@ class Products {
    * @param stdObject  $product     Instancia de objeto que posee el objeto de Centry llamado por API
    * @param Product    $product_ps  Instancia de Producto que puede ser nuevo, o instancia de uno ya existente.
    */
-  private function deleteUnconnectedPhotos($product_ps, $product) {
+  private static function deleteUnconnectedPhotos($product_ps, $product) {
     $images = $product_ps->getImages($product_ps->id_shop_default);
     $not_erase = [];
 
@@ -404,7 +404,7 @@ class Products {
    * Ordena las posiciones de las imágenes
    * @param  array $assets Arreglo de imagenes que vienen desde Centry.
    */
-  private function orderPosition($assets) {
+  private static function orderPosition($assets) {
     $position = 2;
     foreach ($assets as $asset) {
       $id_img = \CentryPs\models\homologation\Image::getIdPrestashop($asset->_id);
@@ -422,7 +422,7 @@ class Products {
    * @param stdObject  $product     Instancia de objeto que posee el objeto de Centry llamado por API
    * @param Product    $product_ps  Instancia de Producto que puede ser nuevo, o instancia de uno ya existente.
    */
-  private function createCover($product_ps, $product) {
+  private static function createCover($product_ps, $product) {
     try {
       $configuration = new \PrestaShop\PrestaShop\Adapter\Configuration();
       $tools = new \PrestaShop\PrestaShop\Adapter\Tools();
@@ -455,7 +455,7 @@ class Products {
    * @param Product    $product_ps  Instancia de Producto que puede ser nuevo, o instancia de uno ya existente.
    * @param tsdObject  $asset       Objeto perteneciente a la imagen que proviene desde Centry.
    * */
-  private function createAsset($product_ps, $asset) {
+  private static function createAsset($product_ps, $asset) {
     try {
       $configuration = new \PrestaShop\PrestaShop\Adapter\Configuration();
       $tools = new \PrestaShop\PrestaShop\Adapter\Tools();
@@ -493,7 +493,7 @@ class Products {
    * @param Product    $product_ps  Instancia de Producto que puede ser nuevo, o instancia de uno ya existente.
    * @param array      $categories  Arreglo de identificadores de las categorias homologadas.
    */
-  private function category($product_ps, $product, $categories) {
+  private static function category($product_ps, $product, $categories) {
     $max_level = 0;
     $id_category_default = 2;
     $centry_category = $product->category_id;
@@ -517,7 +517,7 @@ class Products {
    * @param  array    $variants    arreglo de variantes que vienen desde Centry
    * @param  array    $sync        arreglo que indica que campos se sincronizan.
    */
-  private function saveVariants($product_ps, $variants, $sync) {
+  private static function saveVariants($product_ps, $variants, $sync) {
     self::deleteUnconnectedVariants($product_ps, $variants);
     foreach ($variants as $variant) {
       $combination = \CentryPs\models\homologation\Variant::getIdPrestashop($variant->_id);
@@ -542,7 +542,7 @@ class Products {
    * @param  Product  $product_ps  Instancia de Producto que puede ser nuevo, o instancia de uno ya existente.
    * @param  array    $variants    arreglo de variantes que vienen desde Centry
    */
-  private function deleteUnconnectedVariants($product_ps, $variants) {
+  private static function deleteUnconnectedVariants($product_ps, $variants) {
     $variants_ps = $product_ps->getWsCombinations();
     $not_erase = [];
 
@@ -565,7 +565,7 @@ class Products {
    * @param  stdObject $variant     Instancia de la variante de Centry.
    * @param  array    $sync        arreglo que indica que campos se sincronizan.
    */
-  private function saveSimpleVariant($product_ps, $variant, $sync) {
+  private static function saveSimpleVariant($product_ps, $variant, $sync) {
     if ($variants_ps = $product_ps->getWsCombinations()) {
       foreach ($variants_ps as $variant_ps) {
         (new \Combination($variant_ps["id"]))->delete();
@@ -584,7 +584,7 @@ class Products {
    * @param  stdObject $variant     Instancia de la variante de Centry.
    * @param  array $sync        arreglo que indica que campos se sincronizan.
    */
-  private function saveVariant($combination_ps, $variant, $sync) {
+  private static function saveVariant($combination_ps, $variant, $sync) {
     $combination_ps->reference = $sync["variant_sku"] ? mb_substr($variant->sku, 0, 64) : $combination_ps->reference;
     $combination_ps->ean13 = $sync["barcode"] ? mb_substr($variant->barcode, 0, 13) : $combination_ps->ean13;
 
@@ -613,7 +613,7 @@ class Products {
    * @param  stdObject $variant     Instancia de la variante de Centry.
    * @param  array     $sync        arreglo que indica que campos se sincronizan.
    */
-  private function Attributes($variant_ps, $variant, $sync) {
+  private static function Attributes($variant_ps, $variant, $sync) {
     $attr = [];
     $old_color = null;
     $old_size = null;
@@ -651,7 +651,7 @@ class Products {
    * Busca el grupo del atributo en prestashop devolviendo una instancia nueva si no la encuentra.
    * @param string $value  nombre del atributo, este puede ser color o talla.
    */
-  private function AttributeGroup($value) {
+  private static function AttributeGroup($value) {
     if ($id = \CentryPs\models\homologation\AttributeGroup::getIdPrestashop($value)) {
       $group = new \AttributeGroup($id);
     } else {
@@ -673,7 +673,7 @@ class Products {
    * Crea o instancia un atributo con el valor del color que viene desde Centry
    * @param  stdObject $variant     Instancia de la variante de Centry.
    */
-  private function Color($variant) {
+  private static function Color($variant) {
     if (!property_exists($variant, "color_name") || !property_exists($variant, "color_id")) {
       return false;
     }
@@ -702,7 +702,7 @@ class Products {
    * Crea o instancia un atributo con el valor de la talla que viene desde Centry
    * @param  stdObject $variant     Instancia de la variante de Centry.
    */
-  private function Size($variant) {
+  private static function Size($variant) {
     if (!property_exists($variant, "size_name") || !property_exists($variant, "size_id")) {
       return false;
     }
