@@ -528,7 +528,12 @@ class Products {
         $combination->id_product = $product_ps->id;
       }
 
-      $resp = $combination->save();
+      try {
+        $resp = $combination->save();
+      } catch (\Exception $ex) {
+        error_log($ex->getMessage());
+      }  
+
       if ($resp) {
         $variantC = new \CentryPs\models\homologation\Variant($combination->id, $variant->_id);
         $variantC->save();
