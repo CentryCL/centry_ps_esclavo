@@ -552,7 +552,7 @@ class Products {
     $not_erase = [];
 
     foreach ($variants as $variant) {
-      $id_comb = \CentryPs\models\homologation\Product::getIdPrestashop($variant->_id);
+      $id_comb = \CentryPs\models\homologation\Variant::getIdPrestashop($variant->_id);
       if ($id_comb) {
         array_push($not_erase, $id_comb);
       }
