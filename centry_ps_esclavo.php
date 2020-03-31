@@ -244,13 +244,19 @@ class Centry_PS_esclavo extends Module {
       $taxes = 1 + ($product["rate"]) / 100;
       $variants = (new Product($product["id_product"]))->getWsCombinations();
 
-      $url_images=array();
+      $url_images = array();
+      $cover = \Product::getCover($product["id_product"]);
+      $image = new \Image($cover["id_image"]);
+      $url = $image->getExistingImgPath() ? (_PS_BASE_URL_ . _THEME_PROD_DIR_ . $image->getExistingImgPath() . "." . $image->image_format) : null;
+      array_push($url_images, $url);
       $images = (new Product($product["id_product"]))->getImages((int) \Configuration::get('PS_LANG_DEFAULT'));
       foreach ($images as $value) {
-        array_push($header, "Imagen ". $n);
-        $image = new \Image($value["id_image"]);
-        $url = $image->getExistingImgPath() ? (_PS_BASE_URL_ . _THEME_PROD_DIR_ . $image->getExistingImgPath() . "." . $image->image_format) : "";
-        array_push($url_images, $url);
+        if ($value["cover"] != 1){
+          array_push($header, "Imagen ". $n);
+          $image = new \Image($value["id_image"]);
+          $url = $image->getExistingImgPath() ? (_PS_BASE_URL_ . _THEME_PROD_DIR_ . $image->getExistingImgPath() . "." . $image->image_format) : "";
+          array_push($url_images, $url);
+        }
       }
 
       array_push($line, $product["id_product"]);
