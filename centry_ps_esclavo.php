@@ -14,7 +14,7 @@ class Centry_PS_esclavo extends Module {
     $this->author = 'Centry';
     $this->need_instance = 0;
     $this->ps_versions_compliancy = [
-      'min' => '1.7.4', // Upgrade Symfony to 3.4 LTS https://assets.prestashop2.com/es/system/files/ps_releases/changelog_1.7.4.0.txt
+      'min' => '1.7.6', // Upgrade Symfony to 3.4 LTS https://assets.prestashop2.com/es/system/files/ps_releases/changelog_1.7.4.0.txt
       'max' => _PS_VERSION_
     ];
     $this->bootstrap = true;
@@ -34,8 +34,8 @@ class Centry_PS_esclavo extends Module {
 
     if (!parent::install() ||
             $this->createDbTables() ||
-            !$this->registerHook('actionValidateOrder') ||
-            !$this->registerHook('actionOrderHistoryAddAfter')
+            !$this->registerHook('actionOrderStatusPostUpdate') ||
+            !$this->registerHook('actionPaymentConfirmation')
     ) {
       return false;
     }
@@ -87,12 +87,12 @@ class Centry_PS_esclavo extends Module {
     return true;
   }
 
-  public function hookactionValidateOrder($params) {
-    $this->enqueueOrderToSend($params['order']->id);
+  public function hookactionOrderStatusPostUpdate($params) {
+    $this->enqueueOrderToSend($params['id_order']);
   }
 
-  public function hookactionOrderHistoryAddAfter($params) {
-    $this->enqueueOrderToSend($params['order_history']->id_order);
+  public function hookactionPaymentConfirmation($params) {
+    $this->enqueueOrderToSend($params['id_order']);
   }
 
   /**
