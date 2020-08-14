@@ -499,7 +499,7 @@ class Products {
     $centry_category = $product->category_id;
     $homologate_categories = [];
     foreach ($categories as $category) {
-      array_push($homologate_categories, $category["id"]);
+      array_push($homologate_categories, $category["id_prestashop"]);
       $level = (new \Category($category["id"]))->calcLevelDepth();
       if ($level > $max_level) {
         $max_level = $level;
