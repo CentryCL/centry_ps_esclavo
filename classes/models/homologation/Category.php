@@ -30,7 +30,7 @@ class Category extends AbstractHomologation {
     $db = \Db::getInstance();
     $query = new \DbQuery();
     $query->select('id_prestashop');
-    $query->from(static::tableName());
+    $query->from(static::$TABLE);
     $query->where("id_centry = '" . $db->escape($id_centry) . "'");
     return ($res = $db->executeS($query)) ? $res : false;
   }
