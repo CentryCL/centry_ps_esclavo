@@ -577,7 +577,7 @@ class Products {
       }
     }
     if ($sync["stock"]) {
-      StockAvailable::setQuantity($product_ps->id, 0, $variant->quantity);
+      \StockAvailable::setQuantity($product_ps->id, 0, $variant->quantity);
     }
     $product_ps->ean13 = $sync["barcode"] ? $variant->barcode : $product_ps->ean13;
     $product_ps->save();
