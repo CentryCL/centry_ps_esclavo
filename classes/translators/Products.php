@@ -500,10 +500,10 @@ class Products {
     $homologate_categories = [];
     foreach ($categories as $category) {
       array_push($homologate_categories, $category["id_prestashop"]);
-      $level = (new \Category($category["id"]))->calcLevelDepth();
+      $level = (new \Category($category["id_prestashop"]))->calcLevelDepth();
       if ($level > $max_level) {
         $max_level = $level;
-        $id_category_default = $category["id"];
+        $id_category_default = $category["id_prestashop"];
       }
     }
     $product_ps->updateCategories($homologate_categories);
