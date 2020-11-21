@@ -49,9 +49,9 @@ class Image extends AbstractHomologation {
       $query->from(static::$TABLE);
       $query->where("id_prestashop = '" . $db->escape($id) . "'");
       $result2 = $db->executeS($query);
-      return ($result2) ? $result2 : false;
+      return ($result2) ? $result2[0]['fingerprint'] : false;
     }
-    return $result;
+    return $result[0]['fingerprint'];
   }
 
   /**
