@@ -2,6 +2,9 @@
 
 namespace CentryPs\translators;
 
+use CentryPs\ConfigurationCentry;
+use CentryPs\AuthorizationCentry;
+
 class Orders {
 
   public static function orderToCentry($order_id) {
@@ -66,10 +69,18 @@ class Orders {
   }
 
   private static function items($order_id) {
+    error_log("items");
     $items = array();
     $order = new \Order($order_id);
     $currency = new \Currency($order->id_currency);
     $products = $order->getCartProducts();
+    $centry_items= array();
+    if ($order_centry_id = \CentryPs\models\homologation\Order::getIdCentry($order_id)){
+      $centry = new AuthorizationCentry();
+      $order_centry = $centry::sdk()->getOrder($order_centry_id);
+      $items_centry = $order_centry->items;
+      $products = static::clean_items($items_centry, $products);
+    }
     foreach ($products as $product) {
       $item = array(
         "id_origin" => $product["product_id"],
@@ -87,7 +98,27 @@ class Orders {
     }
     return $items;
   }
-  
+
+  private static function clean_items($items_centry, $items_ps){
+    $items_to_send = array();
+    foreach($items_ps as $item_ps){
+      $send = true;
+      $index = 0;
+      foreach($items_centry as $item_centry){
+        if ($item_ps['reference'] == $item_centry->sku && $item_ps['cart_quantity'] == $item_centry->quantity){
+          array_splice($items_centry, $index, 1);
+          $index += 1;
+          $send = false;
+        }
+      }
+      if($send){
+        array_push($items_to_send, $item_ps);
+      }
+    }
+    error_log(print_r($items_to_send,true));
+    return $items_to_send;
+  }
+
   private static function centryVariantId($product) {
     // TODO: Resolver el caso en que un producto con una única variante se
     // publicó como producto simple en Prestashop.

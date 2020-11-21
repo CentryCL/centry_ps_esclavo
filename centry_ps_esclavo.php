@@ -14,7 +14,7 @@ class Centry_PS_esclavo extends Module {
     $this->author = 'Centry';
     $this->need_instance = 0;
     $this->ps_versions_compliancy = [
-      'min' => '1.7.4', // Upgrade Symfony to 3.4 LTS https://assets.prestashop2.com/es/system/files/ps_releases/changelog_1.7.4.0.txt
+      'min' => '1.7.6', // Upgrade Symfony to 3.4 LTS https://assets.prestashop2.com/es/system/files/ps_releases/changelog_1.7.4.0.txt
       'max' => _PS_VERSION_
     ];
     $this->bootstrap = true;
@@ -34,8 +34,8 @@ class Centry_PS_esclavo extends Module {
 
     if (!parent::install() ||
             $this->createDbTables() ||
-            !$this->registerHook('actionValidateOrder') ||
-            !$this->registerHook('actionOrderHistoryAddAfter')
+            !$this->registerHook('actionOrderStatusPostUpdate') ||
+            !$this->registerHook('actionPaymentConfirmation')
     ) {
       return false;
     }
@@ -87,12 +87,12 @@ class Centry_PS_esclavo extends Module {
     return true;
   }
 
-  public function hookactionValidateOrder($params) {
-    $this->enqueueOrderToSend($params['order']->id);
+  public function hookactionOrderStatusPostUpdate($params) {
+    $this->enqueueOrderToSend($params['id_order']);
   }
 
-  public function hookactionOrderHistoryAddAfter($params) {
-    $this->enqueueOrderToSend($params['order_history']->id_order);
+  public function hookactionPaymentConfirmation($params) {
+    $this->enqueueOrderToSend($params['id_order']);
   }
 
   /**
@@ -114,7 +114,7 @@ class Centry_PS_esclavo extends Module {
               . $ex->getMessage());
     }
   }
-  
+
   /**
    * Ejecuta un curl a un controlador de este módulo entregándole ciertos
    * parámetros y con un timeout de 1 segundo para simular la ejecución de un
@@ -232,18 +232,32 @@ class Centry_PS_esclavo extends Module {
     $products = Product::getProducts($lang, 0, 0, "id_product", "ASC");
     $header = array("id Prestashop", "Nombre del producto", "Sku del producto", "Código de barras", "Descripción", "Condicion",
       "id Marca Prestashop", "Marca", "Altura", "Largo", "Ancho", "Peso", "Precio normal", "Estado", "id Variante Prestashop", "SKU de la variante",
-      "Codigo de barras de la variante", "Cantidad", "id Talla", "Talla", "id Color", "Color");
+      "Codigo de barras de la variante", "Cantidad", "id Talla", "Talla", "id Color", "Color", "Imagenes");
     $filename = "product.csv";
     header('Content-Type: text/csv');
     header('Content-Disposition: attachment;filename=' . $filename);
 
     $fp = fopen('php://output', 'w');
     fputcsv($fp, $header, ",");
-
     foreach ($products as $product) {
       $line = array();
       $taxes = 1 + ($product["rate"]) / 100;
       $variants = (new Product($product["id_product"]))->getWsCombinations();
+
+      $url_images = array();
+      $cover = \Product::getCover($product["id_product"]);
+      $image = new \Image($cover["id_image"]);
+      $url = $image->getExistingImgPath() ? (_PS_BASE_URL_ . _THEME_PROD_DIR_ . $image->getExistingImgPath() . "." . $image->image_format) : null;
+      array_push($url_images, $url);
+      $images = (new Product($product["id_product"]))->getImages((int) \Configuration::get('PS_LANG_DEFAULT'));
+      foreach ($images as $value) {
+        if ($value["cover"] != 1){
+          array_push($header, "Imagen ". $n);
+          $image = new \Image($value["id_image"]);
+          $url = $image->getExistingImgPath() ? (_PS_BASE_URL_ . _THEME_PROD_DIR_ . $image->getExistingImgPath() . "." . $image->image_format) : "";
+          array_push($url_images, $url);
+        }
+      }
 
       array_push($line, $product["id_product"]);
       array_push($line, $product["name"]);
@@ -294,6 +308,7 @@ class Centry_PS_esclavo extends Module {
           array_push($comb_line, $color);
 
           $line2 = array_merge($line, $comb_line);
+          $line2 = array_merge($line2, $url_images);
           fputcsv($fp, $line2, ",");
         }
       } else {
@@ -301,6 +316,7 @@ class Centry_PS_esclavo extends Module {
         array_push($line, $product["reference"]);
         array_push($line, "");
         array_push($line, StockAvailable::getQuantityAvailableByProduct($product["id_product"]));
+        $line = array_merge($line, $url_images);
         fputcsv($fp, $line, ",");
       }
     }
