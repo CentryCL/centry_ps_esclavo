@@ -62,9 +62,9 @@ class Feature extends AbstractHomologation {
       $query->from(static::$TABLE);
       $query->where("id_centry = '" . $db->escape($id_prestashop) . "'");
       $result2 = $db->executeS($query);
-      return ($result2) ? $result2[0]["centry_value" : false;
+      return ($result2) ? $result2[0]["centry_value"] : false;
     }
-    return $result[0]["centry_value";
+    return $result[0]["centry_value"];
   }
 
   /**
