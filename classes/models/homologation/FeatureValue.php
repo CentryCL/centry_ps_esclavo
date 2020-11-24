@@ -72,7 +72,7 @@ class FeatureValue extends AbstractHomologation {
       $query->from(static::$TABLE);
       $query->where("centry_value = '" . $db->escape($id) . "'");
       $result2 = $db->executeS($query);
-      return ($result2) ? $result2 : false;
+      return ($result2) ? $result2[0]["id_prestashop"] : false;
     }
     return $result[0]["id_prestashop"];
   }
