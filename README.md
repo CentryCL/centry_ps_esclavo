@@ -76,7 +76,8 @@ Como el módulo informa a Centry los pedidos que en Prestashop se generen, es ne
 
 ### Carga de archivo de homologación
 
+Puedes encontrar el documento para homologar [aquí](https://www.notion.so/centry/Homologaci-n-de-m-dulo-con-Centry-c2071cc3d929461eab93d746acc9d567)
+
 ### Descarga de archivo CSV con productos de Prestashop para Centry
 
 ## Colaboración
-
