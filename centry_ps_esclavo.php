@@ -207,24 +207,23 @@ class Centry_PS_esclavo extends Module {
    * @param string $table nombre del modelo homologable.
    * @param array $data contenido de la línea del archivo CSV
    */
-  function processHomologationCsvLine($table, $data) {
-    $class = "CentryPs\\models\\homologation\\${$table}";
-    $line = new $class();
-    $line->id_prestashop = $data[0];
-    $line->id_centry = $data[1];
-    if (in_array($table, ["FeatureValue", "AttributeGroup", "Feature", "Image"])) {
-      if ($table == "image") {
-        $line->fingerprint = $data[2];
-      } elseif ($table == "feature") {
-        $line->centry_value = $data[2];
-      } elseif ($table == "featureValue") {
-        $line->product_id = $data[1];
-        $line->id_centry = $data[2];
-        $line->centry_value = $data[3];
-      }
-    }
-    $line->save();
-  }
+   function processHomologationCsvLine($table, $data) {
+     $class = "\\CentryPs\\models\\homologation\\".$table;
+     $line = new $class();
+     $line->id_prestashop = $data[0];
+     $line->id_centry = $data[1];
+     if (in_array($table, ["FeatureValue", "Feature", "Image"])) {
+       if ($table == "Image") {
+         $line->fingerprint = $data[2];
+       } elseif ($table == "Feature") {
+         $line->centry_value = $data[2];
+       } elseif ($table == "FeatureValue") {
+         $line->centry_value = $data[2];
+         $line->product_id = $data[3];
+       }
+     }
+     $line->save();
+   }
 
   private function downloadCsvForCentry() {
     //Declaraciones iniciales
