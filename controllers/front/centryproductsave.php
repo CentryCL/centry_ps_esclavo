@@ -28,11 +28,20 @@ class Centry_Ps_EsclavoCentryProductSaveModuleFrontController extends AbstractTa
     if (($id = CentryPs\models\homologation\Product::getIdPrestashop($resp->_id))) {
       //Actualizacion
       $product_ps = new \Product($id);
-      $sync = ConfigurationCentry::getSyncOnUpdate();
+      $sync = ConfigurationCentry::getSyncOnUpdate(); 
     } else {
-      //Creación
-      $product_ps = new Product();
-      $sync = ConfigurationCentry::getSyncOnCreate();
+      //ADD by Austral
+      $query = 'SELECT * FROM '._DB_PREFIX_ .'product WHERE reference = \''.$resp->sku.'\' LIMIT 1;';
+      $result = Db::getInstance()->ExecuteS($query);
+      if (count($result) == 0){
+        $product_ps = new Product();
+        $sync = ConfigurationCentry::getSyncOnCreate();
+      }else{
+        self::regiterProductcentry($result[0]['id_product'], $resp->_id);
+        //Creación
+        $product_ps = new \Product($result[0]['id_product']);
+        $sync = ConfigurationCentry::getSyncOnUpdate();
+      }
     }
 
     $res = CentryPs\translators\Products::productSave($product_ps, $resp, $sync);
@@ -42,4 +51,12 @@ class Centry_Ps_EsclavoCentryProductSaveModuleFrontController extends AbstractTa
     }
   }
 
+  //ADD by Austral
+  private static function regiterProductcentry($product_ps, $product) { 
+    $sql = "INSERT INTO `". _DB_PREFIX_."product_centry` (`id_prestashop`, `id_centry`) VALUES ('".$product_ps."', '".$product."')";
+    $success = \Db::getInstance()->execute($sql);
+    if (!$success){
+      error_log("No se pudo homologar en tabla product_centry el producto existente");
+    }
+  }
 }

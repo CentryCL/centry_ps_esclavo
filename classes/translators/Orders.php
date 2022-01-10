@@ -33,8 +33,8 @@ class Orders {
         "items" => static::items($order->id),
         "origin" => "Prestashop",
         "original_data" => array("order" => $order, "cart" => $cart, "order_status" => $order_status, "customer" => $customer), //TODO: revisar
-        "id_origin" => $order->id_cart,
-        "number_origin" => $order->reference,
+        "id_origin" => $order->id,
+        "number_origin" => $order->id,
         "created_at_origin" => $order->date_add,
         "updated_at_origin" => $order->date_upd,
         "total_amount" => $order->total_products_wt,

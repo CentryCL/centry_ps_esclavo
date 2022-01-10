@@ -18,6 +18,7 @@ class Products {
     $product_ps->reference = $sync["sku_product"] ? mb_substr($product->sku, 0, 64) : $product_ps->reference;
     $product_ps->active = $sync["status"] ? $product->status : $product_ps->active;
     $product_ps->description = ($sync["description"] && property_exists($product, "description")) ? $product->description : $product_ps->description;
+    $product_ps->description_short = ($sync["description"] && property_exists($product, "shortdescription")) ? $product->shortdescription : $product_ps->description_short;
     $product_ps->condition = $sync["condition"] ? $product->condition : $product_ps->condition;
     $product_ps->width = ($sync["package"] && property_exists($product, "packagewidth")) ? $product->packagewidth : $product_ps->width;
     $product_ps->height = ($sync["package"] && property_exists($product, "packageheight")) ? $product->packageheight : $product_ps->height;
@@ -29,6 +30,8 @@ class Products {
     $product_ps->available_for_order = 1;
     $product_ps->available_now = "Disponible";
     $product_ps->show_price = 1;
+    //add Austral
+    $product_ps->link_rewrite = self::generateLinkRewrite($product_ps->name);
 
     $response = $product_ps->save();
 
@@ -80,11 +83,21 @@ class Products {
     return $response ? $product_ps : false;
   }
 
+  //add Multiservicios Austral
   private static function generateLinkRewrite($name) {
-    $order = array("\r\n", "\n", "\r", " ", "_");
-    $replace = "-";
-    $newstr = str_replace($order, $replace, $name);
-    return preg_replace("/[^a-zA-Z0-9-]/", "", $newstr);
+    $return_str = trim($name);
+    //$return_str = self::replaceAccents($return_str);
+    $return_str = preg_replace('/[^a-zA-Z0-9\s\'\:\/\[\]\-]/', '', $return_str);
+    $return_str = preg_replace('/[\s\'\:\/\[\]\-]+/', ' ', $return_str);
+    $return_str = str_replace([' ', '/'], '-', $return_str);
+    $return_str = mb_strtolower($return_str, 'utf-8');
+    return $return_str;
+  }
+  function replaceAccents($str)
+  {
+    $a = array('À', 'Á', 'Â', 'Ã', 'Ä', 'Å', 'Æ', 'Ç', 'È', 'É', 'Ê', 'Ë', 'Ì', 'Í', 'Î', 'Ï', 'Ð', 'Ñ', 'Ò', 'Ó', 'Ô', 'Õ', 'Ö', 'Ø', 'Ù', 'Ú', 'Û', 'Ü', 'Ý', 'ß', 'à', 'á', 'â', 'ã', 'ä', 'å', 'æ', 'ç', 'è', 'é', 'ê', 'ë', 'ì', 'í', 'î', 'ï', 'ñ', 'ò', 'ó', 'ô', 'õ', 'ö', 'ø', 'ù', 'ú', 'û', 'ü', 'ý', 'ÿ', 'Ā', 'ā', 'Ă', 'ă', 'Ą', 'ą', 'Ć', 'ć', 'Ĉ', 'ĉ', 'Ċ', 'ċ', 'Č', 'č', 'Ď', 'ď', 'Đ', 'đ', 'Ē', 'ē', 'Ĕ', 'ĕ', 'Ė', 'ė', 'Ę', 'ę', 'Ě', 'ě', 'Ĝ', 'ĝ', 'Ğ', 'ğ', 'Ġ', 'ġ', 'Ģ', 'ģ', 'Ĥ', 'ĥ', 'Ħ', 'ħ', 'Ĩ', 'ĩ', 'Ī', 'ī', 'Ĭ', 'ĭ', 'Į', 'į', 'İ', 'ı', 'Ĳ', 'ĳ', 'Ĵ', 'ĵ', 'Ķ', 'ķ', 'Ĺ', 'ĺ', 'Ļ', 'ļ', 'Ľ', 'ľ', 'Ŀ', 'ŀ', 'Ł', 'ł', 'Ń', 'ń', 'Ņ', 'ņ', 'Ň', 'ň', 'ŉ', 'Ō', 'ō', 'Ŏ', 'ŏ', 'Ő', 'ő', 'Œ', 'œ', 'Ŕ', 'ŕ', 'Ŗ', 'ŗ', 'Ř', 'ř', 'Ś', 'ś', 'Ŝ', 'ŝ', 'Ş', 'ş', 'Š', 'š', 'Ţ', 'ţ', 'Ť', 'ť', 'Ŧ', 'ŧ', 'Ũ', 'ũ', 'Ū', 'ū', 'Ŭ', 'ŭ', 'Ů', 'ů', 'Ű', 'ű', 'Ų', 'ų', 'Ŵ', 'ŵ', 'Ŷ', 'ŷ', 'Ÿ', 'Ź', 'ź', 'Ż', 'ż', 'Ž', 'ž', 'ſ', 'ƒ', 'Ơ', 'ơ', 'Ư', 'ư', 'Ǎ', 'ǎ', 'Ǐ', 'ǐ', 'Ǒ', 'ǒ', 'Ǔ', 'ǔ', 'Ǖ', 'ǖ', 'Ǘ', 'ǘ', 'Ǚ', 'ǚ', 'Ǜ', 'ǜ', 'Ǻ', 'ǻ', 'Ǽ', 'ǽ', 'Ǿ', 'ǿ');
+    $b = array('A', 'A', 'A', 'A', 'A', 'A', 'AE', 'C', 'E', 'E', 'E', 'E', 'I', 'I', 'I', 'I', 'D', 'N', 'O', 'O', 'O', 'O', 'O', 'O', 'U', 'U', 'U', 'U', 'Y', 's', 'a', 'a', 'a', 'a', 'a', 'a', 'ae', 'c', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'i', 'n', 'o', 'o', 'o', 'o', 'o', 'o', 'u', 'u', 'u', 'u', 'y', 'y', 'A', 'a', 'A', 'a', 'A', 'a', 'C', 'c', 'C', 'c', 'C', 'c', 'C', 'c', 'D', 'd', 'D', 'd', 'E', 'e', 'E', 'e', 'E', 'e', 'E', 'e', 'E', 'e', 'G', 'g', 'G', 'g', 'G', 'g', 'G', 'g', 'H', 'h', 'H', 'h', 'I', 'i', 'I', 'i', 'I', 'i', 'I', 'i', 'I', 'i', 'IJ', 'ij', 'J', 'j', 'K', 'k', 'L', 'l', 'L', 'l', 'L', 'l', 'L', 'l', 'l', 'l', 'N', 'n', 'N', 'n', 'N', 'n', 'n', 'O', 'o', 'O', 'o', 'O', 'o', 'OE', 'oe', 'R', 'r', 'R', 'r', 'R', 'r', 'S', 's', 'S', 's', 'S', 's', 'S', 's', 'T', 't', 'T', 't', 'T', 't', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'W', 'w', 'Y', 'y', 'Y', 'Z', 'z', 'Z', 'z', 'Z', 'z', 's', 'f', 'O', 'o', 'U', 'u', 'A', 'a', 'I', 'i', 'O', 'o', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'A', 'a', 'AE', 'ae', 'O', 'o');
+    return str_replace($a, $b, $str);
   }
 
   /**
@@ -253,28 +266,29 @@ class Products {
     $features_centry = [];
     foreach ($product_category_attributes as $attribute) {
       $category_attribute = $centry->sdk()->request("conexion/v1/category_attributes/{$attribute->category_attribute_id}.json", $method);
-
-      $feature = self::feature($category_attribute->name, $category_attribute->_id);
-      if (property_exists($attribute, "value_filled")) {
-        $feature_value = self::featureValue($product_ps->id, $feature->id, false, $attribute->value_filled, 1);
-      } else {
-        $options = [];
-        foreach ($category_attribute->options as $option) {
-          if (property_exists($option, "name")) {
-            $options[$option->_id] = $option->name;
+      if ($category_attribute){
+        $feature = self::feature($category_attribute->name, $category_attribute->_id);
+        if (property_exists($attribute, "value_filled")) {
+          $feature_value = self::featureValue($product_ps->id, $feature->id, false, $attribute->value_filled, 1);
+        } else {
+          $options = [];
+          foreach ($category_attribute->options as $option) {
+            if (property_exists($option, "name")) {
+              $options[$option->_id] = $option->name;
+            }
+          }
+          if (property_exists($attribute, "value_selected_ids")) {
+            foreach ($attribute->value_selected_ids as $option_id) {
+              $feature_value = self::featureValue($product_ps->id, $feature->id, $option_id, $options[$option_id], 0);
+            }
           }
         }
-        if (property_exists($attribute, "value_selected_ids")) {
-          foreach ($attribute->value_selected_ids as $option_id) {
-            $feature_value = self::featureValue($product_ps->id, $feature->id, $option_id, $options[$option_id], 0);
-          }
+        if ($feature_value) {
+          array_push($features_centry, array("id" => $feature->id, "id_feature_value" => $feature_value->id));
+          array_push($new_centry, $feature->id);
+        } else {
+          array_push($erase, $feature->id);
         }
-      }
-      if ($feature_value) {
-        array_push($features_centry, array("id" => $feature->id, "id_feature_value" => $feature_value->id));
-        array_push($new_centry, $feature->id);
-      } else {
-        array_push($erase, $feature->id);
       }
     }
     return array($features_centry, $new_centry, $erase);
@@ -355,17 +369,14 @@ class Products {
    * @param stdObject  $product     Instancia de objeto que posee el objeto de Centry llamado por API
    * @param Product    $product_ps  Instancia de Producto que puede ser nuevo, o instancia de uno ya existente.
    */
+  //refactorizado por Msaustral
   private static function saveImages($product_ps, $product) {
-    if (property_exists($product, "cover_url")) {
-      try {
-        self::createCover($product_ps, $product);
-      } catch (\Exception $ex) {
-        error_log("Products.saveImages(cover): " . $ex->getMessage());
-      }
-    }
     self::deleteUnconnectedPhotos($product_ps, $product);
-
-    foreach ($product->assets as $asset) {
+    
+    $centry = new \CentryPs\AuthorizationCentry();
+    $method = "GET";
+    $get_assets = $centry->sdk()->request("conexion/v1/products/{$product->_id}/assets.json", $method);
+    foreach ($get_assets as $asset) {
       if (!\CentryPs\models\homologation\Image::getIdPrestashop($asset->_id)) {
         try {
           self::createAsset($product_ps, $asset);
@@ -374,8 +385,7 @@ class Products {
         }
       }
     }
-
-    self::orderPosition($product->assets);
+    self::orderPosition($get_assets);
   }
 
   /**
@@ -386,8 +396,12 @@ class Products {
   private static function deleteUnconnectedPhotos($product_ps, $product) {
     $images = $product_ps->getImages($product_ps->id_shop_default);
     $not_erase = [];
+    //add Msaustral
+    $centry = new \CentryPs\AuthorizationCentry();
+    $method = "GET";
+    $get_assets = $centry->sdk()->request("conexion/v1/products/{$product->_id}/assets.json", $method);
 
-    foreach ($product->assets as $image) {
+    foreach ($get_assets as $image) {
       $img = \CentryPs\models\homologation\Image::getIdPrestashop($image->_id);
       if ($img) {
         array_push($not_erase, $img);
@@ -418,60 +432,44 @@ class Products {
   }
 
   /**
-   * Crea la imagen principal del producto
-   * @param stdObject  $product     Instancia de objeto que posee el objeto de Centry llamado por API
-   * @param Product    $product_ps  Instancia de Producto que puede ser nuevo, o instancia de uno ya existente.
-   */
-  private static function createCover($product_ps, $product) {
-    try {
-      $configuration = new \PrestaShop\PrestaShop\Adapter\Configuration();
-      $tools = new \PrestaShop\PrestaShop\Adapter\Tools();
-      $context_shop_id = $product_ps->id_shop_default;
-      $hook = new \PrestaShop\PrestaShop\Adapter\Hook\HookDispatcher();
-      $image_copier = new \PrestaShop\PrestaShop\Adapter\Import\ImageCopier($configuration, $tools, $context_shop_id, $hook);
-
-      $id_cover = $product_ps->getCoverWs();
-      $image = new \Image();
-      $image->id_product = $product_ps->id;
-      $image->position = 1;
-      $image->url = $product->cover_url;
-      $image->cover = true;
-      if ($id_cover) {
-        (new \Image($id_cover))->delete();
-      }
-      if (($image->validateFields(false, true)) === true && ($image->validateFieldsLang(false, true)) === true && $image->add()) {
-        $image->associateTo($product_ps->id_shop_default);
-        if (!$image_copier->copyImg($product_ps->id, $image->id, $product->cover_url, 'products', true)) {
-          $image->delete();
-        }
-      }
-    } catch (\Exception $e) {
-      error_log("No se pudo descargar la imagen \n" . $e);
-    }
-  }
-
-  /**
    * Crea una imagen secundaria del producto
    * @param Product    $product_ps  Instancia de Producto que puede ser nuevo, o instancia de uno ya existente.
    * @param tsdObject  $asset       Objeto perteneciente a la imagen que proviene desde Centry.
    * */
+  // refactorizado por Msaustral
   private static function createAsset($product_ps, $asset) {
     try {
-      $configuration = new \PrestaShop\PrestaShop\Adapter\Configuration();
-      $tools = new \PrestaShop\PrestaShop\Adapter\Tools();
-      $context_shop_id = $product_ps->id_shop_default;
-      $hook = new \PrestaShop\PrestaShop\Adapter\Hook\HookDispatcher();
-      $image_copier = new \PrestaShop\PrestaShop\Adapter\Import\ImageCopier($configuration, $tools, $context_shop_id, $hook);
-
-      if ($asset->position != 0) {
+        $configuration = new \PrestaShop\PrestaShop\Adapter\Configuration();
+        $tools = new \PrestaShop\PrestaShop\Adapter\Tools();
+        $context_shop_id = $product_ps->id_shop_default;
+        $hook = new \PrestaShop\PrestaShop\Adapter\Hook\HookDispatcher();
+        $image_copier = new \PrestaShop\PrestaShop\Adapter\Import\ImageCopier($configuration, $tools, $context_shop_id, $hook);
+        
         $image = new \Image();
-        $image->id_product = $product_ps->id;
-        $image->position = $image->getHighestPosition($product_ps->id) + 1;
-        $image->url = $asset->url;
-        $image->cover = false;
-        if (($image->validateFields(false, true)) === true && ($image->validateFieldsLang(false, true)) === true && $image->add()) {
+        $image->id_product = (int) ($product_ps->id);
+        
+        if (isset($asset->cover_url)){
+          $id_cover = $product_ps->getCoverWs();
+          if ($id_cover) {
+            (new \Image($id_cover))->delete();
+          }
+          $image->url = $asset->cover_url;
+          $image->cover = true;
+          $image->position = 1;
+        }else{
+          $image->url = $asset->url;
+          $image->cover = false;
+          $image->position = $image->getHighestPosition($product_ps->id) + 1;
+        }
+
+        if (($validate = $image->validateFieldsLang(false, true)) !== true) {
+          error_log ('error= '.$validate);
+        }
+        if (!$image->add()) {
+          error_log ('error= Error while creating additional image');
+        } else {
           $image->associateTo($product_ps->id_shop_default);
-          if (!$image_copier->copyImg($product_ps->id, $image->id, $asset->url, 'products', true)) {
+          if (!$image_copier->copyImg($product_ps->id, $image->id, $image->url, 'products', true)) {
             $image->delete();
           } else {
             $imageC = new \CentryPs\models\homologation\Image();
@@ -481,12 +479,23 @@ class Products {
             $imageC->save();
           }
         }
+      /**austral */
+      $sql1 = 'SELECT `id_img_ps` FROM `'. _DB_PREFIX_ .'img_variant_centry` WHERE `id_img_ct` = "'.strval($asset->_id).'";';
+      $validador = \Db::getInstance()->executeS($sql1);
+      if ($validador){
+        $sql = 'DELETE FROM `'. _DB_PREFIX_ .'img_variant_centry` WHERE `id_img_ct` = "'.strval($asset->_id).'";';
+        $db = \Db::getInstance()->execute($sql);
+        $sql2 = 'INSERT INTO `'. _DB_PREFIX_ .'img_variant_centry` (`id_img_ps`, `id_img_ct`) VALUES ('.(int) $image->id.', "'.strval($asset->_id).'");';
+        $db = \Db::getInstance()->execute($sql2);
+      }else{
+        $sql = 'INSERT INTO `'. _DB_PREFIX_ .'img_variant_centry` (`id_img_ps`, `id_img_ct`) VALUES ('.(int) $image->id.', "'.strval($asset->_id).'");';
+        $db = \Db::getInstance()->execute($sql);
       }
     } catch (\Exception $e) {
       error_log("No se pudo descargar la imagen \n" . $e);
     }
   }
-
+ 
   /**
    * Asocia categoría de Centry con las ya homologadas de Prestashop y asigna categoría principal como la primera que encuentre de mayor profundidad.
    * @param stdObject  $product     Instancia de objeto que posee el objeto de Centry llamado por API
@@ -531,13 +540,44 @@ class Products {
       try {
         $resp = $combination->save();
       } catch (\Exception $ex) {
-        error_log($ex->getMessage());
+        error_log('error save combination -> '.$ex->getMessage());
       }  
 
       if ($resp) {
         $variantC = new \CentryPs\models\homologation\Variant($combination->id, $variant->_id);
         $variantC->save();
         self::saveVariant($combination, $variant, $sync);
+        //Austral
+        self::imageVariant($variant->_id, $combination->id);
+      }
+      
+    }
+  }
+
+   /**
+   * Asocia la image a la variable ** hecho por Multiservicios Austral**.
+   * @param image_ps_id  Id de la imagen guardada en tabla image de PrestaShop
+   * @param image_ct_id  Id del asset de Centry
+   * @param ps_product_id Id del producto en tabla product de PrestaShop
+   */
+
+  private static function imageVariant($ct_product_id,$ps_product_id){
+    $centry = new \CentryPs\AuthorizationCentry();
+    $method = "GET";
+    $get_variants = $centry->sdk()->request("conexion/v1/variants/{$ct_product_id}/assets.json", $method);
+    
+    if ($get_variants){
+      $sql2 = 'DELETE FROM `'. _DB_PREFIX_ .'product_attribute_image` WHERE `id_product_attribute` = '.(int) $ps_product_id.';';
+      $db = \Db::getInstance()->execute($sql2);
+    }
+    
+    foreach ($get_variants as $variant_detail) {
+      $sql = 'SELECT `id_img_ps` FROM `'. _DB_PREFIX_ .'img_variant_centry` WHERE `id_img_ct` = "'.$variant_detail->asset_id.'";';
+      $id_imag_ps = \Db::getInstance()->executeS($sql);
+
+      if ($id_imag_ps){
+        $sql2 = 'INSERT INTO `'. _DB_PREFIX_ .'product_attribute_image` (`id_product_attribute`, `id_image`) VALUES ('.(int) (int) $ps_product_id.', '.(int) $id_imag_ps[0]["id_img_ps"].');';
+        $db = \Db::getInstance()->execute($sql2);
       }
     }
   }
@@ -591,23 +631,24 @@ class Products {
    */
   private static function saveVariant($combination_ps, $variant, $sync) {
     $combination_ps->reference = $sync["variant_sku"] ? mb_substr($variant->sku, 0, 64) : $combination_ps->reference;
-    $combination_ps->ean13 = $sync["barcode"] ? mb_substr($variant->barcode, 0, 13) : $combination_ps->ean13;
+    // MDF Austral $combination_ps->ean13 = $sync["barcode"] ? mb_substr($variant->barcode, 0, 13) : $combination_ps->ean13;
+    $combination_ps->ean13 = $sync["barcode"] ? mb_substr($variant->barcode, 0, 20) : $combination_ps->ean13;
 
     if ($sync["stock"]) {
       \StockAvailable::setQuantity($combination_ps->id_product, $combination_ps->id, $variant->quantity);
     }
     $attributes = self::Attributes($combination_ps, $variant, $sync);
-    $combination_ps->setAttributes($attributes);
+    //$combination_ps->setAttributes($attributes);
     try {
       $combination_ps->save();
     } catch (\Exception $ex) {
-      error_log($ex->getMessage());
+      error_log('error save combination -> '.$ex->getMessage());
     }
     if ($variant->quantity > 0) {
       try {
         (new \Product($combination_ps->id_product))->setDefaultAttribute($combination_ps->id);
       } catch (\Exception $ex) {
-        error_log($ex->getMessage());
+        error_log('error save combination -> '.$ex->getMessage());
       }
     }
   }

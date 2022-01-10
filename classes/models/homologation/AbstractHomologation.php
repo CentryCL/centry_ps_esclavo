@@ -53,7 +53,7 @@ abstract class AbstractHomologation extends AbstractModel {
     $query->select('id_centry');
     $query->from(static::$TABLE);
     $query->where("id_prestashop = '" . $db->escape($id_prestashop) . "'");
-    return ($res = $db->executeS($query)) ? $res[0]["id_centry"] : false;
+    return ($res = $db->executeS($query)) ? $res[0]["id_centry"] : false; 
   }
 
   /**
@@ -61,7 +61,7 @@ abstract class AbstractHomologation extends AbstractModel {
    * @param  string $id_centry identificador de Centry
    * @return array Resultado de la busqueda, retorna falso si no se encontraron coincidencias.
    */
-  public static function getIdPrestashop($id_centry) {
+  public static function getIdPrestashop($id_centry, $reference) {
     $db = \Db::getInstance();
     $query = new \DbQuery();
     $query->select('id_prestashop');

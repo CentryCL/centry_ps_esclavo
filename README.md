@@ -74,6 +74,9 @@ El codigo de barras es especialmente delicado porque Prestashop valida que su va
 
 Como el módulo informa a Centry los pedidos que en Prestashop se generen, es necesario traducir los distintos estados de pedidos que Prestashop maneja a uno específico de Centry. En esta sección se listan todos los estados registrados en Prestashop y se ofrece seleccionar uno de los posibles estados de Centry. Por lo general los Prestashop manejan un número cercano a 10 estado distintos mientras que en Centry sólo se disponen de 4, no existe ningún problema si dos estados distintos están homologados con la misma opción de Centry. Tampoco es necesario que todas las opciones sean usadas una vez, aunque sí es muy recomendado.
 
+### Carga de archivo de homologación
+
 ### Descarga de archivo CSV con productos de Prestashop para Centry
 
 ## Colaboración
+
