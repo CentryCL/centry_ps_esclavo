@@ -351,50 +351,55 @@ class Products {
   }
 
   /**
-   * Se encarga de crear la foto principal del producto, borrar las imagenes que ya no estén en Centry, crear las fotos faltantes y ordenar la posición de estas.
-   * @param stdObject  $product     Instancia de objeto que posee el objeto de Centry llamado por API
+   * Se encarga de crear la foto principal y secundarias del producto, borrar las imagenes que ya no estén en Centry y ordenar la posición de estas.
    * @param Product    $product_ps  Instancia de Producto que puede ser nuevo, o instancia de uno ya existente.
+   * @param stdObject  $product     Instancia de objeto que posee el objeto de Centry llamado por API
    */
   private static function saveImages($product_ps, $product) {
-    if (property_exists($product, "cover_url")) {
+    if (isset($product->assets) && count($product->assets)) {
+      $cover_image = $product->assets[0];
+      $assets = array_slice($product->assets, 1);
+
       try {
-        self::createCover($product_ps, $product);
+        self::createCover($product_ps, $cover_image);
       } catch (\Exception $ex) {
         error_log("Products.saveImages(cover): " . $ex->getMessage());
       }
-    }
-    self::deleteUnconnectedPhotos($product_ps, $product);
 
-    foreach ($product->assets as $asset) {
-      if (!\CentryPs\models\homologation\Image::getIdPrestashop($asset->_id)) {
-        try {
-          self::createAsset($product_ps, $asset);
-        } catch (\Exception $ex) {
-          error_log("Products.saveImages(asset_id: '{$asset->_id}'): " . $ex->getMessage());
+      if (count($assets)) {
+        foreach ($assets as $asset) {
+          if (!\CentryPs\models\homologation\Image::getIdPrestashop($asset->_id)) {
+            try {
+              self::createImage($product_ps, $asset);
+            } catch (\Exception $ex) {
+              error_log("Products.saveImages(asset_id: '{$asset->_id}'): " . $ex->getMessage());
+            }
+          }
         }
       }
     }
 
+    self::deleteUnconnectedPhotos($product_ps, $product->assets);
     self::orderPosition($product->assets);
   }
 
   /**
    * Borra las fotos que no están conectadas a Centry y aquellas que se encontraban creadas en Prestashop y ya no están en Centry.
-   * @param stdObject  $product     Instancia de objeto que posee el objeto de Centry llamado por API
    * @param Product    $product_ps  Instancia de Producto que puede ser nuevo, o instancia de uno ya existente.
+   * @param stdObject  $assets      Instancia de objeto que posee el listado de las imagenes de un producto de Centry.
    */
-  private static function deleteUnconnectedPhotos($product_ps, $product) {
+  private static function deleteUnconnectedPhotos($product_ps, $assets) {
     $images = $product_ps->getImages($product_ps->id_shop_default);
     $not_erase = [];
 
-    foreach ($product->assets as $image) {
+    foreach ($assets as $image) {
       $img = \CentryPs\models\homologation\Image::getIdPrestashop($image->_id);
       if ($img) {
         array_push($not_erase, $img);
       }
     }
     foreach ($images as $image) {
-      if ($image["cover"] != 1 && !in_array($image["id_image"], $not_erase)) {
+      if (!in_array($image["id_image"], $not_erase)) {
         (new \Image($image["id_image"]))->delete();
       }
     }
@@ -405,7 +410,7 @@ class Products {
    * @param  array $assets Arreglo de imagenes que vienen desde Centry.
    */
   private static function orderPosition($assets) {
-    $position = 2;
+    $position = 1;
     foreach ($assets as $asset) {
       $id_img = \CentryPs\models\homologation\Image::getIdPrestashop($asset->_id);
       if ($id_img) {
@@ -419,43 +424,46 @@ class Products {
 
   /**
    * Crea la imagen principal del producto
-   * @param stdObject  $product     Instancia de objeto que posee el objeto de Centry llamado por API
    * @param Product    $product_ps  Instancia de Producto que puede ser nuevo, o instancia de uno ya existente.
+   * @param stdObject  $cover_image Instancia de objeto que posee la imagen principal de un producto de Centry.
    */
-  private static function createCover($product_ps, $product) {
-    try {
-      $configuration = new \PrestaShop\PrestaShop\Adapter\Configuration();
-      $tools = new \PrestaShop\PrestaShop\Adapter\Tools();
-      $context_shop_id = $product_ps->id_shop_default;
-      $hook = new \PrestaShop\PrestaShop\Adapter\Hook\HookDispatcher();
-      $image_copier = new \PrestaShop\PrestaShop\Adapter\Import\ImageCopier($configuration, $tools, $context_shop_id, $hook);
-
-      $id_cover = $product_ps->getCoverWs();
-      $image = new \Image();
-      $image->id_product = $product_ps->id;
-      $image->position = 1;
-      $image->url = $product->cover_url;
-      $image->cover = true;
-      if ($id_cover) {
-        (new \Image($id_cover))->delete();
-      }
-      if (($image->validateFields(false, true)) === true && ($image->validateFieldsLang(false, true)) === true && $image->add()) {
-        $image->associateTo($product_ps->id_shop_default);
-        if (!$image_copier->copyImg($product_ps->id, $image->id, $product->cover_url, 'products', true)) {
-          $image->delete();
-        }
-      }
-    } catch (\Exception $e) {
-      error_log("No se pudo descargar la imagen \n" . $e);
+  private static function createCover($product_ps, $cover_image) {
+    $actual_cover_id = (int) $product_ps->getCoverWs();
+    $expected_cover_id = (int) \CentryPs\models\homologation\Image::getIdPrestashop($cover_image->_id);
+    
+    if (!$actual_cover_id && !$expected_cover_id) {
+      self::createImage($product_ps, $cover_image, true);
+    } else if (!$actual_cover_id && $expected_cover_id) {
+      self::updateCoverImage($product_ps, $expected_cover_id, true);
+    } else if ($actual_cover_id && !$expected_cover_id) {
+      self::updateCoverImage($product_ps, $actual_cover_id, false);
+      self::createImage($product_ps, $cover_image, true);
+    } else if ($actual_cover_id && $expected_cover_id && $actual_cover_id != $expected_cover_id) {
+      self::updateCoverImage($product_ps, $actual_cover_id, false);
+      self::updateCoverImage($product_ps, $expected_cover_id, true);
     }
   }
 
   /**
-   * Crea una imagen secundaria del producto
+   * Actualiza una imagen de prestashop para que se convierta o deje de ser la imagen principal del producto.
    * @param Product    $product_ps  Instancia de Producto que puede ser nuevo, o instancia de uno ya existente.
-   * @param tsdObject  $asset       Objeto perteneciente a la imagen que proviene desde Centry.
+   * @param int        $image_id    Id de prestashop de la imagen a actualizar.
+   * @param boolean    $is_cover    Indica si la imagen sera o no la principal del producto.
+   */
+  private static function updateCoverImage($product_ps, $image_id, $is_cover) {
+    $image = new \Image($image_id);
+    $image->id_product = $product_ps->id;
+    $image->cover = $is_cover ? 1 : 0;
+    $image->save();
+  }
+
+  /**
+   * Crea una imagen del producto
+   * @param Product    $product_ps  Instancia de Producto que puede ser nuevo, o instancia de uno ya existente.
+   * @param stdObject  $asset       Objeto perteneciente a la imagen que proviene desde Centry.
+   * @param boolean    $is_cover    Indica si la imagen es la principal del producto.
    * */
-  private static function createAsset($product_ps, $asset) {
+  private static function createImage($product_ps, $asset, $is_cover=false) {
     try {
       $configuration = new \PrestaShop\PrestaShop\Adapter\Configuration();
       $tools = new \PrestaShop\PrestaShop\Adapter\Tools();
@@ -463,23 +471,27 @@ class Products {
       $hook = new \PrestaShop\PrestaShop\Adapter\Hook\HookDispatcher();
       $image_copier = new \PrestaShop\PrestaShop\Adapter\Import\ImageCopier($configuration, $tools, $context_shop_id, $hook);
 
-      if ($asset->position != 0) {
-        $image = new \Image();
-        $image->id_product = $product_ps->id;
-        $image->position = $image->getHighestPosition($product_ps->id) + 1;
-        $image->url = $asset->url;
-        $image->cover = false;
-        if (($image->validateFields(false, true)) === true && ($image->validateFieldsLang(false, true)) === true && $image->add()) {
-          $image->associateTo($product_ps->id_shop_default);
-          if (!$image_copier->copyImg($product_ps->id, $image->id, $asset->url, 'products', true)) {
-            $image->delete();
-          } else {
-            $imageC = new \CentryPs\models\homologation\Image();
-            $imageC->id = $image->id;
-            $imageC->id_centry = $asset->_id;
-            $imageC->fingerprint = $asset->image_fingerprint;
-            $imageC->save();
-          }
+      $url = $is_cover ? $asset->cover_url : $asset->url;
+
+      $image = new \Image();
+      $image->id_product = $product_ps->id;
+      $image->position = $image->getHighestPosition($product_ps->id) + 1;
+      $image->url = $url;
+      $image->cover = $is_cover;
+
+      $valid = $image->validateFields(false, true) && $image->validateFieldsLang(false, true);
+      if ($valid) $created = $image->add();
+
+      if ($created) {
+        $image->associateTo($product_ps->id_shop_default);
+        if (!$image_copier->copyImg($product_ps->id, $image->id, $url, 'products', true)) {
+          $image->delete();
+        } else {
+          $imageC = new \CentryPs\models\homologation\Image();
+          $imageC->id_prestashop = $image->id;
+          $imageC->id_centry = $asset->_id;
+          $imageC->fingerprint = $asset->image_fingerprint;
+          $imageC->save();
         }
       }
     } catch (\Exception $e) {
@@ -532,7 +544,7 @@ class Products {
         $resp = $combination->save();
       } catch (\Exception $ex) {
         error_log($ex->getMessage());
-      }  
+      }
 
       if ($resp) {
         $variantC = new \CentryPs\models\homologation\Variant($combination->id, $variant->_id);
