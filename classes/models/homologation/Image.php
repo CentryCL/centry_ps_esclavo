@@ -60,9 +60,9 @@ class Image extends AbstractHomologation {
    */
   protected function create() {
     $db = \Db::getInstance();
-    $sql = "INSERT INTO `" . _DB_PREFIX_ . static::$TABLE
-            . "` (`id`, `id_centry`,`fingerprint`)"
-            . " VALUES (" . ((int) $this->id) . ", '"
+    $sql = "INSERT INTO `" . static::tableName()
+            . "` (`id_prestashop`, `id_centry`, `fingerprint`)"
+            . " VALUES (" . ((int) $this->id_prestashop) . ", '"
             . $db->escape($this->id_centry) . "', '"
             . $db->escape($this->fingerprint) . "')";
     return $db->execute($sql) != false;
