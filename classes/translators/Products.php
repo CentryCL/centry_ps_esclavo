@@ -610,6 +610,16 @@ class Products {
     }
     $attributes = self::Attributes($combination_ps, $variant, $sync);
     $combination_ps->setAttributes($attributes);
+
+    if ($sync["product_images"] && is_array($variant->assets) && count($variant->assets)) {
+      $images_ids = [];
+      foreach ($variant->assets as $asset) {
+        $image_id = \CentryPs\models\homologation\Image::getIdPrestashop($asset->_id);
+        if ($image_id) array_push($images_ids, ['id' => $image_id]);
+      }
+      if (count($images_ids)) $combination_ps->setWsImages($images_ids);
+    }
+
     try {
       $combination_ps->save();
     } catch (\Exception $ex) {
