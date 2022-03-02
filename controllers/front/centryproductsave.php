@@ -25,6 +25,12 @@ class Centry_Ps_EsclavoCentryProductSaveModuleFrontController extends AbstractTa
       throw new Exception('Resource is not a Centry model.');
     }
 
+    $resp->assets = $centry->sdk()->getProductImages($product_id);
+    foreach($resp->variants as $variant) {
+      $params = array('variant_id' => $variant->_id);
+      $variant->assets = $centry->sdk()->getProductVariantImages($product_id, $params);
+    }
+
     if (($id = CentryPs\models\homologation\Product::getIdPrestashop($resp->_id))) {
       //Actualizacion
       $product_ps = new \Product($id);
@@ -41,5 +47,4 @@ class Centry_Ps_EsclavoCentryProductSaveModuleFrontController extends AbstractTa
       $product_centry->save();
     }
   }
-
 }
