@@ -159,9 +159,9 @@ class PendingTask extends AbstractModel {
    * datos y las retorna como un arrego de instancias de esta clase.
    * @return \CentryPs\System\PendingTask
    */
-  public static function getPendingTasksObjects(array $conditions = null, int $limit = null, int $offset = null) {
+  public static function getPendingTasksObjects(array $conditions = null, int $limit = null) {
     $objects = [];
-    $tasks = static::getPendingTasks($conditions, $limit, $offset);
+    $tasks = static::getPendingTasks($conditions, $limit);
     foreach ($tasks as $pending_task) {
       $objects[] = new PendingTask(
               $pending_task['origin'], $pending_task['topic'],
@@ -175,20 +175,42 @@ class PendingTask extends AbstractModel {
 
   /**
    * Lista las tareas pendientes que se encuentran registradas en la base de
-   * datos y las retorna como un arrego de arreglos simple.
+   * datos y las retorna como un arreglo de arreglos simple.
+   * Se priorizan las tareas con origen en prestashop.
    * @return array
    */
-  public static function getPendingTasks(array $conditions = null, int $limit = null, int $offset = null) {
-    $table_name = static::tableName();
-    $sql = "SELECT * FROM `$table_name`";
-    if (isset($conditions)) {
-      $sql .= ' WHERE ' . static::equalities($conditions);
+  public static function getPendingTasks(array $conditions = null, int $limit = null) {
+    if (is_null($limit) || $limit == 0) {
+      $prestashop_tasks = static::getPendingTasksByOrigin('prestashop', $conditions);
+      $centry_tasks = static::getPendingTasksByOrigin('centry', $conditions);
+      return array_merge($prestashop_tasks, $centry_tasks);
+    } 
+
+    $prestashop_tasks = static::getPendingTasksByOrigin('prestashop', $conditions, $limit);
+    $tasks_count = count($prestashop_tasks);
+    if ($tasks_count == $limit) {
+      return $prestashop_tasks;
     }
+
+    $centry_tasks = static::getPendingTasksByOrigin('centry', $conditions, $limit - $tasks_count);
+    return array_merge($prestashop_tasks, $centry_tasks);
+  }
+
+  
+  /**
+   * Lista las tareas pendientes de cierto origen que se encuentran 
+   * registradas en la base de datos y las retorna como un arreglo de 
+   * arreglos simple.
+   * @return array
+   */
+  public static function getPendingTasksByOrigin(string $origin, array $conditions = null, int $limit = null) {
+    $table_name = static::tableName();
+    $conditions = isset($conditions) ? $conditions : [];
+    $conditions += ['origin' => "'{$origin}'"];
+    $sql = "SELECT * FROM `$table_name`";
+    $sql .= ' WHERE ' . static::equalities($conditions);
     if (isset($limit)) {
       $sql .= " LIMIT $limit";
-    }
-    if (isset($offset)) {
-      $sql .= " OFFSET $offset";
     }
     return \Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
   }
@@ -211,7 +233,7 @@ class PendingTask extends AbstractModel {
       'topic' => "'{$topic}'",
       'resource_id' => "'{$resource_id}'"
     ];
-    $task = static::getPendingTasksObjects($conditions, 1, 0);
+    $task = static::getPendingTasksObjects($conditions, 1);
     if (empty($task)) {
       (new PendingTask($origin, $topic, $resource_id))->save();
     } elseif (

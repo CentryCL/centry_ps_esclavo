@@ -49,7 +49,7 @@ abstract class AbstractTaskProcessor extends ModuleFrontController {
       'topic' => "'{$this->topic}'",
       'resource_id' => "'{$id}'"
     ];
-    return PendingTask::getPendingTasksObjects($conditions, 1, 0)[0];
+    return PendingTask::getPendingTasksObjects($conditions, 1)[0];
   }
 
   /**
