@@ -219,13 +219,37 @@ class CentrySDK {
   }
 
   /**
-   * Obitene producto en Centry.
+   * Obtiene producto en Centry.
    * @param $product_id
    * @param null $params
    * @return mixed|string
    */
   public function getProduct($product_id, $params = null) {
     return $this->get("conexion/v1/products/" . $product_id . ".json", $params);
+  }
+
+  /**
+   * Obtiene las imagenes asociadas a un producto en Centry.
+   * @param $product_id
+   * @param null $params
+   * @return mixed|string
+   */
+  public function getProductImages($product_id, $params = null) {
+    return $this->get("conexion/v1/products/" . $product_id . "/assets.json", $params);
+  }
+
+  /**
+   * Obtiene las imagenes asociadas a una variante de un producto en Centry.
+   * @param $product_id
+   * @param $params variant_id
+   * @return mixed|string
+   */
+  public function getProductVariantImages($product_id, $params = null) {
+    if (isset($params['variant_id'])) {
+      return $this->get("conexion/v1/products/" . $product_id . "/assets.json", $params);
+    }
+
+    return [];
   }
 
   /**
