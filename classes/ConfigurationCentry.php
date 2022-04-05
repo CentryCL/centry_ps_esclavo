@@ -120,6 +120,22 @@ class ConfigurationCentry {
   }
 
   /**
+   *  Creación o actualización del campo descripción corta (características) en la base de datos para su sincronizacion en la creación de un producto.
+   * @param $value Indica si se utiliza la descripción corta (características) para la creación del producto.
+   */
+  public static function setSyncOnCreateShortDescription($value) {
+    \Configuration::updateValue("CENTRY_SYNC_ONCREATE_shortdescription", $value);
+  }
+
+  /**
+   * Creación o actualización del campo descripción corta (características) en la base de datos para su sincronizacion en la actualización de un producto.
+   * @param $value Indica si se utiliza la descripción corta (características) para la actualización del producto.
+   */
+  public static function setSyncOnUpdateShortDescription($value) {
+    \Configuration::updateValue("CENTRY_SYNC_ONCREATE_shortdescription", $value);
+  }
+
+  /**
    * Función que obtiene el valor de la base de datos del campo descripcion para la creación de un producto.
    * @return string valor que indica si el campo descripcion se utiliza para la creación de un producto.
    */
@@ -133,6 +149,22 @@ class ConfigurationCentry {
    */
   public static function getSyncOnUpdateDescription() {
     return \Configuration::get("CENTRY_SYNC_ONUPDATE_description", null, null, null, 'on');
+  }
+
+  /**
+   * Función que obtiene el valor de la base de datos del campo descripción corta (características) para la creación de un producto.
+   * @return string valor que indica si el campo descripcion se utiliza para la creación de un producto.
+   */
+  public static function getSyncOnCreateShortDescription() {
+    return \Configuration::get("CENTRY_SYNC_ONCREATE_shortdescription", null, null, null, 'on');
+  }
+
+  /**
+   * Función que obtiene el valor de la base de datos del campo descripción corta (características para la actualización de un producto.
+   * @return string valor que indica si el campo descripcion se utiliza para la actualización de un producto.
+   */
+  public static function getSyncOnUpdateShortDescription() {
+    return \Configuration::get("CENTRY_SYNC_ONUPDATE_shortdescription", null, null, null, 'on');
   }
 
   /**
@@ -674,6 +706,7 @@ class ConfigurationCentry {
     $sync["price_offer"] = ConfigurationCentry::getSyncOnUpdatePriceOffer();
     $sync["characteristics"] = ConfigurationCentry::getSyncOnUpdateCharacteristics();
     $sync["description"] = ConfigurationCentry::getSyncOnUpdateDescription();
+    $sync["shortdescription"] = ConfigurationCentry::getSyncOnUpdateShortDescription();
     $sync["sku_product"] = ConfigurationCentry::getSyncOnUpdateSkuProduct();
     $sync["stock"] = ConfigurationCentry::getSyncOnUpdateStock();
     $sync["size"] = ConfigurationCentry::getSyncOnUpdateSize();
@@ -703,6 +736,7 @@ class ConfigurationCentry {
     $sync["price_offer"] = ConfigurationCentry::getSyncOnCreatePriceOffer();
     $sync["characteristics"] = ConfigurationCentry::getSyncOnCreateCharacteristics();
     $sync["description"] = ConfigurationCentry::getSyncOnCreateDescription();
+    $sync["shortdescription"] = ConfigurationCentry::getSyncOnCreateShortDescription();
     $sync["sku_product"] = ConfigurationCentry::getSyncOnCreateSkuProduct();
     $sync["stock"] = ConfigurationCentry::getSyncOnCreateStock();
     $sync["size"] = ConfigurationCentry::getSyncOnCreateSize();

@@ -18,6 +18,7 @@ class Products {
     $product_ps->reference = $sync["sku_product"] ? mb_substr($product->sku, 0, 64) : $product_ps->reference;
     $product_ps->active = $sync["status"] ? $product->status : $product_ps->active;
     $product_ps->description = ($sync["description"] && property_exists($product, "description")) ? $product->description : $product_ps->description;
+    $product_ps->description_short = ($sync["shortdescription"] && property_exists($product, "shortdescription")) ? $product->shortdescription : $product_ps->description_short;
     $product_ps->condition = $sync["condition"] ? $product->condition : $product_ps->condition;
     $product_ps->width = ($sync["package"] && property_exists($product, "packagewidth")) ? $product->packagewidth : $product_ps->width;
     $product_ps->height = ($sync["package"] && property_exists($product, "packageheight")) ? $product->packageheight : $product_ps->height;

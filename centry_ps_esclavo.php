@@ -372,7 +372,7 @@ class Centry_PS_esclavo extends Module {
    */
   private function saveSynchronizationCheckboxes() {
     $fields = [
-      'name', 'price', 'priceoffer', 'description', 'skuproduct',
+      'name', 'price', 'priceoffer', 'description', 'shortdescription', 'skuproduct',
       'characteristics', 'warranty', 'condition', 'status', 'stock',
       'variantsku', 'size', 'color', 'barcode', 'productimages', 'seo', 'brand',
       'package', 'category'
@@ -404,13 +404,27 @@ class Centry_PS_esclavo extends Module {
   public function displayForm() {
     $defaultLang = (int) Configuration::get('PS_LANG_DEFAULT');
 
-    $sync_fields = [["id" => "name", 'name' => "Nombre"], ["id" => "price", 'name' => "Precio"], ["id" => "priceoffer", 'name' => "Precio de oferta"],
-      ["id" => "description", 'name' => "Descripción"], ["id" => "skuproduct", 'name' => "Sku del Producto"], ["id" => "characteristics", 'name' => "Características"],
-      ["id" => "stock", 'name' => "Stock"], ["id" => "variantsku", 'name' => "Sku de la Variante"], ["id" => "size", 'name' => "Talla"],
-      ["id" => "color", 'name' => "Color"], ["id" => "barcode", 'name' => "Código de barras (Tiene que ser valores válidos. Si no estás seguro, mejor no los mantengas sincronizados.)"], ["id" => "productimages", 'name' => "Imágenes Producto"],
-      ["id" => "condition", 'name' => "Condición"], ["id" => "warranty", 'name' => "Garantía"], ["id" => "status", 'name' => "Estado"],
-      ["id" => "seo", 'name' => "Campos SEO"], ["id" => "brand", 'name' => "Marca"], ["id" => "package", 'name' => "Medidas del paquete"],
-      ["id" => "category", 'name' => "Categoría"]];
+    $sync_fields = [
+      ["id" => "name", 'name' => "Nombre"],
+      ["id" => "price", 'name' => "Precio"],
+      ["id" => "priceoffer", 'name' => "Precio de oferta"],
+      ["id" => "description", 'name' => "Descripción"],
+      ["id" => "shortdescription", 'name' => "Descripción corta (Listado de características)"],
+      ["id" => "skuproduct", 'name' => "Sku del Producto"],
+      ["id" => "characteristics", 'name' => "Características"],
+      ["id" => "stock", 'name' => "Stock"],
+      ["id" => "variantsku", 'name' => "Sku de la Variante"],
+      ["id" => "size", 'name' => "Talla"],
+      ["id" => "color", 'name' => "Color"],
+      ["id" => "barcode", 'name' => "Código de barras (Tiene que ser valores válidos. Si no estás seguro, mejor no los mantengas sincronizados.)"],
+      ["id" => "productimages", 'name' => "Imágenes Producto"],
+      ["id" => "condition", 'name' => "Condición"], ["id" => "warranty", 'name' => "Garantía"],
+      ["id" => "status", 'name' => "Estado"],
+      ["id" => "seo", 'name' => "Campos SEO"],
+      ["id" => "brand", 'name' => "Marca"],
+      ["id" => "package", 'name' => "Medidas del paquete"],
+      ["id" => "category", 'name' => "Categoría"]
+    ];
 
     // Init Fields form array
     $fieldsForm[0]['form'] = array(
