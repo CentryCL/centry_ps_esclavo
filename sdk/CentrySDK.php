@@ -94,9 +94,61 @@ class CentrySDK {
 
     $response = curl_exec($curl);
     $err = curl_error($curl);
+    $info = curl_getinfo($curl);
 
     curl_close($curl);
-    return $err ? $err : json_decode($response);
+    return response($response, $err, $info);
+  }
+
+  /**
+   * Entrega la respuesta parseada como arreglo. Si se trata de un error,
+   * entonces agrega los atributos <code>http_code</code> con el código
+   * informado por el servidor y <code>curl_error</code> con toda la información
+   * del error recogida por curl.
+   * @param string $curl_exec_result
+   * @param string $curl_error
+   * @param array $curl_info
+   * @return array
+   */
+  function response($curl_exec_result, $curl_error, $curl_info) {
+    $http_code = $this->httpCode($curl_info)
+    if $http_code >= 200 && $http_code < 300 {
+      return $this->parsedResponse($curl_exec_result);
+    }
+
+    $resp = $this->parsedResponse($curl_exec_result);
+    $resp["http_code"] = $http_code;
+    $resp["curl_error"] = $curl_error;
+    return $resp;
+  }
+
+  /**
+   * Obtiene el código de respuesta HTTP de una solicitud. Si no lo logra
+   * obtener, retorna un cero.
+   * @param array $curl_info Información de la solicitud.
+   * @return int Código de respuesta HTTP.
+   */
+  function httpCode($curl_info) {
+    try {
+      return intval($curl_info["http_code"]);
+    } catch (Exception $e) {
+      return 0;
+    }
+  }
+
+  /**
+   * Intenta transformar la respuesta suponiendo que se trata de un JSON. Si no
+   * lo logra, retorna el mismo contenido que recibió el método pero como valor 
+   * de la única llave de un arreglo cuyo nombre es <code>body</code>.
+   * @param string $response Respuesta de Centry.
+   * @return array Contenido de la respuesta.
+   */
+  function parsedResponse($response) {
+    try {
+      return json_decode($response);
+    } catch (Exception $e) {
+      return ["body" => $response];
+    }
   }
 
   /**
