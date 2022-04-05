@@ -10,7 +10,7 @@ use CentryPs\models\system\PendingTask;
 
 /**
  * Controlador encargado de ejecutar la tarea de leer un producto de Centry para
- * crearlo o actualizarlo en Prestashop.
+ * crearlo o actualizarlo en PrestaShop.
  */
 class Centry_Ps_EsclavoCentryProductSaveModuleFrontController extends AbstractTaskProcessor {
 
@@ -31,8 +31,8 @@ class Centry_Ps_EsclavoCentryProductSaveModuleFrontController extends AbstractTa
       $variant->assets = $centry->sdk()->getProductVariantImages($product_id, $params);
     }
 
-    if (($id = CentryPs\models\homologation\Product::getIdPrestashop($resp->_id))) {
-      //Actualizacion
+    if (($id = $this->findPrestaShopProductId(($resp->_id, ($resp->_id) CentryPs\models\homologation\Product::getIdPrestashop($resp->_id))) {
+      //Actualización
       $product_ps = new \Product($id);
       $sync = ConfigurationCentry::getSyncOnUpdate();
     } else {
@@ -46,5 +46,20 @@ class Centry_Ps_EsclavoCentryProductSaveModuleFrontController extends AbstractTa
       $product_centry = new CentryPs\models\homologation\Product($res->id, $resp->_id);
       $product_centry->save();
     }
+  }
+
+  /**
+   * Busca en la base de datos el id de un producto de PrestaShop que tenga por
+   * <code>centry_id</code> el pasado como parámetro o, si no hay un producto
+   * homologado, busca un producto por SKU y lo autohomologa.
+   * @param string $centry_id
+   * @param string $sku
+   * @return int
+   */
+  private function findPrestaShopProductId($centry_id, $sku) {
+    if (($id = CentryPs\models\homologation\Product::getIdPrestashop($resp->_id))) {
+      return $id;
+    }
+    return CentryPs\models\homologation\Product::findIdPrestashopBySkuAndHomologate($sku, $centry_id);
   }
 }
