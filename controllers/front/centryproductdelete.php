@@ -20,7 +20,7 @@ class Centry_Ps_EsclavoCentryProductdeleteModuleFrontController extends Abstract
     $product_id = $task->resource_id;
     $centry = new AuthorizationCentry();
     $resp = $centry->sdk()->getProduct($product_id);
-    if (!$resp || !property_exists($resp, "error")) {
+    if (!$resp["http_code"] != 404) {
       throw new Exception('Resource is not a Centry model.');
     }
 
