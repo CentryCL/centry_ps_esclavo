@@ -30,6 +30,7 @@ class Products {
     $product_ps->available_for_order = 1;
     $product_ps->available_now = "Disponible";
     $product_ps->show_price = 1;
+    $product_ps->link_rewrite = \Tools::link_rewrite($product_ps->name);
 
     $response = $product_ps->save();
 
@@ -79,13 +80,6 @@ class Products {
 
     $response = $product_ps->update();
     return $response ? $product_ps : false;
-  }
-
-  private static function generateLinkRewrite($name) {
-    $order = array("\r\n", "\n", "\r", " ", "_");
-    $replace = "-";
-    $newstr = str_replace($order, $replace, $name);
-    return preg_replace("/[^a-zA-Z0-9-]/", "", $newstr);
   }
 
   /**
