@@ -38,7 +38,7 @@ class Product extends AbstractHomologation {
     $query->from('product');
     $query->where("reference = '" . $db->escape($sku) . "'");
     if (!($result = $db->executeS($query))) {
-      return null
+      return null;
     }
     $id_prestashop = $result[0]['id_product'];
    

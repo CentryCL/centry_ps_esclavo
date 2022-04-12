@@ -31,7 +31,7 @@ class Centry_Ps_EsclavoCentryProductSaveModuleFrontController extends AbstractTa
       $variant->assets = $centry->sdk()->getProductVariantImages($product_id, $params);
     }
 
-    if (($id = $this->findPrestaShopProductId(($resp->_id, ($resp->_id) CentryPs\models\homologation\Product::getIdPrestashop($resp->_id))) {
+    if ($id = $this->findPrestaShopProductId($resp->_id, mb_substr($resp->sku, 0, 64))) {
       //Actualización
       $product_ps = new \Product($id);
       $sync = ConfigurationCentry::getSyncOnUpdate();
