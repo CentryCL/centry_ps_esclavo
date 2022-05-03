@@ -97,7 +97,7 @@ class CentrySDK {
     $info = curl_getinfo($curl);
 
     curl_close($curl);
-    return response($response, $err, $info);
+    return $this->response($response, $err, $info);
   }
 
   /**
@@ -111,8 +111,8 @@ class CentrySDK {
    * @return array
    */
   function response($curl_exec_result, $curl_error, $curl_info) {
-    $http_code = $this->httpCode($curl_info)
-    if $http_code >= 200 && $http_code < 300 {
+    $http_code = $this->httpCode($curl_info);
+    if ($http_code >= 200 && $http_code < 300) {
       return $this->parsedResponse($curl_exec_result);
     }
 

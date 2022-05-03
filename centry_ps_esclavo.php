@@ -565,8 +565,8 @@ class Centry_PS_esclavo extends Module {
               'name' => 'shipped'
             ),
             array(
-              'id_option' => 'recieved',
-              'name' => 'recieved'
+              'id_option' => 'received',
+              'name' => 'received'
             ),
             array(
               'id_option' => 'cancelled',
