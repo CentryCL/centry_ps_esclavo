@@ -1,6 +1,6 @@
-# Módulo Centry para Prestahsop
+# Módulo Centry para PrestaShop
 
-El módulo de Centry para PrestaShop te permite maneter tu catálogo de productos
+El módulo de Centry para PrestaShop te permite mantener tu catálogo de productos
 sincronizados entre ambas plataformas, recibiendo actualizaciones en tiempo real
 para ver reflejados en el e-commerce los cambios de los productos realizados en
 Centry y para informar a Centry de las ventas realizadas en PrestaShop.
@@ -18,10 +18,12 @@ versión 1.7.6 o superior.
 
 Este es el paso a paso para una correcta instalación del módulo en PrestaShop:
 
-1. Descarga la última versión del módulo en formato zip en la sección [releases](https://github.com/CentryCL/centry_ps_esclavo/releases/latest)
+1. Descarga la última versión del módulo en formato zip en la sección
+   [releases](https://github.com/CentryCL/centry_ps_esclavo/releases/latest)
 2. Dirígete a la sección "Módulos" en la administración del PrestaShop.
 3. Presiona el botón "Subir un módulo" ubicado en la parte superior derecha.
-4. Arrastrar o seleccionar en la ventana modal el archivo zip descargado en el paso (1).
+4. Arrastrar o seleccionar en la ventana modal el archivo zip descargado en el
+   paso (1).
 5. Dirígete a la sección "Catálogo de Módulos".
 6. Busca el módulo recién cargado por el término "Centry".
 7. Presiona el botón "Instalar"
@@ -40,11 +42,14 @@ entre PrestaShop en Centry. Para obtenerlos se deben seguir estos pasos:
 2. Dirígete a la sección [API & Apps](https://centry.cl/oauth/applications)
 3. Presiona el botón "Nueva Aplicación"
 4. Rellena el formulario con la siguiente información:
-   - Nombre: Ingresa un nombre con el que quieras identificar tu integración. Ej: "Módulo PrestaShop"
+   - Nombre: Ingresa un nombre con el que quieras identificar tu integración.
+     Ej: "Módulo PrestaShop"
    - Redirect URI: Ingresa el valor fijo `urn:ietf:wg:oauth:2.0:oob`.
    - Scopes: Selecciona todas las casillas.
 5. Guardar el formulario presionando el botón "Enviar"
-6. Como resultado aparecerán los campos "App Id (o client_id)" y "Secret" los cuales se tienen que usar para rellenar los campos del formulario de configuración del módulo.
+6. Como resultado aparecerán los campos "App Id (o client_id)" y "Secret" los
+   cuales se tienen que usar para rellenar los campos del formulario de
+   configuración del módulo.
 
 ### Campos a sincronizar
 
