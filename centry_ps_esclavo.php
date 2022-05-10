@@ -391,7 +391,7 @@ class Centry_PS_esclavo extends Module {
 
   /**
    * Registra en la base de datos la homologación de los estados de los pedidos
-   * de Prestashop con los estados de los pedidos de Centry.
+   * de PrestaShop con los estados de los pedidos de Centry.
    */
   private function saveOrderStatusHomologations() {
     $defaultLang = (int) Configuration::get('PS_LANG_DEFAULT');

@@ -9,7 +9,7 @@ use CentryPs\enums\system\PendingTaskTopic;
 use CentryPs\models\system\PendingTask;
 
 /**
- * Controlador encargado de ejecutar la tarea de leer un pedido de Prestashop
+ * Controlador encargado de ejecutar la tarea de leer un pedido de PrestaShop
  * para crearlo o actualizarlo en Centry.
  */
 class Centry_Ps_EsclavoPrestashopOrderSaveModuleFrontController extends AbstractTaskProcessor {

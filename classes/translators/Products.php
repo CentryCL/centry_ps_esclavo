@@ -5,7 +5,10 @@ namespace CentryPs\translators;
 class Products {
 
   /**
-   * Función encargada de guardar toda la información del producto llenando campos y llamando funciones en caso de que sea necesario la sincronización de estos. Se encarga de los datos básicos del producto, variantes y su información, imágenes, caracteristicas.
+   * Función encargada de guardar toda la información del producto llenando
+   * campos y llamando funciones en caso de que sea necesario la sincronización
+   * de estos. Se encarga de los datos básicos del producto, variantes y su
+   * información, imágenes, características.
    * @param  \Product       $product_ps Instancia de Producto que puede ser nuevo, o instancia de uno ya existente.
    * @param  stdObject      $product    Instancia de objeto que posee el objeto de Centry llamado por API
    * @param  Array          $sync       Arreglo que indica que campos deben sincronizarse o no.
@@ -163,7 +166,7 @@ class Products {
   }
 
   /**
-   * Actualiza las caracteristicas que estén seleccionadas para ser sincronizadas
+   * Actualiza las características que estén seleccionadas para ser sincronizadas
    * @param stdObject  $product     Instancia de objeto que posee el objeto de Centry llamado por API
    * @param Product    $product_ps  Instancia de Producto que puede ser nuevo, o instancia de uno ya existente.
    * @param array      $sync        Arreglo que indica que campos deben sincronizarse o no.
@@ -300,10 +303,10 @@ class Products {
   /**
    * Permite saber si el valor de una Característica está creada, si no lo está, se crea.
    * @param  int     $product_id  Identificador del producto de Prestashop.
-   * @param  int     $feature_id  Identificador de la caracterísitca a la que se le será asignado el valor
-   * @param  string  $id_value    Id de Centry de el valor de la caracteristica, si no posee se entrega falso.
-   * @param  string  $value       Valor de la caracteristica.
-   * @param  boolean $custom      Indica si la caracteristica es de texto libre (true) o un selector(false)
+   * @param  int     $feature_id  Identificador de la característica a la que se le será asignado el valor
+   * @param  string  $id_value    Id de Centry de el valor de la característica, si no posee se entrega falso.
+   * @param  string  $value       Valor de la característica.
+   * @param  boolean $custom      Indica si la característica es de texto libre (true) o un selector(false)
    * @return FeatureValue         Retorna la instancia FeatureValue.
    */
   private static function featureValue($product_id, $feature_id, $id_value, $value, $custom) {
@@ -346,7 +349,7 @@ class Products {
   }
 
   /**
-   * Se encarga de crear la foto principal y secundarias del producto, borrar las imagenes que ya no estén en Centry y ordenar la posición de estas.
+   * Se encarga de crear la foto principal y secundarias del producto, borrar las imágenes que ya no estén en Centry y ordenar la posición de estas.
    * @param Product    $product_ps  Instancia de Producto que puede ser nuevo, o instancia de uno ya existente.
    * @param stdObject  $product     Instancia de objeto que posee el objeto de Centry llamado por API
    */
@@ -381,7 +384,7 @@ class Products {
   /**
    * Borra las fotos que no están conectadas a Centry y aquellas que se encontraban creadas en Prestashop y ya no están en Centry.
    * @param Product    $product_ps  Instancia de Producto que puede ser nuevo, o instancia de uno ya existente.
-   * @param stdObject  $assets      Instancia de objeto que posee el listado de las imagenes de un producto de Centry.
+   * @param stdObject  $assets      Instancia de objeto que posee el listado de las imágenes de un producto de Centry.
    */
   private static function deleteUnconnectedPhotos($product_ps, $assets) {
     $images = $product_ps->getImages($product_ps->id_shop_default);
@@ -402,7 +405,7 @@ class Products {
 
   /**
    * Ordena las posiciones de las imágenes
-   * @param  array $assets Arreglo de imagenes que vienen desde Centry.
+   * @param  array $assets Arreglo de imágenes que vienen desde Centry.
    */
   private static function orderPosition($assets) {
     $position = 1;
@@ -440,9 +443,9 @@ class Products {
   }
 
   /**
-   * Actualiza una imagen de prestashop para que se convierta o deje de ser la imagen principal del producto.
+   * Actualiza una imagen de PrestaShop para que se convierta o deje de ser la imagen principal del producto.
    * @param Product    $product_ps  Instancia de Producto que puede ser nuevo, o instancia de uno ya existente.
-   * @param int        $image_id    Id de prestashop de la imagen a actualizar.
+   * @param int        $image_id    Id de PrestaShop de la imagen a actualizar.
    * @param boolean    $is_cover    Indica si la imagen sera o no la principal del producto.
    */
   private static function updateCoverImage($product_ps, $image_id, $is_cover) {
@@ -498,7 +501,7 @@ class Products {
    * Asocia categoría de Centry con las ya homologadas de Prestashop y asigna categoría principal como la primera que encuentre de mayor profundidad.
    * @param stdObject  $product     Instancia de objeto que posee el objeto de Centry llamado por API
    * @param Product    $product_ps  Instancia de Producto que puede ser nuevo, o instancia de uno ya existente.
-   * @param array      $categories  Arreglo de identificadores de las categorias homologadas.
+   * @param array      $categories  Arreglo de identificadores de las categorías homologadas.
    */
   private static function category($product_ps, $product, $categories) {
     $max_level = 0;
@@ -572,7 +575,9 @@ class Products {
   }
 
   /**
-   * Si la configuración toma los productos con variante unica como producto simple se borran todas las combinaciones que tenga el producto en Prestashop y se guarda la información en el producto.
+   * Si la configuración toma los productos con variante unica como producto
+   * simple se borran todas las combinaciones que tenga el producto en
+   * PrestaShop y se guarda la información en el producto.
    * @param  Product   $product_ps  Instancia de Producto que puede ser nuevo, o instancia de uno ya existente.
    * @param  stdObject $variant     Instancia de la variante de Centry.
    * @param  array    $sync        arreglo que indica que campos se sincronizan.

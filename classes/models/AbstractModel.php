@@ -13,7 +13,7 @@ abstract class AbstractModel {
 
   /**
    * Entrega el nombre de la tabla del recurso precedido por el prefijo que
-   * tiene configurado prestashop para ser usado en todas las tablas del sistema
+   * tiene configurado PrestaShop para ser usado en todas las tablas del sistema
    * @return string
    */
   protected static function tableName() {
@@ -30,7 +30,7 @@ abstract class AbstractModel {
    * Si el valor es <code>null</code>, retorna simplemente <code>NULL</code>
    * </li>
    * <li>
-   * Encierra el valor escapado entre comilla si así lo indica el parámetro
+   * Encierra el valor escapado entre comillas si así lo indica el parámetro
    * <code>$isString</code>
    * </li>
    * </ol>
@@ -68,7 +68,7 @@ abstract class AbstractModel {
   }
 
   /**
-   * Genera un <code>string</code> con la concatenacion de varias sentencias SQL
+   * Genera un <code>string</code> con la concatenación de varias sentencias SQL
    * con unidas por el término <code>AND</code>. Se espera que el arreglo de
    * entrada tenga en sus llaves los nombres de las columnas y en los valores
    * el valor con el que debe coincidir.

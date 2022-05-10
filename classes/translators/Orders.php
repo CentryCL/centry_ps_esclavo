@@ -121,7 +121,7 @@ class Orders {
 
   private static function centryVariantId($product) {
     // TODO: Resolver el caso en que un producto con una única variante se
-    // publicó como producto simple en Prestashop.
+    // publicó como producto simple en PrestaShop.
     return \CentryPs\models\homologation\Variant::getIdCentry($product['id_product_attribute']);
   }
 
