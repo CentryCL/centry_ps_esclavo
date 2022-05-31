@@ -57,7 +57,7 @@ class Centry_Ps_EsclavoCentryProductSaveModuleFrontController extends AbstractTa
    * @return int
    */
   private function findPrestaShopProductId($centry_id, $sku) {
-    if (($id = CentryPs\models\homologation\Product::getIdPrestashop($resp->_id))) {
+    if (($id = CentryPs\models\homologation\Product::getIdPrestashop($centry_id))) {
       return $id;
     }
     return CentryPs\models\homologation\Product::findIdPrestashopBySkuAndHomologate($sku, $centry_id);
