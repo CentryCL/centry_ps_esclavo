@@ -83,6 +83,9 @@ class Orders {
     if ($order_centry_id = \CentryPs\models\homologation\Order::getIdCentry($order_id)){
       $centry = new AuthorizationCentry();
       $order_centry = $centry::sdk()->getOrder($order_centry_id);
+      if (isset($order_centry->curl_error)) {
+        throw new Exception('Could not get order from Centry: ' . $order_centry->curl_error);
+      }
       $items_centry = $order_centry->items;
       $products = static::itemsNeverSent($items_centry, $products);
     }

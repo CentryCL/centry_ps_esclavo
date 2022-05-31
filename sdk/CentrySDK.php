@@ -117,8 +117,8 @@ class CentrySDK {
     }
 
     $resp = $this->parsedResponse($curl_exec_result);
-    $resp["http_code"] = $http_code;
-    $resp["curl_error"] = $curl_error;
+    $resp->http_code = $http_code;
+    $resp->curl_error = $curl_error;
     return $resp;
   }
 
@@ -131,7 +131,7 @@ class CentrySDK {
   function httpCode($curl_info) {
     try {
       return intval($curl_info["http_code"]);
-    } catch (Exception $e) {
+    } catch (\Exception $e) {
       return 0;
     }
   }
@@ -146,7 +146,7 @@ class CentrySDK {
   function parsedResponse($response) {
     try {
       return json_decode($response);
-    } catch (Exception $e) {
+    } catch (\Exception $e) {
       return ["body" => $response];
     }
   }
