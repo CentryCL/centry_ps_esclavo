@@ -13,11 +13,18 @@ class Orders {
       $order_status = $order->getCurrentStateFull(\Configuration::get('PS_LANG_DEFAULT'));
       $customer = new \Customer($order->id_customer);
       $cart = new \Cart($order->id_cart);
-
       $status = \CentryPs\models\homologation\OrderStatus::getIdCentry($order_status["id_order_state"]);
+      $products = $order->getCartProducts();
       if ($status == null || $status == "") {
         $status = "pending";
       }
+      $original_data = array(
+        "order" => $order,
+        "cart" => $cart,
+        "products" => $products,
+        "order_status" => $order_status,
+        "customer" => $customer
+      );
       $payload = array(
         "_status" => $status,
         "status_origin" => $order_status["name"],
@@ -27,12 +34,12 @@ class Orders {
         "buyer_email" => $customer->email,
         "buyer_first_name" => $customer->firstname,
         "buyer_last_name" => $customer->lastname,
-        "buyer_birth_date" => $customer->birthday, //TODO: revisar
+        "buyer_birth_date" => $customer->birthday,
         "_buyer_gender" => $customer->id_gender == 1 ? "male" : "female",
         "_payment_mode" => static::paymentMode($order->payment),
-        "items" => static::items($order->id),
+        "items" => static::items($order->id, $products),
         "origin" => "Prestashop",
-        "original_data" => array("order" => $order, "cart" => $cart, "order_status" => $order_status, "customer" => $customer), //TODO: revisar
+        "original_data" => $original_data,
         "id_origin" => $order->id_cart,
         "number_origin" => $order->reference,
         "created_at_origin" => $order->date_add,
@@ -68,12 +75,10 @@ class Orders {
     return $array;
   }
 
-  private static function items($order_id) {
-    error_log("items");
+  private static function items($order_id, $products) {
     $items = array();
     $order = new \Order($order_id);
     $currency = new \Currency($order->id_currency);
-    $products = $order->getCartProducts();
     $centry_items= array();
     if ($order_centry_id = \CentryPs\models\homologation\Order::getIdCentry($order_id)){
       $centry = new AuthorizationCentry();
@@ -82,9 +87,10 @@ class Orders {
       $products = static::clean_items($items_centry, $products);
     }
     foreach ($products as $product) {
+      $sku = empty($product["product_reference"]) ? $product["reference"] : $product["product_reference"] ;
       $item = array(
         "id_origin" => $product["product_id"],
-        "sku" => $product["reference"],
+        "sku" => $sku,
         "name" => $product["product_name"],
         "unit_price" => $product["unit_price_tax_incl"],
         "paid_price" => $product["total_price_tax_incl"],
@@ -105,7 +111,8 @@ class Orders {
       $send = true;
       $index = 0;
       foreach($items_centry as $item_centry){
-        if ($item_ps['reference'] == $item_centry->sku && $item_ps['cart_quantity'] == $item_centry->quantity){
+        $sku = empty($item_ps["product_reference"]) ? $item_ps["reference"] : $item_ps["product_reference"] ;
+        if ($sku == $item_centry->sku && $item_ps['cart_quantity'] == $item_centry->quantity){
           array_splice($items_centry, $index, 1);
           $index += 1;
           $send = false;
@@ -115,7 +122,6 @@ class Orders {
         array_push($items_to_send, $item_ps);
       }
     }
-    error_log(print_r($items_to_send,true));
     return $items_to_send;
   }
 
