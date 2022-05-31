@@ -10,11 +10,11 @@ class Feature extends AbstractHomologation {
 
   /**
    * Constructor de la clase Feature que puede ser instaciada con el valor del
-   * id de ps, el id de centry o el valor de centry. También puede ser
+   * id de ps, el id de Centry o el valor de Centry. También puede ser
    * instanciada sin ninguno de estos datos. Esta clase se diferencia de las
    * demás porque el valor puede poseer un identificador o puede ser un campo
    * libre.
-   * @param [type] $id_prestashop id de Prestashop
+   * @param [type] $id_prestashop id de PrestaShop
    * @param [type] $id_centry id de Centry
    * @param [type] $centry_value Valor en Centry
    */
@@ -44,7 +44,7 @@ class Feature extends AbstractHomologation {
   }
 
   /**
-   * Funcion que permite obtener el valor de Centry consultando por el id de
+   * Función que permite obtener el valor de Centry consultando por el id de
    * prestashop.
    * @param  int $id_prestashop id de prestashop
    * @return array/boolean   Retorna un arreglo con las coincidencias, si no
@@ -68,9 +68,11 @@ class Feature extends AbstractHomologation {
   }
 
   /**
-   * Obtiene el id de Prestashop mediante el identificador de Centry o el valor de Centry.
+   * Obtiene el id de PrestaShop mediante el identificador de Centry o el valor
+   * de Centry.
    * @param  int/string $id_centry   id de centry o valor de centry
-   * @return array/boolean    Retorna un arreglo con las coincidencias, si no encontró el valor devuelve falso.
+   * @return array/boolean Retorna un arreglo con las coincidencias, si no
+   * encontró el valor devuelve falso.
    */
   public static function getIdPrestashop($id_centry) {
     $db = \Db::getInstance();
@@ -90,7 +92,8 @@ class Feature extends AbstractHomologation {
   }
 
   /**
-   * Revisa si debe crear el objeto o no consultando por el identificador de centry y/o el valor de centry
+   * Revisa si debe crear el objeto o no consultando por el identificador de
+   * Centry y/o el valor de Centry.
    * @return boolean indica si el objeto pudo ser creado.
    */
   public function save() {

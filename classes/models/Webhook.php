@@ -17,13 +17,13 @@ class Webhook extends AbstractModel {
 
   /**
    * WebhookCentry constructor.
-   * Si se entrega el parametro $id buscará en la BD el id del Webhook relacionado de Centry.
-   * @param int|null $id Identificador de Prestashop
+   * Si se entrega el parámetro $id buscará en la BD el id del Webhook relacionado de Centry.
+   * @param int|null $id Identificador de PrestaShop
    * @param string|null $callback_url callback url que se utilizará en el webhook.
-   * @param bool $on_product_save define si se suscribirá al topico product_save.
-   * @param bool $on_product_delete define si se suscribirá al topico product_delete.
-   * @param bool $on_order_save define si se suscribirá al topico order_save.
-   * @param bool $on_order_delete define si se suscribirá al topico order_delete.
+   * @param bool $on_product_save define si se suscribirá al tópico product_save.
+   * @param bool $on_product_delete define si se suscribirá al tópico product_delete.
+   * @param bool $on_order_save define si se suscribirá al tópico order_save.
+   * @param bool $on_order_delete define si se suscribirá al tópico order_delete.
    */
   public function __construct(string $id = null, string $callback_url = null, $on_product_save = true, $on_product_delete = true, $on_order_save = true, $on_order_delete = true) {
     if (!is_null($id)) {
@@ -100,7 +100,8 @@ class Webhook extends AbstractModel {
 
   /**
    * Elimina el objeto de la base de datos.
-   * @return boolean indica si el objeto pudo ser eliminado o no. Si no existia en la base de datos retorna true.
+   * @return boolean indica si el objeto pudo ser eliminado o no. Si no existía
+   * en la base de datos retorna true.
    */
   public function delete() {
     $db = \Db::getInstance();
@@ -111,8 +112,8 @@ class Webhook extends AbstractModel {
 
   /**
    * Crea un webhook en Centry con los valores almacenados en sus propiedades.
-   * No creara el webhook en Centry si es que no existen las credenciales de Centry, o si es que no se suscribira a
-   * ninguno de los topicos.
+   * No creara el webhook en Centry si es que no existen las credenciales de
+   * Centry, o si es que no se suscribirá a ninguno de los tópicos.
    * @return bool
    */
   public function createCentryWebhook() {
@@ -139,7 +140,7 @@ class Webhook extends AbstractModel {
   }
 
   /**
-   * Obtiene la informacion del webhook de Centry asociado al id.
+   * Obtiene la información del webhook de Centry asociado al id.
    * @return bool
    */
   public function getCentryWebhook() {
@@ -158,9 +159,10 @@ class Webhook extends AbstractModel {
   }
 
   /**
-   * Actualiza un webhook en Centry con los valores almacenados en sus propiedades.
-   * No actualizara el webhook en Centry si es que no existen las credenciales de Centry,
-   * Se elimina el webhook si es que no se suscribira a ninguno de los topicos.
+   * Actualiza un webhook en Centry con los valores almacenados en sus
+   * propiedades. No actualizara el webhook en Centry si es que no existen las
+   * credenciales de Centry. Se elimina el webhook si es que no se suscribirá a
+   * ninguno de los tópicos.
    * @return bool
    */
   public function updateCentryWebhook() {
@@ -186,7 +188,7 @@ class Webhook extends AbstractModel {
   }
 
   /**
-   * Elimina el webhook asociado en Centry segun el id.
+   * Elimina el webhook asociado en Centry según el id.
    * @return bool
    */
   public function deleteCentryWebhook() {

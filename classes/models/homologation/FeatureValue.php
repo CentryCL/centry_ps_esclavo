@@ -10,9 +10,13 @@ class FeatureValue extends AbstractHomologation {
   public static $TABLE_EXTRA_FIELDS = "`centry_value` VARCHAR(200), `product_id` INT(10) UNSIGNED NOT NULL,";
 
   /**
-   * Constructor de la clase Feature Value que puede ser instaciada con el valor del id de ps, el id de centry o el valor de centry. También puede ser instanciada sin ninguno de estos datos. Esta clase se diferencia de las demás porque el valor puede poseer un identificador o puede ser un campo libre.
-   * @param [type] $id_prestashop           id de Prestashop
-   * @param [type] $id_centry    id de Centry
+   * Constructor de la clase Feature Value que puede ser instaciada con el valor
+   * del id de PrestaShop, el id de Centry o el valor de Centry. También puede
+   * ser instanciada sin ninguno de estos datos. Esta clase se diferencia de las
+   * demás porque el valor puede poseer un identificador o puede ser un campo
+   * libre.
+   * @param [type] $id_prestashop id de PrestaShop
+   * @param [type] $id_centry id de Centry
    * @param [type] $centry_value Valor en Centry
    */
   public function __construct($id_prestashop = null, $id_centry = null, $centry_value = null) {
@@ -42,9 +46,11 @@ class FeatureValue extends AbstractHomologation {
   }
 
   /**
-   * Funcion que permite obtener el valor de Centry consultando por el id de prestashop.
-   * @param  int $id_prestashop         id de prestashop
-   * @return array/boolean   Retorna un arreglo con las coincidencias, si no encontró el valor devuelve falso.
+   * Funcion que permite obtener el valor de Centry consultando por el id de
+   * PrestaShop.
+   * @param  int $id_prestashop id de prestashop
+   * @return array/boolean Retorna un arreglo con las coincidencias, si no
+   * encontró el valor devuelve falso.
    */
   public static function getCentryValue($id_prestashop) {
     $db = \Db::getInstance();
@@ -56,9 +62,11 @@ class FeatureValue extends AbstractHomologation {
   }
 
   /**
-   * Obtiene el id de Prestashop mediante el identificador de Centry o el valor de Centry.
-   * @param  int/string $id   id de centry o valor de centry
-   * @return array/boolean    Retorna un arreglo con las coincidencias, si no encontró el valor devuelve falso.
+   * Obtiene el id de PrestaShop mediante el identificador de Centry o el valor
+   * de Centry.
+   * @param  int/string $id id de centry o valor de centry
+   * @return array/boolean Retorna un arreglo con las coincidencias, si no
+   * encontró el valor devuelve falso.
    */
   public static function getIdPrestashop($id) {
     $db = \Db::getInstance();
@@ -78,9 +86,10 @@ class FeatureValue extends AbstractHomologation {
   }
 
   /**
-   * Funcion que permite obtener el id del producto de Prestashop
-   * @param  int $id         id de prestashop, id de centry, valor de centry.
-   * @return array/boolean   Retorna un arreglo con las coincidencias, si no encontró el valor devuelve falso.
+   * Funcion que permite obtener el id del producto de PrestaShop
+   * @param  int $id id de prestashop, id de centry, valor de centry.
+   * @return array/boolean   Retorna un arreglo con las coincidencias, si no
+   * encontró el valor devuelve falso.
    */
   public static function getProductId($id) {
     $db = \Db::getInstance();
@@ -108,7 +117,8 @@ class FeatureValue extends AbstractHomologation {
   }
 
   /**
-   * Revisa si debe crear el objeto o no consultando por el identificador de centry y/o el valor de centry
+   * Revisa si debe crear el objeto o no consultando por el identificador de
+   * Centry y/o el valor de Centry
    * @return boolean indica si el objeto pudo ser creado.
    */
   public function save() {

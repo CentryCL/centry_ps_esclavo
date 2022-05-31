@@ -110,7 +110,7 @@ class FailedTaskLog extends AbstractModel {
 
   /**
    * Lista los logs de error de tareas que se encuentren registrados en la base
-   * de datos y los retorna como un arrego de instancias de esta clase.
+   * de datos y los retorna como un arreglo de instancias de esta clase.
    * @return \CentryPs\System\PendingTask
    */
   public static function getFailedTaskLogsObjects(array $conditions = null, int $limit = null, int $offset = null) {
@@ -129,7 +129,7 @@ class FailedTaskLog extends AbstractModel {
 
   /**
    * Lista los logs de error de tareas que se encuentren registrados en la base
-   * de datos y los retorna como un arrego de arreglos simple.
+   * de datos y los retorna como un arreglo de arreglos simple.
    * @return array
    */
   public static function getFailedTaskLogs(array $conditions = null, int $limit = null, int $offset = null) {

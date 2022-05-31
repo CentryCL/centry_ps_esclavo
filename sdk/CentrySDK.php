@@ -27,7 +27,7 @@ class CentrySDK {
    *                  autorice a ésta a acceder a sus datos. Si se usa la URI `urn:ietf:wg:oauth:2.0:oob`, entonces el
    *                  código de autorización se mostrará en pantalla y el usuario deberá copiarlo y pegarlo donde la
    *                  aplicación pueda leerlo.
-   * @var accessToken (opcional) Último access_token del que se tiene registro. Si se entrega, entonces no es necesario que el usuario tenga que volver a autorizar la aplicacción.
+   * @var accessToken (opcional) Último access_token del que se tiene registro. Si se entrega, entonces no es necesario que el usuario tenga que volver a autorizar la aplicación.
    * @var refreshToken (opcional) Último refresh_token del que se tiene registro.
    */
   function __construct($clientId, $clientSecret, $redirectUri, $accessToken = null, $refreshToken = null) {
@@ -40,21 +40,21 @@ class CentrySDK {
 
   /**
    * Genera la URL con la que le pediremos a un usuario que nos entregue los permisos
-   * de lecturo y/o escritura a los recursos que se indican en el parámetro <code>scope</code>
+   * de lectura y/o escritura a los recursos que se indican en el parámetro <code>scope</code>
    * @var code Es la concatenación con un espacio de separación (" ") de todos los ámbitos a
    * los que se solicita permiso. Estos pueden ser:
    * <ul>
    *   <li><b>public</b> Para acceder a la información publica de Centry como marcas, categorías, colores, tallas, etc.</li>
    *   <li><b>read_orders</b> Para leer información de pedidos</li>
-   *   <li><b>write_orders</b> Para manulupar o eliminar pedidos</li>
+   *   <li><b>write_orders</b> Para manipular o eliminar pedidos</li>
    *   <li><b>read_products</b>Para leer información de productos y variantes</li>
-   *   <li><b>write_products</b>Para manulupar o eliminar productos y variantes</li>
+   *   <li><b>write_products</b>Para manipular o eliminar productos y variantes</li>
    *   <li><b>read_integration_config</b>Para leer información de configuraciones de integraciones</li>
-   *   <li><b>write_integration_config</b>Para manulupar o eliminar configuraciones de integraciones</li>
+   *   <li><b>write_integration_config</b>Para manipular o eliminar configuraciones de integraciones</li>
    *   <li><b>read_user</b>Para leer información de usuarios de la empresa</li>
-   *   <li><b>write_user</b>Para manulupar o eliminar usuarios de la empresa</li>
+   *   <li><b>write_user</b>Para manipular o eliminar usuarios de la empresa</li>
    *   <li><b>read_webhook</b>Para leer información de webhooks</li>
-   *   <li><b>write_webhook</b>Para manulupar o eliminar webhooks</li>
+   *   <li><b>write_webhook</b>Para manipular o eliminar webhooks</li>
    * </ul>
    */
   function authorizationURL($scope) {
@@ -71,7 +71,7 @@ class CentrySDK {
    * Método encargado de hacer todo tipo de solicitudes a Centry, desde autorizaciones hasta manipulación de inventario.
    * @var endpoint
    * @var method String indicado el método HTTP a usar. Las opciones son "GET", "POST", "PUT", "DELETE". Como es una API REST,
-   *             estos métodos suelen estar asociados a la lectura, creación, edición y eliminacion de recursos.
+   *             estos métodos suelen estar asociados a la lectura, creación, edición y eliminación de recursos.
    * @var params (opcional) Parámetros
    * @var payload (opcional) Body del request puede ser un objeto PHP o un arreglo (diccionario), internamente es transformado a JSON.
    */
@@ -117,8 +117,8 @@ class CentrySDK {
     }
 
     $resp = $this->parsedResponse($curl_exec_result);
-    $resp["http_code"] = $http_code;
-    $resp["curl_error"] = $curl_error;
+    $resp->http_code = $http_code;
+    $resp->curl_error = $curl_error;
     return $resp;
   }
 
@@ -131,7 +131,7 @@ class CentrySDK {
   function httpCode($curl_info) {
     try {
       return intval($curl_info["http_code"]);
-    } catch (Exception $e) {
+    } catch (\Exception $e) {
       return 0;
     }
   }
@@ -146,13 +146,13 @@ class CentrySDK {
   function parsedResponse($response) {
     try {
       return json_decode($response);
-    } catch (Exception $e) {
+    } catch (\Exception $e) {
       return ["body" => $response];
     }
   }
 
   /**
-   * @param $endpoint Endpoint de Centry que se hara un POST.
+   * @param $endpoint Endpoint de Centry que se hará un POST.
    * @param array $params (opcional) Parámetros para el request.
    * @param array $payload (opcional) Body del request puede ser un objeto PHP o un arreglo (diccionario), internamente es transformado a JSON.
    * @return mixed|string
@@ -162,7 +162,7 @@ class CentrySDK {
   }
 
   /**
-   * @param $endpoint Endpoint de Centry que se hara un GET.
+   * @param $endpoint Endpoint de Centry que se hará un GET.
    * @param array $params (opcional) Parámetros para el request.
    * @return mixed|string
    */
@@ -171,7 +171,7 @@ class CentrySDK {
   }
 
   /**
-   * @param $endpoint Endpoint de Centry que se hara un UPDATE.
+   * @param $endpoint Endpoint de Centry que se hará un UPDATE.
    * @param array $params (opcional) Parámetros para el request.
    * @param array $payload (opcional) Body del request puede ser un objeto PHP o un arreglo (diccionario), internamente es transformado a JSON.
    * @return mixed|string
@@ -181,7 +181,7 @@ class CentrySDK {
   }
 
   /**
-   * @param $endpoint Endpoint de Centry que se hara un DELETE.
+   * @param $endpoint Endpoint de Centry que se hará un DELETE.
    * @param array $params (opcional) Parámetros para el request.
    * @return mixed|string
    */
@@ -190,11 +190,11 @@ class CentrySDK {
   }
 
   /**
-   * Una vez que un usuario ha autorizado nuestra aplicación para que accceda a su información, Centry genera un código
+   * Una vez que un usuario ha autorizado nuestra aplicación para que acceda a su información, Centry genera un código
    * de autorización con el cual podremos solicitar el primer access_token y refresh_token. Éste método se encarga de
-   * esta tarea por lo que se le debe entrecar el código de autorización como parámetro.
+   * esta tarea por lo que se le debe entregar el código de autorización como parámetro.
    * Se recomienda registrar estos tokens con algún mecanismo de persistencia como una base de datos.
-   * @var code Código de autorización generado por Centry depués de que el usuario autorizó la aplicación.
+   * @var code Código de autorización generado por Centry después de que el usuario autorizó la aplicación.
    * @see https://www.oauth.com/oauth2-servers/access-tokens/authorization-code-request/
    */
   function authorize($code) {
@@ -202,9 +202,9 @@ class CentrySDK {
   }
 
   /**
-   * Un access_token tiene una vigencia de 7200 segudos (2 horas) por lo que una vez cumplido ese plazo es necesario
+   * Un access_token tiene una vigencia de 7200 segundos (2 horas) por lo que una vez cumplido ese plazo es necesario
    * solicitar un nuevo token usando como llave el refresh_token que teníamos registrado. Este método se encarga de hacer
-   * esta renovacion de tokens.
+   * esta renovación de tokens.
    * Se recomienda registrar estos nuevos tokens con algún mecanismo de persistencia como una base de datos.
    * @see https://www.oauth.com/oauth2-servers/access-tokens/authorization-code-request/
    */
@@ -258,7 +258,7 @@ class CentrySDK {
     }
   }
 
-  // METODOS PARA PRODUCTOS
+  // MÉTODOS PARA PRODUCTOS
 
   /**
    * Crea producto en Centry.
@@ -281,7 +281,7 @@ class CentrySDK {
   }
 
   /**
-   * Obtiene las imagenes asociadas a un producto en Centry.
+   * Obtiene las imgenes asociadas a un producto en Centry.
    * @param $product_id
    * @param null $params
    * @return mixed|string
@@ -291,7 +291,7 @@ class CentrySDK {
   }
 
   /**
-   * Obtiene las imagenes asociadas a una variante de un producto en Centry.
+   * Obtiene las imgenes asociadas a una variante de un producto en Centry.
    * @param $product_id
    * @param $params variant_id
    * @return mixed|string
@@ -343,7 +343,7 @@ class CentrySDK {
     return $this->get("conexion/v1/products/count.json", $params);
   }
 
-  //METODOS PARA VARIANTES
+  //MÉTODOS PARA VARIANTES
 
   /**
    * Crea variante en Centry.
@@ -399,7 +399,7 @@ class CentrySDK {
     return $this->get("conexion/v1/variants.json", $params);
   }
 
-  // METODOS PARA ORDENES
+  // MÉTODOS PARA ÓRDENES
 
   /**
    * Crea orden en Centry.
@@ -422,6 +422,7 @@ class CentrySDK {
   }
 
   /**
+   * Actualiza orden en Centry.
    * @param $order_id
    * @param null $params
    * @param $payload

@@ -39,7 +39,7 @@ class PendingTask extends AbstractModel {
   public $status;
 
   /**
-   * Número de veses que se ha ejecutado la misma notificación. Este campo es
+   * Número de veces que se ha ejecutado la misma notificación. Este campo es
    * útil para el manejo de reintentos.
    * @var int
    */
@@ -156,7 +156,7 @@ class PendingTask extends AbstractModel {
 
   /**
    * Lista las tareas pendientes que se encuentran registradas en la base de
-   * datos y las retorna como un arrego de instancias de esta clase.
+   * datos y las retorna como un arrelgo de instancias de esta clase.
    * @return \CentryPs\System\PendingTask
    */
   public static function getPendingTasksObjects(array $conditions = null, int $limit = null) {
@@ -176,7 +176,7 @@ class PendingTask extends AbstractModel {
   /**
    * Lista las tareas pendientes que se encuentran registradas en la base de
    * datos y las retorna como un arreglo de arreglos simple.
-   * Se priorizan las tareas con origen en prestashop.
+   * Se priorizan las tareas con origen en PrestaShop.
    * @return array
    */
   public static function getPendingTasks(array $conditions = null, int $limit = null) {

@@ -11,7 +11,7 @@ require_once _PS_MODULE_DIR_ ."centry_ps_esclavo/sdk/CentrySDK.php";
  * necesarias para utilizar los recursos de la API.
  * redirect_uri: se utiliza uri por defecto dado que no se usa, pero es
  *               necesario definirlo para obtener las credenciales.
- * scopes: Permisos que tiene la aplicacion asociada en Centry.
+ * scopes: Permisos que tiene la aplicación asociada en Centry.
  * @author Yerko Cuzmar
  */
 class AuthorizationCentry {

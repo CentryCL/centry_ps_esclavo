@@ -9,8 +9,8 @@ class AttributeGroup extends AbstractHomologation {
 
   /**
    * Constructor de la clase Attribute Group que se puede instanciar con el id
-   * de prestashop y el id de Centry.
-   * @param int $id_prestashop Identificador de Prestashop
+   * de PrestaShop y el id de Centry.
+   * @param int $id_prestashop Identificador de PrestaShop
    * @param string $id_centry Valor de Centry
    *
    */

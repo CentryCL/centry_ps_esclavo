@@ -8,7 +8,7 @@ class Category extends AbstractHomologation {
 
   /**
    * Constructor de la clase Categoría que se puede instanciar con el id de
-   * centry
+   * Centry
    * @param string $id_centry Identificador de Centry
    */
   public function __construct($id_prestashop = null, $id_centry = null) {
@@ -21,7 +21,7 @@ class Category extends AbstractHomologation {
   }
 
   /**
-   * Lista los identificadores de categorías de Prestashop homologados con una
+   * Lista los identificadores de categorías de PrestaShop homologados con una
    * categoría de Centry.
    * @param string $id_centry
    * @return array

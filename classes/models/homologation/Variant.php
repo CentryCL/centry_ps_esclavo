@@ -8,8 +8,8 @@ class Variant extends AbstractHomologation {
 
   /**
    * Constructor de la clase variante que se puede instanciar con el id de
-   * prestashop, el id de centry o ambos
-   * @param int $id_prestashop Identificador de Prestashop
+   * PrestaShop, el id de Centry o ambos
+   * @param int $id_prestashop Identificador de PrestaShop
    * @param string $id_centry Identificador de Centry
    */
   public function __construct($id_prestashop = null, $id_centry = null) {

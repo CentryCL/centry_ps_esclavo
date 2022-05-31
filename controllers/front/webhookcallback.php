@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Controlador encargado de ateneder y registrar las notificaciones enviadas por
- * Centry a Prestashop.
+ * Controlador encargado de atender y registrar las notificaciones enviadas por
+ * Centry a PrestaShop.
  */
 class Centry_Ps_EsclavoWebhookCallbackModuleFrontController extends ModuleFrontController {
 

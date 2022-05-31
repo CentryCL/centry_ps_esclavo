@@ -10,8 +10,8 @@ use Symfony\Component\Lock\Store\FlockStore;
 
 /**
  * Controlador encargado de revisar las tareas pendientes de ejecución y delegar
- * a quien correponda la misión de realizar el trabajo preocupándose de que no
- * se supere el límiete de hilos permitidos.
+ * a quien corresponda la misión de realizar el trabajo preocupándose de que no
+ * se supere el límite de hilos permitidos.
  */
 class Centry_Ps_EsclavoTaskManagerModuleFrontController extends ModuleFrontController {
 
@@ -54,7 +54,7 @@ class Centry_Ps_EsclavoTaskManagerModuleFrontController extends ModuleFrontContr
   }
 
   /**
-   * Solicita a un controllador del módulo que atianda asíncronamente la tarea
+   * Solicita a un controlador del módulo que atienda asíncronamente la tarea
    * pendiente.
    * @param PendingTask $task
    */

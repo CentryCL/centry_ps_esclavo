@@ -9,7 +9,8 @@ class Image extends AbstractHomologation {
   public static $TABLE_EXTRA_FIELDS = "`fingerprint` VARCHAR(200) NOT NULL,";
 
   /**
-   * Constructor de la clase Categoría que se puede instanciar con el id de centry
+   * Constructor de la clase Categoría que se puede instanciar con el id de
+   * Centry.
    * @param string $id_centry Identificador de Centry
    */
   public function __construct($id_prestashop = null, $id_centry = null) {
@@ -33,9 +34,9 @@ class Image extends AbstractHomologation {
   }
 
   /**
-   * Obtiene el fingerprint de la imagen buscando por id prestashop o id centry
-   * @param  string/int $id id de prestashop o id de centry
-   * @return string     valor del fingerprint
+   * Obtiene el fingerprint de la imagen buscando por id PrestaShop o id Centry
+   * @param  string/int $id id de PrestaShop o id de centry
+   * @return string valor del fingerprint
    */
   public static function getFingerprint($id) {
     $db = \Db::getInstance();

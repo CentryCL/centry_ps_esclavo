@@ -10,7 +10,7 @@ abstract class AbstractHomologation extends AbstractModel {
   public static $TABLE_EXTRA_FIELDS = '';
 
   /**
-   * Identificador del recurso en Prestashop
+   * Identificador del recurso en PrestaShop
    * @var int 
    */
   public $id_prestashop;
@@ -23,7 +23,7 @@ abstract class AbstractHomologation extends AbstractModel {
 
   /**
    * Creación de la tabla para la homologación del recurso donde el
-   * id_prestashop y el id_centry deben ser unicos.
+   * id_prestashop y el id_centry deben ser únicos.
    * @return boolean indica si la tabla pudo ser creada o no. si ya estaba
    * creada retorna true.
    */
@@ -43,9 +43,9 @@ abstract class AbstractHomologation extends AbstractModel {
   protected abstract static function tableConstraints();
 
   /**
-   * Obtiene id de Centry correspondiente a un cierto id de Prestashop
-   * @param  int $id_prestashop Identificador de Prestashop
-   * @return array Resultado de la busqueda, retorna falso si no se encontraron coincidencias.
+   * Obtiene id de Centry correspondiente a un cierto id de PrestaShop
+   * @param  int $id_prestashop Identificador de PrestaShop
+   * @return array Resultado de la búsqueda, retorna falso si no se encontraron coincidencias.
    */
   public static function getIdCentry($id_prestashop) {
     $db = \Db::getInstance();
@@ -57,9 +57,9 @@ abstract class AbstractHomologation extends AbstractModel {
   }
 
   /**
-   * Obtiene el id de Prestashop correspondiente a un cierto id de centry
+   * Obtiene el id de PrestaShop correspondiente a un cierto id de centry
    * @param  string $id_centry identificador de Centry
-   * @return array Resultado de la busqueda, retorna falso si no se encontraron coincidencias.
+   * @return array Resultado de la búsqueda, retorna falso si no se encontraron coincidencias.
    */
   public static function getIdPrestashop($id_centry) {
     $db = \Db::getInstance();
@@ -114,7 +114,7 @@ abstract class AbstractHomologation extends AbstractModel {
 
   /**
    * Elimina el objeto de la base de datos.
-   * @return boolean indica si el objeto pudo ser eliminado o no. Si no existia
+   * @return boolean indica si el objeto pudo ser eliminado o no. Si no existía
    * en la base de datos retorna true.
    */
   public function delete() {

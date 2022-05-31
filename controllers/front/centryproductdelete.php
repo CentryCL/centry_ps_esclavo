@@ -9,7 +9,7 @@ use CentryPs\models\system\PendingTask;
 
 /**
  * Controlador encargado de ejecutar la tarea de eliminar un producto de
- * Prestashopde asegurándose de que ya no existe en Centry.
+ * PrestaShop asegurándose de que ya no existe en Centry.
  */
 class Centry_Ps_EsclavoCentryProductdeleteModuleFrontController extends AbstractTaskProcessor {
 
