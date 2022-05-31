@@ -146,14 +146,34 @@ class Orders {
   private static function isItemInCentry($item_ps, &$items_centry) {
     $index = 0;
     foreach($items_centry as $item_centry){
-      $sku = static::itemSku($item_ps);
-      if ($sku == $item_centry->sku && $item_ps['cart_quantity'] == $item_centry->quantity){
+      if (static::isSameItem($item_ps, $item_centry)) {
         array_splice($items_centry, $index, 1);
         return true;
       }
       $index += 1;
     }
     return false;
+  }
+
+  /**
+   * Indica si son el mismo item, según identificador de variante o SKU.
+   * @param array $item_ps
+   * @param array $item_centry
+   * @return bool
+   */
+  private static function isSameItem($item_ps, $item_centry) {
+    // Si no tienen la misma cantidad, no son iguales.
+    if ($item_ps['cart_quantity'] != $item_centry->quantity) {
+      return false;
+    }
+    // Si tienen el mismo `variant_id` entre Centry y PrestaShop.
+    if ($item_centry->variant_id && static::centryVariantId($item_ps)) {
+      return static::centryVariantId($item_ps) == $item_centry->variant_id;
+    }
+
+    // Si tienen el mismo `sku` entre Centry y PrestaShop.
+    $sku = static::itemSku($item_ps);
+    return $sku == $item_centry->sku;
   }
 
   private static function centryVariantId($product) {
