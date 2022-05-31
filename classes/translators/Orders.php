@@ -80,7 +80,7 @@ class Orders {
     $order = new \Order($order_id);
     $currency = new \Currency($order->id_currency);
     $centry_items= array();
-    if ($order_centry_id = \CentryPs\models\homologation\Order::getIdCentry($order_id)){
+    if ($order_centry_id = \CentryPs\models\homologation\Order::getIdCentry($order_id)) {
       $centry = new AuthorizationCentry();
       $order_centry = $centry::sdk()->getOrder($order_centry_id);
       if (isset($order_centry->curl_error)) {
@@ -91,7 +91,7 @@ class Orders {
     }
     foreach ($products as $product) {
       $item = array(
-        "id_origin" => $product["product_id"],
+        "id_origin" => $product["id_order_detail"],
         "sku" => static::itemSku($product),
         "name" => $product["product_name"],
         "unit_price" => $product["unit_price_tax_incl"],
@@ -123,10 +123,10 @@ class Orders {
    * @param array $products
    * @return array
    */
-  private static function itemsNeverSent($items_centry, $items_ps){
+  private static function itemsNeverSent($items_centry, $items_ps) {
     $items_to_send = array();
-    foreach($items_ps as $item_ps){
-      if (!static::isItemInCentry($item_ps, $items_centry)){
+    foreach($items_ps as $item_ps) {
+      if (!static::isItemInCentry($item_ps, $items_centry)) {
         array_push($items_to_send, $item_ps);
       }
     }
@@ -145,7 +145,7 @@ class Orders {
    */
   private static function isItemInCentry($item_ps, &$items_centry) {
     $index = 0;
-    foreach($items_centry as $item_centry){
+    foreach($items_centry as $item_centry) {
       if (static::isSameItem($item_ps, $item_centry)) {
         array_splice($items_centry, $index, 1);
         return true;
