@@ -328,7 +328,7 @@ class Centry_PS_esclavo extends Module {
     $this->saveOrderStatusHomologations();
 
     CentryPs\ConfigurationCentry::setPriceBehavior(Tools::getValue("price_behavior"));
-    CentryPs\ConfigurationCentry::setSyncVaraintSimple(Tools::getValue("VARIANT_SIMPLE"));
+    CentryPs\ConfigurationCentry::setSyncVariantSimple(Tools::getValue("VARIANT_SIMPLE"));
 
     return $output . $this->displayConfirmation('Campos actualizados');
   }
@@ -699,7 +699,7 @@ class Centry_PS_esclavo extends Module {
       $helper->fields_value['ONUPDATE_' . $sync_field['id']] = Configuration::get('CENTRY_SYNC_ONUPDATE_' . $sync_field['id'], null, null, null, 'on');
     }
     $helper->fields_value['price_behavior'] = CentryPs\ConfigurationCentry::getPriceBehavior();
-    $helper->fields_value['VARIANT_SIMPLE'] = CentryPs\ConfigurationCentry::getSyncVaraintSimple();
+    $helper->fields_value['VARIANT_SIMPLE'] = CentryPs\ConfigurationCentry::getSyncVariantSimple();
     $helper->fields_value['field_to_homologate'] = 1;
     $helper->fields_value['display_show_header'] = true;
     foreach (OrderState::getOrderStates($defaultLang) as $state) {
