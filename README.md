@@ -12,7 +12,7 @@ de informar acerca de cualquier venta que ahí se genere.
 ## Requisitos
 
 El único requisito para la instalación de este módulo es tener un PrestaShop
-versión 1.7.6 o superior.
+versión 1.7.7 o superior.
 
 ## Instalación
 
