@@ -41,9 +41,9 @@ class Centry_Ps_EsclavoCentryProductSaveModuleFrontController extends AbstractTa
       $sync = ConfigurationCentry::getSyncOnCreate();
     }
 
-    $res = CentryPs\translators\Products::productSave($product_ps, $resp, $sync);
+    $res = \CentryPs\translators\Products::productSave($product_ps, $resp, $sync);
     if ($res) {
-      $product_centry = new CentryPs\models\homologation\Product($res->id, $resp->_id);
+      $product_centry = new \CentryPs\models\homologation\Product($res->id, $resp->_id);
       $product_centry->save();
     }
   }
@@ -57,9 +57,9 @@ class Centry_Ps_EsclavoCentryProductSaveModuleFrontController extends AbstractTa
    * @return int
    */
   private function findPrestaShopProductId($centry_id, $sku) {
-    if (($id = CentryPs\models\homologation\Product::getIdPrestashop($centry_id))) {
+    if (($id = \CentryPs\models\homologation\Product::getIdPrestashop($centry_id))) {
       return $id;
     }
-    return CentryPs\models\homologation\Product::findIdPrestashopBySkuAndHomologate($sku, $centry_id);
+    return \CentryPs\models\homologation\Product::findIdPrestashopBySkuAndHomologate($sku, $centry_id);
   }
 }

@@ -59,12 +59,17 @@ class Centry_Ps_EsclavoTaskManagerModuleFrontController extends ModuleFrontContr
    * @param PendingTask $task
    */
   private function requestProcessTask(PendingTask $task) {
-    $task->status = PendingTaskStatus::Running;
+    $task->status = \CentryPs\enums\system\PendingTaskStatus::Running;
     $task->attempt++;
-    $task->update();
-    $controller = $task->origin . str_replace('_', '', $task->topic);
-    $params = ['id' => $task->resource_id];
-    $this->context->controller->module->curlToLocalController($controller, $params);
+    $task->createLogSuccess('Task started');
+    try {
+      $task->update();
+      $controller = $task->origin . str_replace('_', '', $task->topic);
+      $params = ['id' => $task->resource_id];
+      $this->context->controller->module->curlToLocalController($controller, $params);
+    } catch (\Exception $ex) {
+      $task->createLogFailure($ex);
+    }
   }
 
 }

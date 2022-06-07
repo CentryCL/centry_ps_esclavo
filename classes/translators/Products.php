@@ -64,7 +64,7 @@ class Products {
       } else {
         $default_category = $product_ps->getDefaultCategory();
         $default_category = (getType($default_category) == "array") ? $default_category["id_category_default"] : $default_category;
-        self::category($product_ps, $product, array(array("id" => $default_category)));
+        self::category($product_ps, $product, array(array("id_prestashop" => $default_category)));
       }
     }
 
@@ -74,7 +74,7 @@ class Products {
     if (count($product->variants) > 1) {
       self::saveVariants($product_ps, $product->variants, $sync);
     } else {
-      if (\CentryPs\ConfigurationCentry::getSyncVaraintSimple()) {
+      if (\CentryPs\ConfigurationCentry::getSyncVariantSimple()) {
         self::saveSimpleVariant($product_ps, $product->variants[0], $sync);
       } else {
         self::saveVariants($product_ps, $product->variants, $sync);
@@ -111,21 +111,10 @@ class Products {
     if ($config) {
       if ($query) {
         $discount = new \SpecificPrice($query[0]["id_specific_price"]);
-        $discount->price = ($config == "discount") ? $price_offer : -1;          //cuando es reducido es -1, descontado precio final, porcentaje -1
-        $discount->reduction = ($config == "discount") ? 0 : $price_offer;           //reducido precio final, descontado es 0, porcentaje precio final.
-        $discount->reduction_type = ($config == "percentage") ? "percentage" : "amount";  // reducido y descontado es amount, porcentaje es percentage
-        $discount->from = $from;
-        $discount->to = $to;
-        $discount->save();
       } else {
         $discount = new \SpecificPrice();
         $discount->id_product = $product_ps->id;
-        $discount->price = ($config == "discount") ? $price_offer : -1;       //cuando es reducido es -1, descontado precio final, porcentaje -1
-        $discount->reduction = ($config == "discount") ? 0 : $price_offer;        //reducido precio final, descontado es 0, porcentaje precio final.
-        $discount->reduction_type = ($config == "percentage") ? "percentage" : "amount";  // reducido y descontado es amount, porcentaje es percentage
         $discount->from_quantity = 1; // iguales desde aca uwu
-        $discount->from = $from;
-        $discount->to = $to;
         $discount->reduction_tax = 1;
         $discount->id_product_attribute = 0;
         $discount->id_customer = 0;
@@ -135,8 +124,16 @@ class Products {
         $discount->id_shop_group = 0;
         $discount->id_shop = 0;
         $discount->id_cart = 0;
-        $discount->save();
       }
+      // cuando es reducido es -1, descontado precio final, porcentaje -1
+      $discount->price = ($config == "discount") ? $price_offer : -1;
+      // reducido precio final, descontado es 0, porcentaje precio final.
+      $discount->reduction = ($config == "discount") ? 0 : $price_offer;
+      // reducido y descontado es amount, porcentaje es percentage
+      $discount->reduction_type = ($config == "percentage") ? "percentage" : "amount";
+      $discount->from = $from;
+      $discount->to = $to;
+      $discount->save();
     }
   }
 

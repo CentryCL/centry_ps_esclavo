@@ -3,6 +3,7 @@
 namespace CentryPs\models\system;
 
 use CentryPs\models\AbstractModel;
+use CentryPs\models\system\PendingTaskLog;
 
 /**
  * Representa una tarea que está pendiente de ser ejecutada
@@ -73,7 +74,7 @@ class PendingTask extends AbstractModel {
    */
   public function save() {
     try {
-      return $this->create();
+      return $this->create() || $this->update();
     } catch (\PrestaShopDatabaseException $ex) {
       return $this->update();
     }
@@ -155,8 +156,23 @@ class PendingTask extends AbstractModel {
   }
 
   /**
+   * Busca una tarea por su origen, tópico e identificador del recurso.
+   * @param string $origin
+   * @param string $topic
+   * @param string $resource_id
+   */
+  public static function findByOriginTopicAndResourceId($origin, $topic, $resource_id) {
+    $conditions = [
+      'origin' => "'{$origin}'",
+      'topic' => "'{$topic}'",
+      'resource_id' => "'{$resource_id}'"
+    ];
+    return static::getPendingTasksObjects($conditions, 1)[0];
+  }
+
+  /**
    * Lista las tareas pendientes que se encuentran registradas en la base de
-   * datos y las retorna como un arrelgo de instancias de esta clase.
+   * datos y las retorna como un arreglo de instancias de esta clase.
    * @return \CentryPs\System\PendingTask
    */
   public static function getPendingTasksObjects(array $conditions = null, int $limit = null) {
@@ -171,6 +187,61 @@ class PendingTask extends AbstractModel {
       );
     }
     return $objects;
+  }
+
+  /**
+   * Crear un registro de log exitoso para esta tarea con el mensaje pasado
+   * como parámetro.
+   * @param string $message
+   * @param string $stage etapa del proceso
+   * @return boolean indica si el registro pudo ser creado o no.
+   */
+  public function createLogSuccess($message, $stage = null) {
+    try {
+      $log = PendingTaskLog::fromTaskSuccess(
+        $this, $stage ? $stage : $this->status, $message
+      );
+      $log->create();
+    } catch (\Exception $ex) {
+      error_log(
+        "CentryPs\models\system\PendingTask.createLogSuccess($message): "
+        . $ex->getMessage()
+      );
+    }
+  }
+
+  /**
+   * Crear un registro de log fallido para esta tarea con un mensaje construido
+   * a partir de la excepción pasada como parámetro.
+   * @param \Throwable $ex
+   * @param string $stage etapa del proceso
+   * @return boolean indica si el registro pudo ser creado o no.
+   */
+  public function createLogFailure(\Throwable $exception, string $stage = null) {
+    try {
+      $log = PendingTaskLog::fromTaskException(
+        $this, $stage ? $stage : $this->status, $exception
+      );
+      $log->create();
+    } catch (\Exception $ex) {
+      error_log(
+        "CentryPs\models\system\PendingTask.createLogFailure(): "
+        . $ex->getMessage()
+      );
+    }
+  }
+
+  /**
+   * Indica si la tarea cumple con las condiciones para ser ejecutada}
+   * nuevamente.
+   * @return boolean
+   */
+  public function canRetry() {
+    return $this->status == \CentryPs\enums\system\PendingTaskStatus::Failed ||
+    (
+      $this->status == \CentryPs\enums\system\PendingTaskStatus::Running &&
+      $this->date_upd < date('Y-m-d H:i:s', strtotime("-5 minutes"))
+    );
   }
 
   /**
@@ -195,7 +266,6 @@ class PendingTask extends AbstractModel {
     $centry_tasks = static::getPendingTasksByOrigin('centry', $conditions, $limit - $tasks_count);
     return array_merge($prestashop_tasks, $centry_tasks);
   }
-
   
   /**
    * Lista las tareas pendientes de cierto origen que se encuentran 
@@ -226,6 +296,7 @@ class PendingTask extends AbstractModel {
    * @param string $origin
    * @param string $topic
    * @param string $resource_id
+   * @return PendingTask
    */
   public static function registerNotification($origin, $topic, $resource_id) {
     $conditions = [
@@ -233,20 +304,16 @@ class PendingTask extends AbstractModel {
       'topic' => "'{$topic}'",
       'resource_id' => "'{$resource_id}'"
     ];
-    $task = static::getPendingTasksObjects($conditions, 1);
-    if (empty($task)) {
-      (new PendingTask($origin, $topic, $resource_id))->save();
-    } elseif (
-            $task[0]->status == \CentryPs\enums\system\PendingTaskStatus::Failed ||
-            (
-            $task[0]->status == \CentryPs\enums\system\PendingTaskStatus::Running &&
-            $task[0]->date_upd < date('Y-m-d H:i:s', strtotime("-5 minutes"))
-            )
-    ) {
-      $task[0]->status = \CentryPs\enums\system\PendingTaskStatus::Pending;
-      $task[0]->attempt = 0;
-      $task[0]->save();
+    $tasks = static::getPendingTasksObjects($conditions, 1);
+    $task = empty($tasks) ? null : $tasks[0];
+    if (!isset($task) || $task->canRetry()) {
+      $task = new PendingTask($origin, $topic, $resource_id);
+      $task->status = \CentryPs\enums\system\PendingTaskStatus::Pending;
+      $task->attempt = 0;
     }
+    $task->save();
+    $task->createLogSuccess('Task registered');
+    return $task;
   }
 
   public static function cleanFrozenTasks() {

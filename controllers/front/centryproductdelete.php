@@ -24,9 +24,9 @@ class Centry_Ps_EsclavoCentryProductdeleteModuleFrontController extends Abstract
       throw new Exception('Resource is not a Centry model.');
     }
 
-    if (($id = CentryPs\models\homologation\Product::getIdPrestashop($product_id))) {
+    if (($id = \CentryPs\models\homologation\Product::getIdPrestashop($product_id))) {
       (new \Product($id))->delete();
-      (new CentryPs\models\homologation\Product($id, $product_id))->delete();
+      (new \CentryPs\models\homologation\Product($id, $product_id))->delete();
     }
   }
 

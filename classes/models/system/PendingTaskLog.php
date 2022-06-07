@@ -10,9 +10,9 @@ use CentryPs\models\AbstractModel;
  *
  * @author Elías Lama L. <elias.lama@centry.cl>
  */
-class FailedTaskLog extends AbstractModel {
+class PendingTaskLog extends AbstractModel {
 
-  protected static $TABLE = "centry_failed_task_log";
+  protected static $TABLE = "centry_pending_task_log";
 
   /**
    * Identificador del registro.
@@ -41,6 +41,13 @@ class FailedTaskLog extends AbstractModel {
   public $resource_id;
 
   /**
+   * Etapa en la que se encuentra el procesamiento de la tarea.
+   * @Enum({"pending", "running", "finish", "failed"})
+   * @var string
+   */
+  public $stage;
+
+  /**
    * Mensaje que resume el error ocurrido.
    * @var string
    */
@@ -58,14 +65,33 @@ class FailedTaskLog extends AbstractModel {
    */
   public $date_add;
 
-  function __construct($origin, $topic, $resource_id, $message, $trace, $id = null, $date_add = null) {
+  function __construct($origin, $topic, $resource_id, $stage, $message, $trace = null, $id = null, $date_add = null) {
     $this->origin = $origin;
     $this->topic = $topic;
     $this->resource_id = $resource_id;
+    $this->stage = $stage;
     $this->message = $message;
     $this->trace = $trace;
     $this->id = $id;
     $this->date_add = $date_add;
+  }
+
+  public static function fromTaskSuccess(PendingTask $task, string $stage, string $message) {
+    return new static(
+      $task->origin, $task->topic, $task->resource_id, $stage, $message
+    );
+  }
+
+  /**
+   * Genera un registro con el motivo del error.
+   * @param PendingTask $task
+   * @param \Throwable $ex
+   */
+  public static function fromTaskException(PendingTask $task, string $stage, \Throwable $ex) {
+    return new static(
+      $task->origin, $task->topic, $task->resource_id, $stage,
+      $ex->getMessage(), $ex->getTraceAsString()
+    );
   }
 
   /**
@@ -73,17 +99,28 @@ class FailedTaskLog extends AbstractModel {
    * @return boolean indica si el objeto pudo ser guardado o no.
    */
   public function create() {
+    $this->deleteOldData();
     $db = \Db::getInstance();
     $sql = "INSERT INTO `{$this->tableName()}` "
-            . "(`origin`, `topic`, `resource_id`, `message`, `trace`, `date_add`) "
+            . "(`origin`, `topic`, `resource_id`, `stage`, `message`, `trace`, `date_add`) "
             . "VALUES ("
             . " {$this->escape($this->origin, $db)},"
             . " {$this->escape($this->topic, $db)},"
             . " {$this->escape($this->resource_id, $db)},"
+            . " {$this->escape($this->stage, $db)},"
             . " {$this->escape($this->message, $db)},"
             . " {$this->escape($this->trace, $db)},"
             . " '" . date('Y-m-d H:i:s') . "'"
             . ")";
+    return $db->execute($sql) != false;
+  }
+
+  /**
+   * Elimina los registros antiguos de la tabla.
+   */
+  private function deleteOldData() {
+    $db = \Db::getInstance();
+    $sql = "DELETE FROM `{$this->tableName()}` WHERE `date_add` < DATE_SUB(NOW(), INTERVAL 1 DAY)";
     return $db->execute($sql) != false;
   }
 
@@ -100,50 +137,13 @@ class FailedTaskLog extends AbstractModel {
             . "`origin` VARCHAR(32) NOT NULL, "
             . "`topic` VARCHAR(32) NOT NULL, "
             . "`resource_id` VARCHAR(32) NOT NULL, "
+            . "`stage` VARCHAR(32) NOT NULL, "
             . "`message` TEXT NOT NULL, "
             . "`trace` MEDIUMTEXT NULL, "
             . "`date_add` DATETIME NOT NULL, "
             . "PRIMARY KEY (`id`)"
             . ")";
     return \Db::getInstance()->execute($sql);
-  }
-
-  /**
-   * Lista los logs de error de tareas que se encuentren registrados en la base
-   * de datos y los retorna como un arreglo de instancias de esta clase.
-   * @return \CentryPs\System\PendingTask
-   */
-  public static function getFailedTaskLogsObjects(array $conditions = null, int $limit = null, int $offset = null) {
-    $objects = [];
-    $tasks = static::getFailedTaskLogs($conditions, $limit, $offset);
-    foreach ($tasks as $pending_task) {
-      $objects[] = new PendingTask(
-              $pending_task['origin'], $pending_task['topic'],
-              $pending_task['resource_id'], $pending_task['message'],
-              $pending_task['trace'], $pending_task['id'],
-              $pending_task['date_add']
-      );
-    }
-    return $objects;
-  }
-
-  /**
-   * Lista los logs de error de tareas que se encuentren registrados en la base
-   * de datos y los retorna como un arreglo de arreglos simple.
-   * @return array
-   */
-  public static function getFailedTaskLogs(array $conditions = null, int $limit = null, int $offset = null) {
-    $sql = "SELECT * FROM `{$this->tableName()}`";
-    if (isset($conditions)) {
-      $sql .= ' WHERE ' . static::equalities($conditions);
-    }
-    if (isset($limit)) {
-      $sql .= " LIMIT $limit";
-    }
-    if (isset($offset)) {
-      $sql .= " OFFSET $offset";
-    }
-    return \Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
   }
 
 }
