@@ -13,6 +13,7 @@ class CentrySDK {
   private $redirectUri;
   public $accessToken;
   public $refreshToken;
+  public $curlOptTimeout;
   public $tokenType;
   public $scope;
   public $createdAt;
@@ -81,6 +82,9 @@ class CentrySDK {
     curl_setopt($curl, CURLOPT_URL, "https://www.centry.cl/$endpoint" . ($params ? "?" . http_build_query($params) : ""));
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
+    if ($this->curlOptTimeout) {
+      curl_setopt($curl, CURLOPT_TIMEOUT, $this->curlOptTimeout);
+    }
     $header = array("Content-Type: application/json");
     if ($payload) {
       $stringPayload = json_encode($payload);

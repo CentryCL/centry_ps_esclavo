@@ -24,7 +24,10 @@ class AuthorizationCentry {
     if (!isset($GLOBALS['CentrySDK'])) {
       $redirect_uri = "urn:ietf:wg:oauth:2.0:oob";
       $scopes = "public read_orders write_orders read_products write_products read_integration_config write_integration_config read_user write_user read_webhook write_webhook read_warehouses write_warehouses";
-      $GLOBALS['CentrySDK'] = new \Centry\CentrySDK(ConfigurationCentry::getSyncAuthAppId(), ConfigurationCentry::getSyncAuthSecretId(), $redirect_uri);
+      $appId = ConfigurationCentry::getSyncAuthAppId();
+      $secret = ConfigurationCentry::getSyncAuthSecretId();
+      $GLOBALS['CentrySDK'] = new \Centry\CentrySDK($appId, $secret, $redirect_uri);
+      $GLOBALS['CentrySDK']->curlOptTimeout = ConfigurationCentry::getCurlTimeout();
       $GLOBALS['CentrySDK'] = $GLOBALS['CentrySDK']->client_credentials($scopes);
     }
     return $GLOBALS['CentrySDK'];

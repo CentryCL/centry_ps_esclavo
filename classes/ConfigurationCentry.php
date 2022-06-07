@@ -812,6 +812,22 @@ class ConfigurationCentry {
   }
 
   /**
+   * Creación o actualización del campo Secret Id en la base de datos,
+   * @param int $value valor del secret id
+   */
+  public static function setCurlTimeout(int $value) {
+    \Configuration::updateValue("CENTRY_CURLOPT_TIMEOUT", $value);
+  }
+
+  /**
+   * Función que obtiene el valor de la base de datos del Secret id.
+   * @return string valor del secret id
+   */
+  public static function getCurlTimeout() {
+    return \Configuration::get("CENTRY_CURLOPT_TIMEOUT", null, null, null, 20);
+  }
+
+  /**
    * Registra en la base de datos el número máximo de hilos para procesar tareas
    * asíncronas que tiene permitido el módulo.
    * @param int $value

@@ -326,6 +326,7 @@ class Centry_PS_esclavo extends Module {
 
   private function saveConfigurationForm() {
     $output = $this->saveApiCredentials();
+    $this->saveAdvancedSettings();
     $this->saveSynchronizationCheckboxes();
     $this->saveOrderStatusHomologations();
 
@@ -365,6 +366,11 @@ class Centry_PS_esclavo extends Module {
       $wh->createCentryWebhook();
     }
     return $output;
+  }
+
+  private function saveAdvancedSettings() {
+    $curlOptTimeout = intval(Tools::getValue('curlOptTimeout'));
+    CentryPs\ConfigurationCentry::setCurlTimeout($curlOptTimeout);
   }
 
   /**
@@ -664,6 +670,25 @@ class Centry_PS_esclavo extends Module {
       )
     );
 
+    $fieldsForm[5]['form'] = array(
+      'legend' => array(
+        'title' => $this->l('Advanced Settings'),
+      ),
+      'input' => array(
+        array(
+          'type' => 'text',
+          'label' => $this->l('Centry request timeout'),
+          'name' => 'curlOptTimeout',
+          'required' => false
+        )
+      ),
+      'submit' => array(
+        'title' => $this->l('Save'),
+        'class' => 'btn btn-default pull-right',
+        'name' => 'submit'
+      )
+    );
+
     $helper = new HelperForm();
 
     // Module, token and currentIndex
@@ -696,6 +721,7 @@ class Centry_PS_esclavo extends Module {
     // Load current value
     $helper->fields_value['centryAppId'] = CentryPs\ConfigurationCentry::getSyncAuthAppId();
     $helper->fields_value['centrySecretId'] = CentryPs\ConfigurationCentry::getSyncAuthSecretId();
+    $helper->fields_value['curlOptTimeout'] = CentryPs\ConfigurationCentry::getCurlTimeout();
     foreach ($sync_fields as $sync_field) {
       $helper->fields_value['ONCREATE_' . $sync_field['id']] = Configuration::get('CENTRY_SYNC_ONCREATE_' . $sync_field['id'], null, null, null, 'on');
       $helper->fields_value['ONUPDATE_' . $sync_field['id']] = Configuration::get('CENTRY_SYNC_ONUPDATE_' . $sync_field['id'], null, null, null, 'on');
