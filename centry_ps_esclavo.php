@@ -371,6 +371,8 @@ class Centry_PS_esclavo extends Module {
   private function saveAdvancedSettings() {
     $curlOptTimeout = intval(Tools::getValue('curlOptTimeout'));
     CentryPs\ConfigurationCentry::setCurlTimeout($curlOptTimeout);
+    $maxTaskThreads = intval(Tools::getValue('maxTaskThreads'));
+    CentryPs\ConfigurationCentry::setMaxTaskThreads($maxTaskThreads);
   }
 
   /**
@@ -677,10 +679,16 @@ class Centry_PS_esclavo extends Module {
       'input' => array(
         array(
           'type' => 'text',
-          'label' => $this->l('Centry request timeout'),
+          'label' => $this->l('Centry request timeout [seconds]'),
           'name' => 'curlOptTimeout',
           'required' => false
-        )
+        ),
+        array(
+          'type' => 'text',
+          'label' => $this->l('Max number of threads to process pending tasks'),
+          'name' => 'maxTaskThreads',
+          'required' => false
+        ),
       ),
       'submit' => array(
         'title' => $this->l('Save'),
@@ -722,6 +730,7 @@ class Centry_PS_esclavo extends Module {
     $helper->fields_value['centryAppId'] = CentryPs\ConfigurationCentry::getSyncAuthAppId();
     $helper->fields_value['centrySecretId'] = CentryPs\ConfigurationCentry::getSyncAuthSecretId();
     $helper->fields_value['curlOptTimeout'] = CentryPs\ConfigurationCentry::getCurlTimeout();
+    $helper->fields_value['maxTaskThreads'] = CentryPs\ConfigurationCentry::getMaxTaskThreads();
     foreach ($sync_fields as $sync_field) {
       $helper->fields_value['ONCREATE_' . $sync_field['id']] = Configuration::get('CENTRY_SYNC_ONCREATE_' . $sync_field['id'], null, null, null, 'on');
       $helper->fields_value['ONUPDATE_' . $sync_field['id']] = Configuration::get('CENTRY_SYNC_ONUPDATE_' . $sync_field['id'], null, null, null, 'on');
