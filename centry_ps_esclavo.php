@@ -57,6 +57,7 @@ class Centry_PS_esclavo extends Module {
             !$this->whenInstall('CentryPs\\models\\homologation\\Order', 'createTable') ||
             !$this->whenInstall('CentryPs\\models\\homologation\\OrderStatus', 'createTable') ||
             !$this->whenInstall('CentryPs\\models\\homologation\\Product', 'createTable') ||
+            !$this->whenInstall('CentryPs\\models\\homologation\\SimpleProductVariant', 'createTable') ||
             !$this->whenInstall('CentryPs\\models\\homologation\\Size', 'createTable') ||
             !$this->whenInstall('CentryPs\\models\\homologation\\Variant', 'createTable') ||
             !$this->whenInstall('CentryPs\\models\\Webhook', 'createTable');

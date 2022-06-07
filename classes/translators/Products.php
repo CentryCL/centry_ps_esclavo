@@ -590,6 +590,9 @@ class Products {
     }
     $product_ps->ean13 = $sync["barcode"] ? $variant->barcode : $product_ps->ean13;
     $product_ps->save();
+    $variantC = new \CentryPs\models\homologation\SimpleProductVariant($product_ps->id, $variant->_id);
+    $variantC->save();
+    error_log("Homologación producto simple:" . print_r($variantC, true));
   }
 
   /**
