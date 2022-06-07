@@ -17,6 +17,8 @@ abstract class AbstractTaskProcessor extends ModuleFrontController {
   public function initContent() {
     $task = $this->getTask(Tools::getValue('id'));
     if (isset($task)) {
+      $max_time = ini_get("max_execution_time");
+      set_time_limit(0);
       try {
         $this->processTask($task);
         $task->createLogSuccess('Task processed successfully', PendingTaskStatus::Finish);
@@ -29,6 +31,7 @@ abstract class AbstractTaskProcessor extends ModuleFrontController {
         $task->createLogFailure($ex);
       }
       $this->context->controller->module->curlToLocalController('taskmanager');
+      set_time_limit($max_time);
     }
 
     die;
