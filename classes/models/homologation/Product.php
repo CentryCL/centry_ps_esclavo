@@ -42,7 +42,7 @@ class Product extends AbstractHomologation {
     }
     $id_prestashop = $result[0]['id_product'];
    
-    $product_centry = new CentryPs\models\homologation\Product($id_prestashop, $id_centry);
+    $product_centry = new \CentryPs\models\homologation\Product($id_prestashop, $id_centry);
     $product_centry->save();
     return $id_prestashop;
   }

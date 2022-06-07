@@ -18,7 +18,6 @@ class Centry_Ps_EsclavoPrestashopOrderDeleteModuleFrontController extends Abstra
   protected $topic = PendingTaskTopic::OrderDelete;
 
   protected function processTask(PendingTask $task) {
-    error_log(print_r($task, true));
     throw new Exception('Unimplemented method');
   }
 

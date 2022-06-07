@@ -764,7 +764,7 @@ class ConfigurationCentry {
    * cuando tengan una única variante.
    * @param type $value
    */
-  public static function setSyncVaraintSimple($value) {
+  public static function setSyncVariantSimple($value) {
     \Configuration::updateValue("CENTRY_SYNC_VARIANT_SIMPLE", $value);
   }
 
@@ -773,7 +773,7 @@ class ConfigurationCentry {
    * tengan una única variante.
    * @return string
    */
-  public static function getSyncVaraintSimple() {
+  public static function getSyncVariantSimple() {
     return \Configuration::get("CENTRY_SYNC_VARIANT_SIMPLE");
   }
 

@@ -9,14 +9,18 @@ class Centry_Ps_EsclavoWebhookCallbackModuleFrontController extends ModuleFrontC
   public function initContent() {
     header('Content-Type: application/json');
     $data = $this->getRequestPayload();
+    $task = null;
     try {
-      $origin = CentryPs\enums\system\PendingTaskOrigin::Centry;
+      $origin = \CentryPs\enums\system\PendingTaskOrigin::Centry;
       $topic = $this->translateTopic($data['topic']);
       $resource_id = $this->getNotificationResourceId($data, $topic);
-      CentryPs\models\system\PendingTask::registerNotification($origin, $topic, $resource_id);
+      $task = \CentryPs\models\system\PendingTask::registerNotification($origin, $topic, $resource_id);
       $this->context->controller->module->curlToLocalController('taskmanager');
       $this->ajaxDie(json_encode(['status' => 'ok']));
-    } catch (Exception $ex) {
+    } catch (\Exception $ex) {
+      if (isset($task)) {
+        $task->createLogFailure($ex);
+      }
       $this->ajaxDie(json_encode([
         'error' => 'Notification omitted for inconsistent data',
         'message' => $ex->getMessage(),

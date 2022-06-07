@@ -11,5 +11,6 @@ abstract class PendingTaskStatus {
   const Pending = 'pending';
   const Running = 'running';
   const Failed = 'failed';
+  const Finish = 'finish';
 
 }

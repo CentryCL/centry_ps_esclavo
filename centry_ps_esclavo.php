@@ -14,7 +14,7 @@ class Centry_PS_esclavo extends Module {
     $this->author = 'Centry';
     $this->need_instance = 0;
     $this->ps_versions_compliancy = [
-      'min' => '1.7.6', // Upgrade Symfony to 3.4 LTS https://assets.prestashop2.com/es/system/files/ps_releases/changelog_1.7.4.0.txt
+      'min' => '1.7.7', // Upgrade Symfony to 3.4 LTS https://assets.prestashop2.com/es/system/files/ps_releases/changelog_1.7.4.0.txt
       'max' => _PS_VERSION_
     ];
     $this->bootstrap = true;
@@ -46,7 +46,7 @@ class Centry_PS_esclavo extends Module {
   private function createDbTables() {
     return
             !$this->whenInstall('CentryPs\\models\\system\\PendingTask', 'createTable') ||
-            !$this->whenInstall('CentryPs\\models\\system\\FailedTaskLog', 'createTable') ||
+            !$this->whenInstall('CentryPs\\models\\system\\PendingTaskLog', 'createTable') ||
             !$this->whenInstall('CentryPs\\models\\homologation\\AttributeGroup', 'createTable') ||
             !$this->whenInstall('CentryPs\\models\\homologation\\Brand', 'createTable') ||
             !$this->whenInstall('CentryPs\\models\\homologation\\Category', 'createTable') ||
@@ -101,17 +101,18 @@ class Centry_PS_esclavo extends Module {
    * @param int $id_order
    */
   private function enqueueOrderToSend($id_order) {
+    $task = null;
     try {
-      $origin = CentryPs\enums\system\PendingTaskOrigin::PrestaShop;
-      $topic = CentryPs\enums\system\PendingTaskTopic::OrderSave;
-      $resource_id = $id_order;
-      CentryPs\models\system\PendingTask::registerNotification(
-              $origin, $topic, $resource_id
+      $task = CentryPs\models\system\PendingTask::registerNotification(
+        CentryPs\enums\system\PendingTaskOrigin::PrestaShop,
+        CentryPs\enums\system\PendingTaskTopic::OrderSave,
+        $id_order
       );
       $this->curlToLocalController('taskmanager');
-    } catch (Exception $ex) {
-      error_log("Centry_PS_esclavo.enqueueOrderToSend($id_order): "
-              . $ex->getMessage());
+    } catch (\Exception $ex) {
+      if (isset($task)) {
+        $task->createLogFailure($ex);
+      }
     }
   }
 
@@ -162,7 +163,7 @@ class Centry_PS_esclavo extends Module {
     }
 
     if (!move_uploaded_file($_FILES['upload_file']["tmp_name"], $target_file)) {
-      return $this->displayError($this->l('No fue posible mover el archivo temporal a la carpeta de cargas de Prestahsop.'));
+      return $this->displayError($this->l('No fue posible mover el archivo temporal a la carpeta de cargas de PrestaShop.'));
     }
     $handle = fopen($target_file, "r");
     if ($handle === FALSE) {
@@ -171,7 +172,7 @@ class Centry_PS_esclavo extends Module {
 
     $error_prods = $this->processHomologationCsv($handle, strval(Tools::getValue('field_to_homologate')));
 
-    $message = $error_prods ? "Revisa que los identificadores existan en su página y que el fórmato sea el correcto. Filas con error: " . $error_prods : "";
+    $message = $error_prods ? "Revisa que los identificadores existan en su página y que el formato sea el correcto. Filas con error: " . $error_prods : "";
     return $this->displayConfirmation($this->l('Homologación subida. ' . $message));
   }
 
@@ -192,7 +193,7 @@ class Centry_PS_esclavo extends Module {
       }
       try {
         $this->processHomologationCsvLine($table, $data);
-      } catch (Exception $e) {
+      } catch (\Exception $e) {
         $error_prods .= $file_line . ", ";
         continue;
       }
@@ -328,7 +329,7 @@ class Centry_PS_esclavo extends Module {
     $this->saveOrderStatusHomologations();
 
     CentryPs\ConfigurationCentry::setPriceBehavior(Tools::getValue("price_behavior"));
-    CentryPs\ConfigurationCentry::setSyncVaraintSimple(Tools::getValue("VARIANT_SIMPLE"));
+    CentryPs\ConfigurationCentry::setSyncVariantSimple(Tools::getValue("VARIANT_SIMPLE"));
 
     return $output . $this->displayConfirmation('Campos actualizados');
   }
@@ -699,7 +700,7 @@ class Centry_PS_esclavo extends Module {
       $helper->fields_value['ONUPDATE_' . $sync_field['id']] = Configuration::get('CENTRY_SYNC_ONUPDATE_' . $sync_field['id'], null, null, null, 'on');
     }
     $helper->fields_value['price_behavior'] = CentryPs\ConfigurationCentry::getPriceBehavior();
-    $helper->fields_value['VARIANT_SIMPLE'] = CentryPs\ConfigurationCentry::getSyncVaraintSimple();
+    $helper->fields_value['VARIANT_SIMPLE'] = CentryPs\ConfigurationCentry::getSyncVariantSimple();
     $helper->fields_value['field_to_homologate'] = 1;
     $helper->fields_value['display_show_header'] = true;
     foreach (OrderState::getOrderStates($defaultLang) as $state) {

@@ -2,7 +2,6 @@
 
 use CentryPs\ConfigurationCentry;
 use CentryPs\enums\system\PendingTaskStatus;
-use CentryPs\models\system\FailedTaskLog;
 use CentryPs\models\system\PendingTask;
 
 /**
@@ -20,13 +19,14 @@ abstract class AbstractTaskProcessor extends ModuleFrontController {
     if (isset($task)) {
       try {
         $this->processTask($task);
+        $task->createLogSuccess('Task processed successfully', PendingTaskStatus::Finish);
         $task->delete();
-      } catch (\Exception $ex) {
-        $this->generateLog($task, $ex);
+      } catch (\Throwable $ex) {
         $maxTaskAttempts = ConfigurationCentry::getMaxTaskAttempts();
         $task->status = $task->attempt >= $maxTaskAttempts ?
                 PendingTaskStatus::Failed : PendingTaskStatus::Pending;
-        $task->save();
+        $res = $task->save();
+        $task->createLogFailure($ex);
       }
       $this->context->controller->module->curlToLocalController('taskmanager');
     }
@@ -44,23 +44,9 @@ abstract class AbstractTaskProcessor extends ModuleFrontController {
    * @return PendingTask
    */
   private function getTask(string $id) {
-    $conditions = [
-      'origin' => "'{$this->origin}'",
-      'topic' => "'{$this->topic}'",
-      'resource_id' => "'{$id}'"
-    ];
-    return PendingTask::getPendingTasksObjects($conditions, 1)[0];
-  }
-
-  /**
-   * Genera un registro con el motivo del error.
-   * @param PendingTask $task
-   * @param Exception $ex
-   */
-  private function generateLog(PendingTask $task, Exception $ex) {
-    (new FailedTaskLog(
-            $task->origin, $task->topic, $task->resource_id,
-            $ex->getMessage(), $ex->getTraceAsString()))->create();
+    return PendingTask::findByOriginTopicAndResourceId(
+      $this->origin, $this->topic, $id
+    );
   }
 
 }

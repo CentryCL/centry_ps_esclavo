@@ -19,8 +19,8 @@ class Centry_Ps_EsclavoPrestashopOrderSaveModuleFrontController extends Abstract
 
   protected function processTask(PendingTask $task) {
     $order_id_ps = $task->resource_id;
-    $order_id_centry = CentryPs\models\homologation\Order::getIdCentry($order_id_ps);
-    $payload = CentryPs\translators\Orders::orderToCentry($order_id_ps);
+    $order_id_centry = \CentryPs\models\homologation\Order::getIdCentry($order_id_ps);
+    $payload = \CentryPs\translators\Orders::orderToCentry($order_id_ps);
     if ($order_id_centry) {
       AuthorizationCentry::sdk()->updateOrder($order_id_centry, null, $payload);
     } else {
