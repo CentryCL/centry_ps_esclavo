@@ -172,11 +172,14 @@ class PendingTask extends AbstractModel {
 
   /**
    * Lista las tareas pendientes que se encuentran registradas en la base de
-   * datos y las retorna como un arreglo de instancias de esta clase.
+   * datos y las retorna como un arreglo de instancias de esta clase. Se controla que Limit no sea negativo
    * @return \CentryPs\System\PendingTask
    */
   public static function getPendingTasksObjects(array $conditions = null, int $limit = null) {
     $objects = [];
+    if (isset($limit)){ 
+      $limit = $limit <0 ? 0 : $limit;
+    }
     $tasks = static::getPendingTasks($conditions, $limit);
     foreach ($tasks as $pending_task) {
       $objects[] = new PendingTask(
