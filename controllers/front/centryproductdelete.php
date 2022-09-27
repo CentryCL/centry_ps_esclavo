@@ -20,8 +20,8 @@ class Centry_Ps_EsclavoCentryProductdeleteModuleFrontController extends Abstract
     $product_id = $task->resource_id;
     $centry = new AuthorizationCentry();
     $resp = $centry->sdk()->getProduct($product_id);
-    if (!$resp["http_code"] != 404) {
-      throw new Exception('Resource is not a Centry model.');
+    if ($resp->http_code != 404) {
+      throw new Exception('La respuesta del producto eliminado no dió 404, confirme si '.$product_id  .' se eliminó correctamente en centry');
     }
 
     if (($id = \CentryPs\models\homologation\Product::getIdPrestashop($product_id))) {
