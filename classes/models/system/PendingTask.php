@@ -251,7 +251,7 @@ class PendingTask extends AbstractModel {
    * @return array
    */
   public static function getPendingTasks(array $conditions = null, int $limit = null) {
-    if (is_null($limit) || $limit == 0) {
+    if (is_null($limit)) {
       $prestashop_tasks = static::getPendingTasksByOrigin('prestashop', $conditions);
       $centry_tasks = static::getPendingTasksByOrigin('centry', $conditions);
       return array_merge($prestashop_tasks, $centry_tasks);
