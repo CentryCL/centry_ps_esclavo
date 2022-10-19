@@ -122,7 +122,7 @@ class Webhook extends AbstractModel {
             ($this->on_product_save == false && $this->on_product_delete == false && $this->on_order_save == false && $this->on_order_delete == false)) {
       return false;
     } else {
-      $endpoint = "conexion/v1/webhooks.json ";
+      $endpoint = "conexion/v1/webhooks.json";
       $payload = array(
         "callback_url" => $this->callback_url,
         "on_product_save" => $this->on_product_save,
@@ -144,7 +144,7 @@ class Webhook extends AbstractModel {
    * @return bool
    */
   public function getCentryWebhook() {
-    $endpoint = "conexion/v1/webhooks/{$this->id}.json ";
+    $endpoint = "conexion/v1/webhooks/{$this->id}.json";
     $resp = AuthorizationCentry::sdk()->get($endpoint);
     // TODO: Verificar request exitoso
     $this->callback_url = $resp->callback_url;
@@ -174,7 +174,7 @@ class Webhook extends AbstractModel {
       return true;
     } else {
 
-      $endpoint = "conexion/v1/webhooks/{$this->id}.json ";
+      $endpoint = "conexion/v1/webhooks/{$this->id}.json";
       $payload = array(
         "callback_url" => $this->callback_url,
         "on_product_save" => $this->on_product_save,
@@ -195,7 +195,7 @@ class Webhook extends AbstractModel {
     if (ConfigurationCentry::getSyncAuthSecretId() == false || ConfigurationCentry::getSyncAuthSecretId() == false) {
       return false;
     } else {
-      $endpoint = "conexion/v1/webhooks/{$this->id}.json ";
+      $endpoint = "conexion/v1/webhooks/{$this->id}.json";
       $resp = AuthorizationCentry::sdk()->delete($endpoint);
       // TODO: Verificar request exitoso
       $this->delete();
