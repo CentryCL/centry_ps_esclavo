@@ -584,7 +584,7 @@ class Products {
       }
     }
     if ($sync["stock"]) {
-      \StockAvailable::setQuantity($product_ps->id, 0, $variant->quantity);
+      \StockAvailable::setQuantity($product_ps->id, 0, ($variant->quantity < 0) ? 0 : $variant->quantity));
     }
     $product_ps->ean13 = $sync["barcode"] ? $variant->barcode : $product_ps->ean13;
     $product_ps->save();
@@ -601,7 +601,7 @@ class Products {
     $combination_ps->ean13 = $sync["barcode"] ? mb_substr($variant->barcode, 0, 13) : $combination_ps->ean13;
 
     if ($sync["stock"]) {
-      \StockAvailable::setQuantity($combination_ps->id_product, $combination_ps->id, $variant->quantity);
+      \StockAvailable::setQuantity($combination_ps->id_product, $combination_ps->id, ($variant->quantity < 0) ? 0 : $variant->quantity));
     }
     $attributes = self::Attributes($combination_ps, $variant, $sync);
     $combination_ps->setAttributes($attributes);
