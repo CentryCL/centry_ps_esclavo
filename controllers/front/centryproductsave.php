@@ -22,7 +22,7 @@ class Centry_Ps_EsclavoCentryProductSaveModuleFrontController extends AbstractTa
     $centry = new AuthorizationCentry();
     $resp = $centry->sdk()->getProduct($product_id);
     if (!$resp || !property_exists($resp, "_id")) {
-      throw new Exception('Resource is not a Centry model.');
+      throw new Exception("Resource is not a Centry model:\n".json_encode($resp));
     }
 
     $resp->assets = $centry->sdk()->getProductImages($product_id);
