@@ -812,6 +812,40 @@ class ConfigurationCentry {
   }
 
   /**
+   * Creación o actualización del campo Access Token en la base de datos,
+   * @param string $value valor del token de acceso
+   */
+  public static function setSyncAuthAccessToken(string $value) {
+    \Configuration::updateValue("CENTRY_SYNC_ACCESS_TOKEN", $value);
+  }
+
+  /**
+   * Función que obtiene el valor de la base de datos del token de acceso.
+   * @return string valor del token de acceso
+   */
+  public static function getSyncAuthAccessToken() {
+    return \Configuration::get("CENTRY_SYNC_ACCESS_TOKEN");
+  }
+
+  /**
+   * Creación o actualización de la fecha en la que caduca el Access Token en la
+   * base de datos. El valor se guarda en formato timestamp.
+   * @param int $value valor de la fecha de expiración del token de acceso
+   */
+  public static function setSyncAuthExpiresAt(int $value) {
+    \Configuration::updateValue("CENTRY_SYNC_EXPIRES_AT", $value);
+  }
+
+  /**
+   * Función que obtiene el valor de la base de datos de la fecha de expiración
+   * del token de acceso. El valor se guarda en formato timestamp.
+   * @return int valor de la fecha de expiración del token de acceso
+   */
+  public static function getSyncAuthExpiresAt() {
+    return \Configuration::get("CENTRY_SYNC_EXPIRES_AT");
+  }
+
+  /**
    * Creación o actualización del campo Secret Id en la base de datos,
    * @param int $value valor del secret id
    */
