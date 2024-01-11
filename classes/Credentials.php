@@ -40,10 +40,7 @@ class Credentials {
    */
   public function sdk() {
     if ($this->isTokenExpired()) {
-      error_log("Token expirado, refrescando...");
       $this->refreshToken();
-    } else {
-      error_log("Token no expirado, no se refresca.");
     }
     return $this->sdk;
   }
